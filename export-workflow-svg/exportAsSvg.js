@@ -1,5 +1,5 @@
-import { app } from "../scripts/app.js";
-import { ComfyWidgets } from "../scripts/widgets.js";
+import { app } from "/scripts/app.js";
+import { ComfyWidgets } from "/scripts/widgets.js";
 
 // Adds support for import + export as SVG including input + output images
 // Adds two context menu items to the canvas

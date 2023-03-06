@@ -1,4 +1,5 @@
 This will embed the selected image into the generated images which probably isnt desired
+Havent checked if there is a better way to filter these out.
 Current fix for this is to add this to execution.py:
 
 def prune_prompt(prompt):

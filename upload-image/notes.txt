@@ -26,3 +26,9 @@ def prune_prompt(prompt):
 And call that from 
             if h[x] == "PROMPT":
                 input_data_all[x] = prune_prompt(prompt)
+                
+                
+It also requires increasing the maximum request size on the API in server.py 
+    self.app = web.Application(client_max_size=20971520)
+    
+Or some other sensible limit

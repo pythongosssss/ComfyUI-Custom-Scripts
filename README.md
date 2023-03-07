@@ -1,2 +1,2 @@
-# ComfyUI-Custom-Nodes
+# ComfyUI-Custom-Scripts
 Random custom nodes + scripts of varing completeness

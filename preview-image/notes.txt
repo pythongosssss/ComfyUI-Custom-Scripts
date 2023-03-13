@@ -1,2 +1,12 @@
 This will store the base64 encoded version of every input image in memory until it is removed from history
 May need some kind of limit on this...
+
+Requires an update to app.js to allow rendering of b64 images
+
+around line 113ish (in function addDrawBackgroundHandler) replace:
+
+img.src = "/view/" + src;
+
+with 
+
+img.src = src.startsWith("data:image") ? src : "/view/" + src;

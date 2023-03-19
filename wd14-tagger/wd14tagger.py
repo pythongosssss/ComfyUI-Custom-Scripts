@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import csv
 import os
+from server import PromptServer
 
 NODE_CLASS_MAPPINGS = {}
 valid = False
@@ -92,6 +93,9 @@ elif valid:
                                              "_").replace("(", "\\(").replace(")", "\\)") for item in character + general))
 
             print(res)
+
+            if PromptServer.instance.client_id is not None:
+                PromptServer.instance.send_sync("wd14tagger", res, PromptServer.instance.client_id)
 
             return (res,)
 

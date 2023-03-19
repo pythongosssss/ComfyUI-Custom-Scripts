@@ -88,8 +88,8 @@ elif valid:
             general = [item for item in result[general_index:character_index] if item[1] > threshold]
             character = [item for item in result[character_index:] if item[1] > character_threshold]
 
-            res = ", ".join((item[0] for item in character + general)).replace(" ",
-                                                                               "_").replace("(", "\\(").replace(")", "\\)")
+            res = ", ".join((item[0].replace(" ",
+                                             "_").replace("(", "\\(").replace(")", "\\)") for item in character + general))
 
             print(res)
 

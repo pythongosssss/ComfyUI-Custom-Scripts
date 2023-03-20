@@ -34,6 +34,7 @@ elif valid:
                 "model": (sorted(filter(lambda x: x.endswith(".onnx"), os.listdir(models_dir))), ),
                 "threshold": ("FLOAT", {"default": 0.35, "min": 0.0, "max": 1, "step": 0.05}),
                 "character_threshold": ("FLOAT", {"default": 0.85, "min": 0.0, "max": 1, "step": 0.05}),
+                "exclude_tags": ("STRING", {"default": ""}),
             }}
 
         RETURN_TYPES = ("STRING",)
@@ -42,7 +43,7 @@ elif valid:
 
         CATEGORY = "image"
 
-        def tag(self, image, model, threshold, character_threshold):
+        def tag(self, image, model, threshold, character_threshold, exclude_tags = ""):
             name = os.path.join(models_dir, model)
             model = InferenceSession(name, providers=ort.get_available_providers())
 
@@ -90,8 +91,12 @@ elif valid:
             general = [item for item in result[general_index:character_index] if item[1] > threshold]
             character = [item for item in result[character_index:] if item[1] > character_threshold]
 
+            all = character + general
+            remove = [s.strip() for s in exclude_tags.lower().split(",")]
+            all = [tag for tag in all if tag not in remove]
+
             res = ", ".join((item[0].replace(" ",
-                                             "_").replace("(", "\\(").replace(")", "\\)") for item in character + general))
+                                             "_").replace("(", "\\(").replace(")", "\\)") for item in all))
 
             print(res)
 

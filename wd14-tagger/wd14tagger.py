@@ -93,10 +93,9 @@ elif valid:
 
             all = character + general
             remove = [s.strip() for s in exclude_tags.lower().split(",")]
-            all = [tag for tag in all if tag not in remove]
+            all = [tag for tag in all if tag[0] not in remove]
 
-            res = ", ".join((item[0].replace(" ",
-                                             "_").replace("(", "\\(").replace(")", "\\)") for item in all))
+            res = ", ".join((item[0].replace("(", "\\(").replace(")", "\\)") for item in all))
 
             print(res)
 

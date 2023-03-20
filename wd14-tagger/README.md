@@ -10,7 +10,7 @@ Place them in comfy_extras/wd14_models
 Place wd14tagger.py in custom_nodes
 
 This currently requires this branch of ComfyUI to be of any use:
-https://github.com/pythongosssss/ComfyUI/tree/widget2input
+https://github.com/pythongosssss/ComfyUI/tree/custom-ws-messages
 
 You can right click the CLIPTextEncode node
 convert text to input

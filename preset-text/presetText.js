@@ -116,7 +116,6 @@ app.registerExtension({
 					// For each output link copy our value over the original widget value
 					if (this.outputs[0].links && this.outputs[0].links.length) {
 						for (const l of this.outputs[0].links) {
-							debugger;
 							const link_info = app.graph.links[l];
 							const outNode = app.graph.getNodeById(link_info.target_id);
 							const outIn = outNode && outNode.inputs && outNode.inputs[link_info.target_slot];

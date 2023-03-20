@@ -38,6 +38,7 @@ elif valid:
 
         RETURN_TYPES = ("STRING",)
         FUNCTION = "tag"
+        OUTPUT_NODE = True
 
         CATEGORY = "image"
 

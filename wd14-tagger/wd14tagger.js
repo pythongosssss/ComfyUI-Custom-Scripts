@@ -19,6 +19,9 @@ app.registerExtension({
 				api.addEventListener("wd14tagger", (e) => {
 					if (+app.runningNodeId === this.id) {
 						w.inputEl.value = e.detail;
+						if (this.size[1] < 180) {
+							this.size[1] = 180;
+						}
 					}
 				});
 

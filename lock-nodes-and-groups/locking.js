@@ -1,8 +1,6 @@
-import { api } from "/scripts/api.js";
 import { app } from "/scripts/app.js";
 
-// Simple script that adds the current queue size to the window title
-// Adds a favicon that changes color while active
+// Adds lock/unlock menu item for nodes + groups to prevent moving / resizing them
 
 const LOCKED = Symbol();
 

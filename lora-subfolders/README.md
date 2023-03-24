@@ -1,0 +1,1 @@
+Splits the LoraLoader dropdown menu into multiple sub menus based on folders

@@ -1,8 +1,6 @@
 import { app } from "/scripts/app.js";
-import { ComfyWidgets } from "/scripts/widgets.js";
-import { api } from "/scripts/api.js";
 
-// Displays the wd14 prompt
+// Adds sub menus for lora directories
 
 app.registerExtension({
 	name: "pysssss.LoraSubfolder",

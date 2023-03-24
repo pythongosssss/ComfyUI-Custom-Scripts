@@ -8,6 +8,7 @@ app.registerExtension({
 		class PresetTextNode {
 			constructor() {
 				this.isVirtualNode = true;
+				this.serialize_widgets = true;
 
 				const id = "pysssss.PresetText.Presets";
 				const getPresets = () => {
@@ -16,9 +17,7 @@ app.registerExtension({
 						items = JSON.parse(localStorage.getItem(id));
 					} catch (error) {}
 					if (!items || !items.length) {
-						items = [
-							{ name: "default negative", value: "worst quality" },
-						];
+						items = [{ name: "default negative", value: "worst quality" }];
 					}
 					return items;
 				};

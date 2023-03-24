@@ -5,7 +5,7 @@ import { api } from "/scripts/api.js";
 // Displays the wd14 prompt
 
 app.registerExtension({
-	name: "Comfy.Wd14Tagger",
+	name: "pysssss.Wd14Tagger",
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
 		if (nodeData.name === "WD14Tagger") {
 			const onNodeCreated = nodeType.prototype.onNodeCreated;

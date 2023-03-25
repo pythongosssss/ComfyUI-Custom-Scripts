@@ -1,3 +1,4 @@
+import copy
 import sys
 import os
 import torch
@@ -102,11 +103,11 @@ class Segment:
                 img = img[:, :, :3]
 
             img = img.astype(np.float32) / 255.0
-            img = torch.from_numpy(img)
+            img = torch.from_numpy(img)[None,]
             outputs.append(img)
 
-        # if len(outputs) == 1:
-        #     outputs = outputs[0]
+        if len(outputs) == 1:
+            outputs = outputs[0]
 
         return (outputs, first_mask,)
 

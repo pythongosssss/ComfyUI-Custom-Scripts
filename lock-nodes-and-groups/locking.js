@@ -60,7 +60,7 @@ app.registerExtension({
 		const getGroupOnPos = LGraph.prototype.getGroupOnPos;
 		LGraph.prototype.getGroupOnPos = function () {
 			const r = getGroupOnPos.apply(this, arguments);
-			if (r && r[LOCKED]) return null;
+			if (r && r[LOCKED] && !(new Error()).stack.includes("processContextMenu")) return null;
 			return r;
 		};
 

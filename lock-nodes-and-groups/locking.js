@@ -56,6 +56,14 @@ app.registerExtension({
 			}
 		};
 
+		// Allow click through locked groups
+		const getGroupOnPos = LGraph.prototype.getGroupOnPos;
+		LGraph.prototype.getGroupOnPos = function () {
+			const r = getGroupOnPos.apply(this, arguments);
+			if (r && r[LOCKED]) return null;
+			return r;
+		};
+
 		// Add menu options for lock/unlock
 		const getGroupMenuOptions = LGraphCanvas.prototype.getGroupMenuOptions;
 		LGraphCanvas.prototype.getGroupMenuOptions = function (node) {

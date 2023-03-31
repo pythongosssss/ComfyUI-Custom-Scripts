@@ -277,7 +277,7 @@ class TomePatch:
     def INPUT_TYPES(s):
         return {"required": {
            "model": ("MODEL",),
-           "ratio": ("FLOAT", {"default": 0.5, "min": 0.0, "max": 1.0}),
+           "ratio": ("FLOAT", {"default": 0.5, "min": 0.0, "max": 1.0, "step": 0.1}),
         }}
 
     RETURN_TYPES = ("MODEL",)

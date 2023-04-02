@@ -27,6 +27,36 @@ app.registerExtension({
 
 				return r;
 			};
+		} else if (nodeData.name === "LoadImage") {
+			const onNodeCreated = nodeType.prototype.onNodeCreated;
+
+			const BUTTON_TEXT = "WD14 Interrogate";
+			const BUTTON_TEXT_LOADING = "Loading...";
+			nodeType.prototype.onNodeCreated = function () {
+				const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
+				const btn = this.addWidget("button", BUTTON_TEXT, "interrogate", () => {
+					if (btn.name === BUTTON_TEXT_LOADING) return;
+
+					btn.name = BUTTON_TEXT_LOADING;
+					app.canvas.setDirty(true);
+					(async () => {
+						try {
+							const w = this.widgets.find((w) => w.name === "image");
+							if (w?.value) {
+								const tags = await (
+									await fetch("/pysssss/wd14tagger?type=input&image=" + encodeURIComponent(w.value))
+								).json();
+								alert(tags);
+							}
+						} finally {
+							btn.name = BUTTON_TEXT;
+							app.canvas.setDirty(true);
+						}
+					})();
+				});
+
+				return r;
+			};
 		}
 	},
 });

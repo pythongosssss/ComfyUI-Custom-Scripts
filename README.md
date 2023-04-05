@@ -43,7 +43,7 @@ Adds various menu items to some nodes for quickly setting up common parts of gra
 
 ## Show Text
 ![image](https://user-images.githubusercontent.com/125205205/230174888-c004fd48-da78-4de9-81c2-93a866fcfcd1.png)  
-Takes input from a node that produces a string and displays it, useful for things like integgorators, prompt generators, etc.
+Takes input from a node that produces a string and displays it, useful for things like interrogator, prompt generators, etc.
 
 ## Touch Support
 Provides basic support for touch screen devices, its not perfect but better than nothing

@@ -4,7 +4,7 @@ import { app } from "/scripts/app.js";
 // Adds a list of images that are generated to the bottom of the page
 
 app.registerExtension({
-	name: "pysssss.ImageList",
+	name: "pysssss.ImageFeed",
 	setup() {
 		const imageList = document.createElement("div");
 		Object.assign(imageList.style, {

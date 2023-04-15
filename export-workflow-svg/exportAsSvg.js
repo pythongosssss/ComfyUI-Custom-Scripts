@@ -205,7 +205,7 @@ app.registerExtension({
 			// Override file handling to allow drag & drop of SVG
 			const handleFile = app.handleFile;
 			app.handleFile = function (file) {
-				if (file.type === "image/svg+xml" || file.name.endsWith(".svg")) {
+				if (file && (file.type === "image/svg+xml" || file.name?.endsWith(".svg"))) {
 					const reader = new FileReader();
 					reader.onload = () => {
 						// Extract embedded workflow from desc tags

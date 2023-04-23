@@ -1,30 +1,60 @@
 import { app } from "/scripts/app.js";
 
 // Allows you to manage preset tags for e.g. common negative prompt
+// Also performs replacements on any text field e.g. allowing you to use preset text in CLIP Text encode fields
+
+let replaceRegex;
+const id = "pysssss.PresetText.Presets";
+
+const getPresets = () => {
+	let items;
+	try {
+		items = JSON.parse(localStorage.getItem(id));
+	} catch (error) {}
+	if (!items || !items.length) {
+		items = [{ name: "default negative", value: "worst quality" }];
+	}
+	return items;
+};
+
+let presets = getPresets();
 
 app.registerExtension({
 	name: "pysssss.PresetText",
+	setup() {
+		app.ui.settings.addSetting({
+			id: "pysssss.PresetText.ReplacementRegex",
+			name: "[pysssss] Preset Text Replacement Regex",
+			type: "text",
+			defaultValue: "(?:^|[^\\w])(?<replace>@(?<id>[\\w-]+))",
+			tooltip:
+				"The regex should return two named capture groups: id (the name of the preset text to use), replace (the matched text to replace)",
+			attrs: {
+				style: {
+					fontFamily: "monospace",
+				},
+			},
+			onChange(value) {
+				if (!value) {
+					replaceRegex = null;
+					return;
+				}
+				try {
+					replaceRegex = new RegExp(value, "g");
+				} catch (error) {
+					alert("Error creating regex for preset text replacement, no replacements will be performed.");
+					replaceRegex = null;
+				}
+			},
+		});
+	},
 	registerCustomNodes() {
 		class PresetTextNode {
 			constructor() {
 				this.isVirtualNode = true;
 				this.serialize_widgets = true;
-
-				const id = "pysssss.PresetText.Presets";
-				const getPresets = () => {
-					let items;
-					try {
-						items = JSON.parse(localStorage.getItem(id));
-					} catch (error) {}
-					if (!items || !items.length) {
-						items = [{ name: "default negative", value: "worst quality" }];
-					}
-					return items;
-				};
-
 				this.addOutput("text", "STRING");
 
-				let presets = getPresets();
 				const widget = this.addWidget("combo", "value", presets[0].name, () => {}, {
 					values: presets.map((p) => p.name),
 				});
@@ -138,5 +168,55 @@ app.registerExtension({
 		);
 
 		PresetTextNode.category = "utils";
+	},
+	nodeCreated(node) {
+		if (node.widgets) {
+			// Locate dynamic prompt text widgets
+			const widgets = node.widgets.filter((n) => n.type === "customtext" || n.type === "text");
+			for (const widget of widgets) {
+				const callbacks = [
+					() => {
+						let prompt = widget.value;
+						if (replaceRegex) {
+							prompt = prompt.replace(replaceRegex, (match, p1, p2, index, text, groups) => {
+								if (!groups.replace || !groups.id) return match; // No match, bad regex?
+
+								const preset = presets.find((p) => p.name.replaceAll(/\s/g, "-") === groups.id);
+								if (!preset) return match; // Invalid name
+
+								const pos = match.indexOf(groups.replace);
+								return match.substring(0, pos) + preset.value;
+							});
+						}
+						return prompt;
+					},
+				];
+				if (widget.serializeValue) {
+					callbacks.push(widget.serializeValue);
+				}
+
+				const serializeValue = (workflowNode, widgetIndex) => {
+					const widgetValue = widget.value;
+
+					for (const cb of callbacks) {
+						widget.value = cb(workflowNode, widgetIndex);
+					}
+
+					const prompt = widget.value;
+					widget.value = widgetValue;
+
+					return prompt;
+				};
+
+				Object.defineProperty(widget, "serializeValue", {
+					get() {
+						return serializeValue;
+					},
+					set(cb) {
+						callbacks.push(cb);
+					},
+				});
+			}
+		}
 	},
 });

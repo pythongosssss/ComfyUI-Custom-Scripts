@@ -195,8 +195,11 @@ app.registerExtension({
 					callbacks.push(widget.serializeValue);
 				}
 
+				let called = false;
 				const serializeValue = (workflowNode, widgetIndex) => {
 					const widgetValue = widget.value;
+					if (called) return widgetValue;
+					called = true;
 
 					for (const cb of callbacks) {
 						widget.value = cb(workflowNode, widgetIndex);
@@ -204,6 +207,8 @@ app.registerExtension({
 
 					const prompt = widget.value;
 					widget.value = widgetValue;
+
+					called = false;
 
 					return prompt;
 				};

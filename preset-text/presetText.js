@@ -152,7 +152,11 @@ app.registerExtension({
 								const w = outNode.widgets.find((w) => w.name === outIn.widget.name);
 								if (!w) continue;
 								const preset = presets.find((p) => p.name === widget.value);
-								if (!preset) continue;
+								if (!preset) {
+									const msg = `Preset text '${widget.value}' not found. Please fix this and queue again.`;
+									alert(msg);
+									throw new Error(msg);
+								}
 								w.value = preset.value;
 							}
 						}

@@ -150,9 +150,10 @@ app.registerExtension({
 							const outIn = outNode && outNode.inputs && outNode.inputs[link_info.target_slot];
 							if (outIn.widget) {
 								const w = outNode.widgets.find((w) => w.name === outIn.widget.name);
-								if (w) {
-									w.value = presets.find((p) => p.name === widget.value).value;
-								}
+								if (!w) continue;
+								const preset = presets.find((p) => p.name === widget.value);
+								if (!preset) continue;
+								w.value = preset.value;
 							}
 						}
 					}

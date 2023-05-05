@@ -34,8 +34,6 @@ app.registerExtension({
 			const BUTTON_TEXT_LOADING = "Loading...";
 			nodeType.prototype.onNodeCreated = function () {
 				const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
-				this.imageOffset = 120;
-
 				const btn = this.addWidget("button", BUTTON_TEXT, "interrogate", () => {
 					if (btn.name === BUTTON_TEXT_LOADING) return;
 

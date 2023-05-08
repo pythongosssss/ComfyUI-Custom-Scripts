@@ -178,7 +178,7 @@ class PysssssWorkflows {
 							const data = app.graph.serialize();
 							if (!(await saveWorkflow(name, data))) {
 								if (confirm("A workspace with this name already exists, do you want to overwrite it?")) {
-									await api.saveWorkflow(name, app.graph.serialize(), true);
+									await saveWorkflow(name, app.graph.serialize(), true);
 								} else {
 									return;
 								}

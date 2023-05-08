@@ -5,7 +5,7 @@ import inspect
 import json
 
 root_directory = os.path.dirname(inspect.getfile(PromptServer))
-workflows_directory = os.path.join(root_directory, "workflows")
+workflows_directory = os.path.join(root_directory, "pysssss-workflows")
 NODE_CLASS_MAPPINGS = {}
 
 

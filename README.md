@@ -49,5 +49,4 @@ Takes input from a node that produces a string and displays it, useful for thing
 Provides basic support for touch screen devices, its not perfect but better than nothing
 
 ## WD14 Tagger
-![image](https://user-images.githubusercontent.com/125205205/230175199-c1478840-a8c6-4428-8df9-52215e1410bc.png)  
-Uses WD14 Tagger to interrogate images 
+Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger

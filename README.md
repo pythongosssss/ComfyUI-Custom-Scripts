@@ -1,5 +1,9 @@
 # ComfyUI-Custom-Scripts
 
+# Installation
+`.js` files go into `ComfyUI/web/extensions` folder, you optionally include any subdirectories
+`.py` files go into `ComfyUI/custom_nodes` folder, do not add any subdirectories
+
 ## Anime Segmentation
 ![image](https://user-images.githubusercontent.com/125205205/230170464-90a60a6e-9dfa-4244-b027-4e13169c71f6.png)  
 Takes an image/images and uses https://github.com/SkyTNT/anime-segmentation to remove the background or foreground.

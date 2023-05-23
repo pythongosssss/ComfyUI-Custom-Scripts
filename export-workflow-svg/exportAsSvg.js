@@ -67,8 +67,8 @@ app.registerExtension({
 						ctx.resetTransform();
 
 						const style = document.defaultView.getComputedStyle(this.inputEl, null);
-						const x = parseInt(this.inputEl.style.left);
-						const y = parseInt(this.inputEl.style.top);
+						const x = parseInt(this.inputEl.style.left) + 10;
+						const y = parseInt(this.inputEl.style.top) + LiteGraph.NODE_TITLE_HEIGHT;
 						const w = parseInt(this.inputEl.style.width);
 						const h = parseInt(this.inputEl.style.height);
 						ctx.fillStyle = style.getPropertyValue("background-color");
@@ -117,6 +117,10 @@ app.registerExtension({
 				const offset = app.canvas.ds.offset;
 
 				const svgCtx = new C2S(bounds[2] - bounds[0], bounds[3] - bounds[1]);
+
+				svgCtx.canvas.getBoundingClientRect = function () {
+					return { width: svgCtx.width, height: svgCtx.height };
+				};
 
 				// Override the c2s handling of images to draw images as canvases
 				const drawImage = svgCtx.drawImage;

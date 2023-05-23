@@ -1,7 +1,7 @@
 # ComfyUI-Custom-Scripts
 
 # Installation
-`.js` files go into `ComfyUI/web/extensions` folder, you optionally include any subdirectories
+`.js` files go into `ComfyUI/web/extensions` folder, you optionally include any subdirectories  
 `.py` files go into `ComfyUI/custom_nodes` folder, do not add any subdirectories
 
 ## Anime Segmentation

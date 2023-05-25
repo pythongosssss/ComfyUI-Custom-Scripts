@@ -1,9 +1,34 @@
 # ComfyUI-Custom-Scripts
 
 # Installation
-`.js` files go into `ComfyUI/web/extensions` folder, you optionally include any subdirectories  
-`.py` files go into `ComfyUI/custom_nodes` folder, do not add any subdirectories  
-If the script has its own readme, that may include additional requirements so be sure to check it!
+## Usage
+
+1. Clone the repository:
+git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
+2. Navigate to the repository directory:
+cd ComfyUI-Custom-Scripts
+3. Run the `InstallCustomNodes.py` script:
+python InstallCustomNodes.py
+4. Follow the prompts to choose between installation and uninstallation, as well as test mode.
+
+- For installation:
+  - Choose 'i' to install.
+  - If the destination directory already exists, you will be prompted to remove it.
+  - Choose whether to run in test mode (dry run) or perform the actual file movements.
+  - The script will clone the repository, move the files, and create a mapping file.
+  - If you choose not to run in test mode, the installation will be completed.
+
+- For uninstallation:
+  - Choose 'u' to uninstall.
+  - The script will use the mapping file to undo the file movements.
+  - Any errors encountered during the uninstallation process will be displayed, but the script will continue.
+  - The script will remove both the files and empty directories.
+
+5. Review the generated `move_mapping.yaml` file for the mapping of moved files.
+
+6. If needed, repeat the steps above to perform installation or uninstallation again
+
+**If the script has its own readme, that may include additional requirements so be sure to check it!**
 
 ## Anime Segmentation
 ![image](https://user-images.githubusercontent.com/125205205/230170464-90a60a6e-9dfa-4244-b027-4e13169c71f6.png)  

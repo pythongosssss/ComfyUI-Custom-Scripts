@@ -5,14 +5,16 @@ class ShowText:
             "text": ("STRING", {"forceInput": True}),
         }}
 
+    INPUT_IS_LIST = True
     RETURN_TYPES = ("STRING",)
     FUNCTION = "notify"
     OUTPUT_NODE = True
+    OUTPUT_IS_LIST = (True,)
 
     CATEGORY = "utils"
 
-    def notify(self, text):   
-        return {"ui": { "text": text }, "result": (text,)}
+    def notify(self, text):
+        return {"ui": {"text": text}, "result": (text,)}
 
 
 NODE_CLASS_MAPPINGS = {

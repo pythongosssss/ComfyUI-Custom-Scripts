@@ -2,6 +2,8 @@
 
 > &#x26a0;&#xfe0f; **If updating from a version prior to 2023-06-18**: Many of the nodes have been renamed to include `pysssss` to prevent conflicts with other nodes. If you get missing nodes, please replace them with the new names.
 
+> &#x26a0;&#xfe0f; **Auto installation process is still a new feature in need of testing, if you have any problems please log an issue**
+
 # Installation
 
 1. Clone the repository:
@@ -80,6 +82,7 @@ Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 - ✨ Add Link Render Mode setting to choose how links are rendered
 - ✨ Add Constrain Image node for resizing nodes to a min/max resolution with optional cropping
 - ✨ Add Show Image On Menu to include the latest image output on the menu
+- ✨ Add KSamplerAdvanced simple denoise prompt for configuring the node using steps + denoise
 
 ### Other
 - ♻️ Include [canvas2svg](https://gliffy.github.io/canvas2svg/) for SVG export in assets to prevent downloading at runtime

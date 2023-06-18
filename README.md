@@ -83,6 +83,7 @@ Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 - ✨ Add Constrain Image node for resizing nodes to a min/max resolution with optional cropping
 - ✨ Add Show Image On Menu to include the latest image output on the menu
 - ✨ Add KSamplerAdvanced simple denoise prompt for configuring the node using steps + denoise
+- 🎨 Add sizing options to Image Feed
 
 ### Other
 - ♻️ Include [canvas2svg](https://gliffy.github.io/canvas2svg/) for SVG export in assets to prevent downloading at runtime

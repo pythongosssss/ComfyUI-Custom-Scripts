@@ -65,17 +65,24 @@ Provides basic support for touch screen devices, its not perfect but better than
 Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 
 ---
+<br>
 
 # Changelog
 
 ## 2023-06-18
-- ♻️ Reworked folder structure
+### Major Changes
 - ✨ Added auto installation of scripts and `__init__` with thanks to @TashaSkyUp
+- ♻️ Reworked folder structure
 - 🚨 Renamed a number of nodes to include `pysssss` to prevent name conflicts
-- 🐛 Fix Manage Widget Defaults to work with new ComfyUI settings dialog
+- 🚨 Remove Latent Upscale By as it is now a built in node in ComfyUI
+- 🚨 Removed Anime Segmentation to own repo
+### New
 - ✨ Add Link Render Mode setting to choose how links are rendered
 - ✨ Add Constrain Image node for resizing nodes to a min/max resolution with optional cropping
-- 🚨 Remove Latent Upscale By as it is now a built in node in ComfyUI
+- ✨ Add Show Image On Menu to include the latest image output on the menu
+
+### Other
 - ♻️ Include [canvas2svg](https://gliffy.github.io/canvas2svg/) for SVG export in assets to prevent downloading at runtime
-- 🎨 Add background color to exported SVG
+- 🎨 Add background color (using theme color) to exported SVG
+- 🐛 Fix Manage Widget Defaults to work with new ComfyUI settings dialog
 - 🐛 Increase Image Feed z-index to prevent node text overlapping

@@ -14,7 +14,7 @@ $el("style", {
 		bottom: 0;
 		background: #333;
 		overflow: auto;
-		z-index: 999;
+		z-index: 99;
 		font-family: sans-serif;
 		font-size: 12px;
 	}

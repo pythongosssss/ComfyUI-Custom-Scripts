@@ -1,38 +1,25 @@
 # ComfyUI-Custom-Scripts
 
+> &#x26a0;&#xfe0f; **If updating from a version prior to 2023-06-18**: Many of the nodes have been renamed to include `pysssss` to prevent conflicts with other nodes. If you get missing nodes, please replace them with the new names.
+
 # Installation
-## Usage
 
 1. Clone the repository:
-git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
-2. Navigate to the repository directory:
-cd ComfyUI-Custom-Scripts
-3. Run the `InstallCustomNodes.py` script:
-python InstallCustomNodes.py
-4. Follow the prompts to choose between installation and uninstallation, as well as test mode.
+`git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git`  
+to your ComfyUI `custom_nodes` directory
 
-- For installation:
-  - Choose 'i' to install.
-  - If the destination directory already exists, you will be prompted to remove it.
-  - Choose whether to run in test mode (dry run) or perform the actual file movements.
-  - The script will clone the repository, move the files, and create a mapping file.
-  - If you choose not to run in test mode, the installation will be completed.
+   The script will then automatically install all custom scripts and nodes.  
+   It will attempt to use symlinks and junctions to prevent having to copy files and keep them up to date.
 
 - For uninstallation:
-  - Choose 'u' to uninstall.
-  - The script will use the mapping file to undo the file movements.
-  - Any errors encountered during the uninstallation process will be displayed, but the script will continue.
-  - The script will remove both the files and empty directories.
+  - Delete the cloned repo in `custom_nodes`
+  - Ensure `web/extensions/pysssss/CustomScripts` has also been removed
 
-5. Review the generated `move_mapping.yaml` file for the mapping of moved files.
+# Update
+1. Navigate to the cloned repo e.g. `custom_nodes/ComfyUI-Custom-Scripts`
+2. `git pull`
 
-6. If needed, repeat the steps above to perform installation or uninstallation again
-
-**If the script has its own readme, that may include additional requirements so be sure to check it!**
-
-## Anime Segmentation
-![image](https://user-images.githubusercontent.com/125205205/230170464-90a60a6e-9dfa-4244-b027-4e13169c71f6.png)  
-Takes an image/images and uses https://github.com/SkyTNT/anime-segmentation to remove the background or foreground.
+# Features
 
 ## Auto Arrange Graph
 ![image](https://user-images.githubusercontent.com/125205205/230170664-acddff3e-f47b-452e-970e-0a7279734b96.png)  
@@ -50,10 +37,6 @@ Adds a favicon and title to the window, favicon changes color while generating a
 ## Image Feed
 ![image](https://user-images.githubusercontent.com/125205205/230172436-3fbeb426-a0e8-4a89-9a1d-c7383d11a9db.png)  
 Adds a panel at the bottom of the window showing images that have been generated in the current session
-
-## Latent Upscale By
-![image](https://user-images.githubusercontent.com/125205205/230172680-9348b086-5278-472e-91ac-d08433b7b197.png)  
-Allows upscaling by a factor instead of specific width and height
 
 ## Lock Nodes & Groups
 ![image](https://user-images.githubusercontent.com/125205205/230172868-5c5a943c-ade1-4799-bf80-cc931da5d4b2.png)  
@@ -80,3 +63,19 @@ Provides basic support for touch screen devices, its not perfect but better than
 
 ## WD14 Tagger
 Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
+
+---
+
+# Changelog
+
+## 2023-06-18
+- ♻️ Reworked folder structure
+- ✨ Added auto installation of scripts and `__init__` with thanks to @TashaSkyUp
+- 🚨 Renamed a number of nodes to include `pysssss` to prevent name conflicts
+- 🐛 Fix Manage Widget Defaults to work with new ComfyUI settings dialog
+- ✨ Add Link Render Mode setting to choose how links are rendered
+- ✨ Add Constrain Image node for resizing nodes to a min/max resolution with optional cropping
+- 🚨 Remove Latent Upscale By as it is now a built in node in ComfyUI
+- ♻️ Include [canvas2svg](https://gliffy.github.io/canvas2svg/) for SVG export in assets to prevent downloading at runtime
+- 🎨 Add background color to exported SVG
+- 🐛 Increase Image Feed z-index to prevent node text overlapping

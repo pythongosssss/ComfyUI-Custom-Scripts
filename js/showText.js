@@ -6,7 +6,7 @@ import { ComfyWidgets } from "/scripts/widgets.js";
 app.registerExtension({
 	name: "pysssss.ShowText",
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
-		if (nodeData.name === "ShowText") {
+		if (nodeData.name === "ShowText|pysssss") {
 			// When the node is executed we will be sent the input text, display this in the widget
 			const onExecuted = nodeType.prototype.onExecuted;
 			nodeType.prototype.onExecuted = function (message) {

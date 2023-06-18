@@ -23,7 +23,7 @@ app.registerExtension({
 				document.head.appendChild(link);
 			}
 
-			link.href = new URL(`${favicon}.ico`, import.meta.url);
+			link.href = new URL(`assets/${favicon}.ico`, import.meta.url);
 		});
 	},
 });

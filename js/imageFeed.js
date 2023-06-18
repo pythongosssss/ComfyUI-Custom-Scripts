@@ -15,6 +15,7 @@ app.registerExtension({
 			bottom: 0,
 			background: "#333",
 			overflow: "auto",
+			zIndex: 99
 		});
 		document.body.append(imageList);
 
@@ -71,7 +72,7 @@ app.registerExtension({
 					const a = document.createElement("a");
 					a.href = `/view?filename=${encodeURIComponent(src.filename)}&type=${src.type}&subfolder=${encodeURIComponent(
 						src.subfolder
-					)}`;
+					)}&t=${+new Date()}`;
 					a.target = "_blank";
 					Object.assign(img.style, {
 						height: "120px",

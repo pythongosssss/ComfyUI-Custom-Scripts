@@ -24,7 +24,7 @@ app.registerExtension({
 	setup() {
 		app.ui.settings.addSetting({
 			id: "pysssss.PresetText.ReplacementRegex",
-			name: "[pysssss] Preset Text Replacement Regex",
+			name: "🐍 Preset Text Replacement Regex",
 			type: "text",
 			defaultValue: "(?:^|[^\\w])(?<replace>@(?<id>[\\w-]+))",
 			tooltip:
@@ -166,9 +166,9 @@ app.registerExtension({
 		}
 
 		LiteGraph.registerNodeType(
-			"PresetText",
+			"PresetText|pysssss",
 			Object.assign(PresetTextNode, {
-				title: "PresetText",
+				title: "Preset Text 🐍",
 			})
 		);
 

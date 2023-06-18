@@ -7,6 +7,7 @@ import json
 root_directory = os.path.dirname(inspect.getfile(PromptServer))
 workflows_directory = os.path.join(root_directory, "pysssss-workflows")
 NODE_CLASS_MAPPINGS = {}
+NODE_DISPLAY_NAME_MAPPINGS = {}
 
 
 @PromptServer.instance.routes.get("/pysssss/workflows")
@@ -15,13 +16,15 @@ async def get_workflows(request):
     for dirpath, directories, file in os.walk(workflows_directory):
         for file in file:
             if (file.endswith(".json")):
-                files.append(os.path.relpath(os.path.join(dirpath, file), workflows_directory))
+                files.append(os.path.relpath(os.path.join(
+                    dirpath, file), workflows_directory))
     return web.json_response(list(map(lambda f: os.path.splitext(f)[0].replace("\\", "/"), files)))
 
 
 @PromptServer.instance.routes.get("/pysssss/workflows/{name:.+}")
 async def get_workflow(request):
-    file = os.path.abspath(os.path.join(workflows_directory, request.match_info["name"] + ".json"))
+    file = os.path.abspath(os.path.join(
+        workflows_directory, request.match_info["name"] + ".json"))
     if os.path.commonpath([file, workflows_directory]) != workflows_directory:
         return web.Response(status=403)
 
@@ -31,7 +34,8 @@ async def get_workflow(request):
 @PromptServer.instance.routes.post("/pysssss/workflows")
 async def save_workflow(request):
     json_data = await request.json()
-    file = os.path.abspath(os.path.join(workflows_directory, json_data["name"] + ".json"))
+    file = os.path.abspath(os.path.join(
+        workflows_directory, json_data["name"] + ".json"))
     if os.path.commonpath([file, workflows_directory]) != workflows_directory:
         return web.Response(status=403)
 

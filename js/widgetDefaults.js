@@ -201,19 +201,29 @@ app.registerExtension({
 
 		setting = app.ui.settings.addSetting({
 			id,
-			name: "[pysss] Widget Defaults",
+			name: "🐍 Widget Defaults",
 			type: () => {
-				return $el("button", {
-					textContent: "[pysss] Manage Widget Defaults",
-					onclick: () => {
-						app.ui.settings.close();
-						const dialog = new WidgetDefaultsDialog();
-						dialog.show();
-					},
-					style: {
-						fontSize: "14px",
-					},
-				});
+				return $el("tr", [
+					$el("td", [
+						$el("label", {
+							for: id.replaceAll(".", "-"),
+							textContent: "🐍 Widget Defaults:",
+						}),
+					]),
+					$el("td", [
+						$el("button", {
+							textContent: "Manage",
+							onclick: () => {
+								app.ui.settings.element.close();
+								const dialog = new WidgetDefaultsDialog();
+								dialog.show();
+							},
+							style: {
+								fontSize: "14px",
+							},
+						}),
+					]),
+				]);
 			},
 		});
 		defaults = getDefaults();

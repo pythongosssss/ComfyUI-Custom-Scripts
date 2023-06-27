@@ -94,6 +94,16 @@ app.registerExtension({
 			parent: document.body,
 		});
 		const imageList = $el("div.pysssss-image-feed-list");
+
+		const hideButton = $el("button.pysssss-image-feed-btn", {
+			textContent: "❌",
+			onclick: () => {
+				imageFeed.style.display = "none";
+				showButton.style.display = "unset";
+				saveVal("Visible", 0);
+			},
+		});
+
 		imageFeed.append(
 			$el("div.pysssss-image-feed-menu", [
 				$el(
@@ -153,21 +163,20 @@ app.registerExtension({
 					textContent: "Clear",
 					onclick: () => imageList.replaceChildren(),
 				}),
-				$el("button.pysssss-image-feed-btn", {
-					textContent: "❌",
-					onclick: () => {
-						imageFeed.style.display = "none";
-						showButton.style.display = "unset";
-					},
-				}),
+				hideButton,
 			]),
 			imageList
 		);
 		showButton.onclick = () => {
 			imageFeed.style.display = "block";
 			showButton.style.display = "none";
+			saveVal("Visible", 1);
 		};
 		document.querySelector(".comfy-settings-btn").after(showButton);
+
+		if (!+getVal("Visible", 1)) {
+			hideButton.onclick();
+		}
 
 		api.addEventListener("executed", ({ detail }) => {
 			if (detail?.output?.images) {

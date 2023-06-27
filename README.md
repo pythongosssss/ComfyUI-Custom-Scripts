@@ -71,6 +71,11 @@ Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 
 # Changelog
 
+## 2023-06-27
+### Minor
+- ✨ Save Image Feed close state
+- 🐛 Fix unlocked group size calculation
+
 ## 2023-06-18
 ### Major Changes
 - ✨ Added auto installation of scripts and `__init__` with thanks to @TashaSkyUp

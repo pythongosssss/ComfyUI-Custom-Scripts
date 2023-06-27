@@ -27,16 +27,7 @@ app.registerExtension({
 	name: "pysssss.Locking",
 	init() {
 		function lockGroup(node) {
-			// Store the original move and nop it
-			node[LOCKED] = node.move;
-			node.move = () => {};
-
-			// Hack to prevent resizing
-			// size isnt a configurable property and there is no resize event
-			// _size is an arraybuffer, so we cant prevent setting that either
-			// replace it with an array and prevent setting the 0/1 indexes
-			node._size = [node._size[0], node._size[1]];
-			lockArray(node._size, () => !!node[LOCKED]);
+			node[LOCKED] = true;
 		}
 
 		// Add the locked flag to serialization
@@ -60,7 +51,7 @@ app.registerExtension({
 		const getGroupOnPos = LGraph.prototype.getGroupOnPos;
 		LGraph.prototype.getGroupOnPos = function () {
 			const r = getGroupOnPos.apply(this, arguments);
-			if (r && r[LOCKED] && !(new Error()).stack.includes("processContextMenu")) return null;
+			if (r && r[LOCKED] && !new Error().stack.includes("processContextMenu")) return null;
 			return r;
 		};
 
@@ -74,7 +65,6 @@ app.registerExtension({
 					? {
 							content: "Unlock",
 							callback: () => {
-								node.move = node[LOCKED];
 								delete node[LOCKED];
 							},
 					  }

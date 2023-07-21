@@ -207,7 +207,7 @@ app.registerExtension({
 					called = true;
 
 					for (const cb of callbacks) {
-						widget.value = cb(workflowNode, widgetIndex);
+						widget.value = await cb(workflowNode, widgetIndex);
 					}
 
 					const prompt = widget.value;

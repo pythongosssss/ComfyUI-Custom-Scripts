@@ -201,7 +201,7 @@ app.registerExtension({
 				}
 
 				let called = false;
-				const serializeValue = (workflowNode, widgetIndex) => {
+				const serializeValue = async (workflowNode, widgetIndex) => {
 					const widgetValue = widget.value;
 					if (called) return widgetValue;
 					called = true;

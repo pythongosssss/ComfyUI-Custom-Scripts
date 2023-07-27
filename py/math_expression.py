@@ -33,7 +33,7 @@ class MathExpression:
 
     RETURN_TYPES = ("INT", "FLOAT", "STRING", )
     FUNCTION = "evaluate"
-    CATEGORY = "util"
+    CATEGORY = "utils"
 
     def get_widget_value(self, extra_pnginfo, prompt, node_name, widget_name):
         workflow = extra_pnginfo["workflow"]

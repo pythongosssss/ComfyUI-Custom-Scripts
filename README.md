@@ -118,14 +118,38 @@ Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 
 # Changelog
 
-## 2023-06-27
+## 2023-07-27
+### New
+- ✨ Added custom Lora Loader that includes image previews
+### Minor
+- ✨ Add preview output to string function node
+- 📄 Updated missing/out of date parts of readme
+- 🐛 Fix crash on show image on menu when set to not show (thanks @DrJKL)
+- 🐛 Fix incorrect category (util vs utils) for math node (thanks @DrJKL)
+
+## 2023-07-27
 ### Minor
 - ✨ Save Image Feed close state
 - 🐛 Fix unlocked group size calculation
 
+## 2023-07-21 + 22
+### Minor
+- 🐛 Fix preset text incompatibility with Impact Pack (thanks @ltdrdata)
+
+## 2023-07-13
+### New
+- ✨ Add Math Expression node for evaluating expressions using values from the graph
+### Minor
+- ✨ Add settings for image feed location + image order
+
+## 2023-06-27
+### Minor
+- 🐛 Fix unlocking group using incorrect size
+- ✨ Save visibility of image feed
+
 ## 2023-06-18
 ### Major Changes
-- ✨ Added auto installation of scripts and `__init__` with thanks to @TashaSkyUp
+- ✨ Added auto installation of scripts and `__init__` (thanks @TashaSkyUp)
 - ♻️ Reworked folder structure
 - 🚨 Renamed a number of nodes to include `pysssss` to prevent name conflicts
 - 🚨 Remove Latent Upscale By as it is now a built in node in ComfyUI

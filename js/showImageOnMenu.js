@@ -70,7 +70,9 @@ const ext = {
 				enabled = value;
 				if (!value) {
 					app.ui.menuContainer.style.removeProperty("padding-bottom");
-					app.ui.menuContainer.removeChild(link);
+					if (link.parentNode) {
+						link.parentNode.removeChild(link);
+					}
 				}
 			},
 		});

@@ -34,7 +34,7 @@ class StringFunction:
                out = text_a.replace(text_b, text_c)
         if tidy_tags:
             out = out.replace("  ", " ").replace(" ,", ",").replace(",,", ",").replace(",,", ",")
-        return (out, )
+        return {"ui": {"text": (out,)}, "result": (out,)}
             
 NODE_CLASS_MAPPINGS = {
     "StringFunction|pysssss": StringFunction,

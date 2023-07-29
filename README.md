@@ -109,6 +109,12 @@ Adds menu options for importing and exporting the graph as SVG showing a view of
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/4a0a5244-2201-4c1f-b5f0-7ac18eacb19a)  
 Adds a custom Lora Loader node that supports showing images on hover, currently does not support subfolder navigation.
 
+## [Testing] Reroute Primitive
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/8b870eef-d572-43f9-b394-cfa7abbd2f98)  
+Provides a node that allows rerouting primitives.  
+The node can also be collapsed to a single point that you can drag around.  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/a9bd0112-cf8f-44f3-af6d-f9a8fed152a7)  
+Warning: Don't use normal reroutes or primitives with these nodes, it isn't tested and this node replaces their functionality.
 
 ## WD14 Tagger
 Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
@@ -117,6 +123,14 @@ Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 <br>
 
 # Changelog
+
+## 2023-07-29
+### New
+- ✨ Added Reroute Primitive combining the functionality of reroutes + primitives, also allowing collapsing to a single point.
+### Minor
+- ✨ Remove new lines in Math Expression node
+- ✨ String function is now an output node
+- 🐛 Fix conflict between Lora Loader + Lora submenu causing the context menu to be have strangely (#23, #24)
 
 ## 2023-07-27
 ### New

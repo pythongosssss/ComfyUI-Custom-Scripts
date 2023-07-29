@@ -18,6 +18,7 @@ class StringFunction:
     RETURN_TYPES = ("STRING",)
     FUNCTION = "exec"
     CATEGORY = "utils"
+    OUTPUT_NODE = True
 
     def exec(self, action, tidy_tags, text_a, text_b, text_c=""):
         tidy_tags = tidy_tags == "yes"

@@ -67,8 +67,8 @@ app.registerExtension({
 						ctx.resetTransform();
 
 						const style = document.defaultView.getComputedStyle(this.inputEl, null);
-						const x = parseInt(this.inputEl.style.left) + 10;
-						const y = parseInt(this.inputEl.style.top) + LiteGraph.NODE_TITLE_HEIGHT;
+						const x = parseInt(this.inputEl.style.left);
+						const y = parseInt(this.inputEl.style.top);
 						const w = parseInt(this.inputEl.style.width);
 						const h = parseInt(this.inputEl.style.height);
 						ctx.fillStyle = style.getPropertyValue("background-color");

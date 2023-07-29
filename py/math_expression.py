@@ -60,6 +60,7 @@ class MathExpression:
         raise NameError(f"Node not found: {node_name}.{widget_name}")
 
     def evaluate(self, expression, extra_pnginfo, prompt, a=None, b=None, c=None):
+        expression = expression.replace('\n', ' ').replace('\r', '')
         node = ast.parse(expression, mode='eval').body
 
         def eval_expr(node):

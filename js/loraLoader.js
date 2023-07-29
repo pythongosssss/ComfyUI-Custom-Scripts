@@ -25,46 +25,17 @@ app.registerExtension({
 			parent: document.body,
 		});
 
-		// Big ol' hack to get subclassing the context menu to work
-		// Replace the addItem function with our own that wraps the context of "this" with a proxy
-		// That proxy then replaces the constructor with another proxy
-		// That proxy then calls the custom ContextMenu that supports filters
-		const ctorProxy = new Proxy(LiteGraph.ContextMenu, {
-			construct(target, args) {
-				return new LiteGraph.ContextMenu(...args);
-			},
-		});
-
-		const addItem = LiteGraph.ContextMenu.prototype.addItem;
-		LiteGraph.ContextMenu.prototype.addItem = function () {
-			const proxy = new Proxy(this, {
-				get(target, prop) {
-					if (prop === "constructor") {
-						return ctorProxy;
-					}
-					return target[prop];
-				},
-			});
-			proxy.__target__ = this;
-			const el = addItem.apply(proxy, arguments);
-			if (arguments[1]?.image) {
+		LiteGraph.ContextMenu["pyssss:addItem"].push(function (el, menu, args) {
+			if (args[1]?.image) {
 				el.textContent += " *";
 				$el("div.pysssss-combo-image", {
 					parent: el,
 					style: {
-						backgroundImage: `url(/pysssss/view/${encodeURIComponent(arguments[1].image)})`,
+						backgroundImage: `url(/pysssss/view/${encodeURIComponent(args[1].image)})`,
 					},
 				});
 			}
-			return el;
-		};
-
-		// We also need to patch the ContextMenu constructor to unwrap the parent else it fails a LiteGraph type check
-		const ctxMenu = LiteGraph.ContextMenu;
-		LiteGraph.ContextMenu = function (values, options) {
-			ctxMenu.call(this, values, options);
-		};
-		LiteGraph.ContextMenu.prototype = ctxMenu.prototype;
+		});
 
 		const combo = ComfyWidgets["COMBO"];
 		ComfyWidgets["COMBO"] = function (node, inputName, inputData) {

@@ -101,9 +101,9 @@ Allows you to specify default values for widgets when adding new nodes, the valu
 Adds options to the menu for saving + loading workflows:  
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/7b5a3012-4c59-47c6-8eea-85cf534403ea)
 
-## Workflow SVG
-![image](https://user-images.githubusercontent.com/125205205/230170905-904888e7-d980-4713-b94f-0656f062c406.png)  
-Adds menu options for importing and exporting the graph as SVG showing a view of the nodes
+## Workflow Images
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/06453fd2-c020-46ee-a7db-2b8bf5bcba7e)  
+Adds menu options for importing/exporting the graph as SVG and PNG showing a view of the nodes
 
 ## [Testing] Lora Loader with Images
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/4a0a5244-2201-4c1f-b5f0-7ac18eacb19a)  
@@ -127,10 +127,12 @@ Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 ## 2023-07-29
 ### New
 - ✨ Added Reroute Primitive combining the functionality of reroutes + primitives, also allowing collapsing to a single point.
+- ✨ Add support for exporting workflow images as PNGs and optional embedding of metadata in PNG and SVG
 ### Minor
 - ✨ Remove new lines in Math Expression node
 - ✨ String function is now an output node
 - 🐛 Fix conflict between Lora Loader + Lora submenu causing the context menu to be have strangely (#23, #24)
+- 🎨 Rename "SVG -> Import/Export" to "Workflow Image" -> Import/Export
 
 ## 2023-07-27
 ### New

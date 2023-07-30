@@ -26,6 +26,10 @@ Adds a menu option to auto arrange the graph in order of execution, this makes v
 ## Constrain Image
 Adds a node for resizing an image to a max & min size optionally cropping if required.
 
+## Custom Colors
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/fa7883f3-f81c-49f6-9ab6-9526e4debab6)
+Adds a custom color picker to nodes & groups
+
 ## Favicon Status
 ![image](https://user-images.githubusercontent.com/125205205/230171227-31f061a6-6324-4976-bed9-723a87500cf3.png)
 ![image](https://user-images.githubusercontent.com/125205205/230171445-c7202a45-b511-4d69-87fa-945ad44c063f.png)  
@@ -123,6 +127,14 @@ Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 <br>
 
 # Changelog
+
+## 2023-07-30
+### Major
+- 🐛 Fix issue with context menu (right click) not working for some users after Lora script updates
+### New
+- ✨ Add "Custom" option to color menu for nodes & groups
+### Minor
+- 🐛 Fix String Function values converted to unconnected inputs outputting the text "undefined"
 
 ## 2023-07-29
 ### New

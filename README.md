@@ -1,9 +1,5 @@
 # ComfyUI-Custom-Scripts
 
-> &#x26a0;&#xfe0f; **If updating from a version prior to 2023-06-18**: Many of the nodes have been renamed to include `pysssss` to prevent conflicts with other nodes. If you get missing nodes, please replace them with the new names.
-
-> &#x26a0;&#xfe0f; **Auto installation process is still a new feature in need of testing, if you have any problems please log an issue**
-
 # Installation
 
 1. Clone the repository:
@@ -24,12 +20,15 @@ to your ComfyUI `custom_nodes` directory
 # Features
 
 ## Auto Arrange Graph
-![image](https://user-images.githubusercontent.com/125205205/230170664-acddff3e-f47b-452e-970e-0a7279734b96.png)  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/04b06081-ca6f-4c0f-8584-d0a157c36747)  
 Adds a menu option to auto arrange the graph in order of execution, this makes very wide graphs!
 
-## Workflow SVG
-![image](https://user-images.githubusercontent.com/125205205/230170905-904888e7-d980-4713-b94f-0656f062c406.png)  
-Adds menu options for importing and exporting the graph as SVG showing a view of the nodes
+## Constrain Image
+Adds a node for resizing an image to a max & min size optionally cropping if required.
+
+## Custom Colors
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/fa7883f3-f81c-49f6-9ab6-9526e4debab6)
+Adds a custom color picker to nodes & groups
 
 ## Favicon Status
 ![image](https://user-images.githubusercontent.com/125205205/230171227-31f061a6-6324-4976-bed9-723a87500cf3.png)
@@ -37,8 +36,23 @@ Adds menu options for importing and exporting the graph as SVG showing a view of
 Adds a favicon and title to the window, favicon changes color while generating and the window title includes the number of prompts in the queue
 
 ## Image Feed
-![image](https://user-images.githubusercontent.com/125205205/230172436-3fbeb426-a0e8-4a89-9a1d-c7383d11a9db.png)  
-Adds a panel at the bottom of the window showing images that have been generated in the current session
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/06aaf682-6d98-4a97-95eb-f1e2d0b7a1f3)  
+Adds a panel showing images that have been generated in the current session, you can control the direction that images are added and the position of the panel via the ComfyUI settings screen and the size of the panel and the images via the sliders at the top of the panel.  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/ca093d38-41a3-4647-9223-5bd0b9ee4f1e)
+
+## KSampler (Advanced) denoise helper
+Provides a simple method to set custom denoise on the advanced sampler  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/42946bd8-0078-4c7a-bfe9-7adb1382b5e2)
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/7cfccb22-f155-4848-934b-a2b2a6efe16f)
+
+## Link Render Mode
+Allows you to control the rendering of the links between nodes.
+Straight:  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/ad3be76b-43b1-455e-a64a-bf2a6571facf)  
+Linear:  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/cadf7ccf-a6fe-4467-b063-5a32c1d1d633)  
+Spline (default):  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/e967b59d-2b69-468c-a4ab-ac2fe0cb439e)
 
 ## Lock Nodes & Groups
 ![image](https://user-images.githubusercontent.com/125205205/230172868-5c5a943c-ade1-4799-bf80-cc931da5d4b2.png)  
@@ -47,6 +61,15 @@ Adds a lock option to nodes & groups that prevents you from moving them until un
 ## Lora Subfolders
 ![image](https://user-images.githubusercontent.com/125205205/230173454-9ade50fb-6f08-435a-8c30-e87e8043de48.png)  
 Changes the lora menu into a dropdown of subfolders, not currently compatible with the searching/filtering (the search won't appear on submenus)
+
+## Math Expression
+Allows for evaluating complex expressions using values from the graph.  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/c0047cbd-8512-46ae-841f-f570b93f700b)  
+Other nodes values can be referenced via the `Node name for S&R` via the `Properties` menu item on a node, or the node title.  
+The above example evaluates as `(10 * 512) / 2 + 1000`.  
+## Node Finder
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/177d2b67-acbc-4ec3-ab31-7c295a98c194)  
+Adds a menu item for following/jumping to the executing node, and a menu to quickly go to a node of a specific type.
 
 ## Preset Text
 ![image](https://user-images.githubusercontent.com/125205205/230173939-08459efc-785b-46da-93d1-b02f0300c6f4.png)  
@@ -60,8 +83,42 @@ Adds various menu items to some nodes for quickly setting up common parts of gra
 ![image](https://user-images.githubusercontent.com/125205205/230174888-c004fd48-da78-4de9-81c2-93a866fcfcd1.png)  
 Takes input from a node that produces a string and displays it, useful for things like interrogator, prompt generators, etc.
 
+## Show Image on Menu
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/b6ab58f2-583b-448c-bcfc-f93f5cdab0fc)  
+Shows the current generating image on the menu at the bottom, you can disable this via the settings menu.
+
+## String Function
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/01107137-8a93-4765-bae0-fcc110a09091)
+Supports appending and replacing text  
+`tidy_tags` will add commas between parts when in `append` mode.  
+`replace` mode supports regex replace by using `/your regex here/` and you can reference capturing groups using `\number` e.g. `\1`
+
 ## Touch Support
 Provides basic support for touch screen devices, its not perfect but better than nothing
+
+## Widget Defaults
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/3d675032-2b19-4da8-a7d7-fa2d7c555daa)
+Allows you to specify default values for widgets when adding new nodes, the values are configured via the settings menu
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/7b57a3d8-98d3-46e9-9b33-6645c0da41e7)
+
+## Workflows
+Adds options to the menu for saving + loading workflows:  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/7b5a3012-4c59-47c6-8eea-85cf534403ea)
+
+## Workflow Images
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/06453fd2-c020-46ee-a7db-2b8bf5bcba7e)  
+Adds menu options for importing/exporting the graph as SVG and PNG showing a view of the nodes
+
+## [Testing] Lora Loader with Images
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/4a0a5244-2201-4c1f-b5f0-7ac18eacb19a)  
+Adds a custom Lora Loader node that supports showing images on hover, currently does not support subfolder navigation.
+
+## [Testing] Reroute Primitive
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/8b870eef-d572-43f9-b394-cfa7abbd2f98)  
+Provides a node that allows rerouting primitives.  
+The node can also be collapsed to a single point that you can drag around.  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/a9bd0112-cf8f-44f3-af6d-f9a8fed152a7)  
+Warning: Don't use normal reroutes or primitives with these nodes, it isn't tested and this node replaces their functionality.
 
 ## WD14 Tagger
 Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
@@ -71,14 +128,56 @@ Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 
 # Changelog
 
-## 2023-06-27
+## 2023-07-30
+### Major
+- 🐛 Fix issue with context menu (right click) not working for some users after Lora script updates
+### New
+- ✨ Add "Custom" option to color menu for nodes & groups
+### Minor
+- 🐛 Fix String Function values converted to unconnected inputs outputting the text "undefined"
+
+## 2023-07-29
+### New
+- ✨ Added Reroute Primitive combining the functionality of reroutes + primitives, also allowing collapsing to a single point.
+- ✨ Add support for exporting workflow images as PNGs and optional embedding of metadata in PNG and SVG
+### Minor
+- ✨ Remove new lines in Math Expression node
+- ✨ String function is now an output node
+- 🐛 Fix conflict between Lora Loader + Lora submenu causing the context menu to be have strangely (#23, #24)
+- 🎨 Rename "SVG -> Import/Export" to "Workflow Image" -> Import/Export
+
+## 2023-07-27
+### New
+- ✨ Added custom Lora Loader that includes image previews
+### Minor
+- ✨ Add preview output to string function node
+- 📄 Updated missing/out of date parts of readme
+- 🐛 Fix crash on show image on menu when set to not show (thanks @DrJKL)
+- 🐛 Fix incorrect category (util vs utils) for math node (thanks @DrJKL)
+
+## 2023-07-27
 ### Minor
 - ✨ Save Image Feed close state
 - 🐛 Fix unlocked group size calculation
 
+## 2023-07-21 + 22
+### Minor
+- 🐛 Fix preset text incompatibility with Impact Pack (thanks @ltdrdata)
+
+## 2023-07-13
+### New
+- ✨ Add Math Expression node for evaluating expressions using values from the graph
+### Minor
+- ✨ Add settings for image feed location + image order
+
+## 2023-06-27
+### Minor
+- 🐛 Fix unlocking group using incorrect size
+- ✨ Save visibility of image feed
+
 ## 2023-06-18
 ### Major Changes
-- ✨ Added auto installation of scripts and `__init__` with thanks to @TashaSkyUp
+- ✨ Added auto installation of scripts and `__init__` (thanks @TashaSkyUp)
 - ♻️ Reworked folder structure
 - 🚨 Renamed a number of nodes to include `pysssss` to prevent name conflicts
 - 🚨 Remove Latent Upscale By as it is now a built in node in ComfyUI

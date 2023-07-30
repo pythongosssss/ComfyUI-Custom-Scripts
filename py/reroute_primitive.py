@@ -1,0 +1,36 @@
+# Hack: string type that is always equal in not equal comparisons
+class AnyType(str):
+    def __ne__(self, __value: object) -> bool:
+        return False
+
+
+# Our any instance wants to be a wildcard string
+any = AnyType("*")
+
+
+class ReroutePrimitive:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {"value": (any, )},
+        }
+
+    @classmethod
+    def VALIDATE_INPUTS(s, **kwargs):
+        return True
+
+    RETURN_TYPES = (any,)
+    FUNCTION = "route"
+    CATEGORY = "utils"
+
+    def route(self, value):
+        return (value,)
+
+
+NODE_CLASS_MAPPINGS = {
+    "ReroutePrimitive|pysssss": ReroutePrimitive,
+}
+
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "ReroutePrimitive|pysssss": "Reroute Primitive 🐍",
+}

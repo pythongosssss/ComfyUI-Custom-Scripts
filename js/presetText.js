@@ -201,13 +201,13 @@ app.registerExtension({
 				}
 
 				let called = false;
-				const serializeValue = (workflowNode, widgetIndex) => {
+				const serializeValue = async (workflowNode, widgetIndex) => {
 					const widgetValue = widget.value;
 					if (called) return widgetValue;
 					called = true;
 
 					for (const cb of callbacks) {
-						widget.value = cb(workflowNode, widgetIndex);
+						widget.value = await cb(workflowNode, widgetIndex);
 					}
 
 					const prompt = widget.value;

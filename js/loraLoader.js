@@ -25,6 +25,9 @@ app.registerExtension({
 			parent: document.body,
 		});
 
+		if (!LiteGraph.ContextMenu["pysssss:addItem"]) {
+			LiteGraph.ContextMenu["pysssss:addItem"] = [];
+		}
 		LiteGraph.ContextMenu["pysssss:addItem"].push(function (el, menu, args) {
 			if (args[1]?.image) {
 				el.textContent += " *";

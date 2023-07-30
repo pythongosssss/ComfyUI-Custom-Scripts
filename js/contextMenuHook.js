@@ -59,7 +59,11 @@ app.registerExtension({
 			ctxMenu.call(this, values, options);
 		};
 		LiteGraph.ContextMenu.prototype = ctxMenu.prototype;
-		LiteGraph.ContextMenu["pysssss:ctor"] = [];
-		LiteGraph.ContextMenu["pysssss:addItem"] = [];
+		if (!LiteGraph.ContextMenu["pysssss:ctor"]) {
+			LiteGraph.ContextMenu["pysssss:ctor"] = [];
+		}
+		if (!LiteGraph.ContextMenu["pysssss:addItem"]) {
+			LiteGraph.ContextMenu["pysssss:addItem"] = [];
+		}
 	},
 });

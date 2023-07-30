@@ -5,7 +5,7 @@ import { app } from "/scripts/app.js";
 app.registerExtension({
 	name: "pysssss.LoraSubfolder",
 	setup() {
-		LiteGraph.ContextMenu["pyssss:ctor"].push(function (values, options) {
+		LiteGraph.ContextMenu["pysssss:ctor"].push(function (values, options) {
 			// Copy the class from the parent so if we are dark we are also dark
 			if (options.parentMenu?.options?.className === "dark") {
 				options.className = "dark";

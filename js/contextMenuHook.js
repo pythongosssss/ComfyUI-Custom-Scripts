@@ -24,9 +24,18 @@ app.registerExtension({
 			});
 			proxy.__target__ = this;
 			let el = addItem.apply(proxy, arguments);
-			const callbacks = LiteGraph.ContextMenu["pyssss:addItem"];
-			for (const cb of callbacks) {
-				el = cb(el, this, arguments) || el;
+			const callbacks = LiteGraph.ContextMenu["pysssss:addItem"];
+			if (callbacks && callbacks instanceof Array) {
+				for (const cb of callbacks) {
+					el = cb(el, this, arguments) || el;
+				}
+			} else {
+				console.warn(
+					"[pysssss 🐍]",
+					"invalid addItem callbacks",
+					callbacks,
+					"pysssss:addItem" in LiteGraph.ContextMenu
+				);
 			}
 			return el;
 		};
@@ -39,14 +48,18 @@ app.registerExtension({
 					options.parentMenu = options.parentMenu.__target__;
 				}
 			}
-			const callbacks = LiteGraph.ContextMenu["pyssss:ctor"];
-			for (const cb of callbacks) {
-				cb(values, options);
+			const callbacks = LiteGraph.ContextMenu["pysssss:ctor"];
+			if (callbacks && callbacks instanceof Array) {
+				for (const cb of callbacks) {
+					cb(values, options);
+				}
+			} else {
+				console.warn("[pysssss 🐍]", "invalid ctor callbacks", callbacks, "pysssss:ctor" in LiteGraph.ContextMenu);
 			}
 			ctxMenu.call(this, values, options);
 		};
 		LiteGraph.ContextMenu.prototype = ctxMenu.prototype;
-		LiteGraph.ContextMenu["pyssss:ctor"] = [];
-		LiteGraph.ContextMenu["pyssss:addItem"] = [];
+		LiteGraph.ContextMenu["pysssss:ctor"] = [];
+		LiteGraph.ContextMenu["pysssss:addItem"] = [];
 	},
 });

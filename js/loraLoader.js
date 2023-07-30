@@ -25,7 +25,7 @@ app.registerExtension({
 			parent: document.body,
 		});
 
-		LiteGraph.ContextMenu["pyssss:addItem"].push(function (el, menu, args) {
+		LiteGraph.ContextMenu["pysssss:addItem"].push(function (el, menu, args) {
 			if (args[1]?.image) {
 				el.textContent += " *";
 				$el("div.pysssss-combo-image", {

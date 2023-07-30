@@ -1,14 +1,58 @@
 import { app } from "/scripts/app.js";
 import { ComfyWidgets } from "/scripts/widgets.js";
 
-const NODE_ID = "ReroutePrimitive|pysssss";
+const REROUTE_PRIMITIVE = "ReroutePrimitive|pysssss";
+const MULTI_PRIMITIVE = "MultiPrimitive|pysssss";
+
 app.registerExtension({
 	name: "pysssss.ReroutePrimitive",
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
-		if (nodeData.name === NODE_ID) {
+		// On graph configure, fire onGraphConfigured to create widgets
+		const graphConfigure = LGraph.prototype.configure;
+		LGraph.prototype.configure = function () {
+			const r = graphConfigure.apply(this, arguments);
+			for (const n of app.graph._nodes) {
+				if (n.type === REROUTE_PRIMITIVE) {
+					n.onGraphConfigured();
+				}
+			}
+
+			return r;
+		};
+
+		function addOutputHandler() {
+			// Finds the first non reroute output node down the chain
+			nodeType.prototype.getFirstReroutedOutput = function (slot) {
+				if (nodeData.name === MULTI_PRIMITIVE) {
+					slot = 0;
+				}
+				const links = this.outputs[slot].links;
+				if (!links) return null;
+
+				const search = [];
+				for (const l of links) {
+					const link = app.graph.links[l];
+					if (!link) continue;
+
+					const node = app.graph.getNodeById(link.target_id);
+					if (node.type !== REROUTE_PRIMITIVE && node.type !== MULTI_PRIMITIVE) {
+						return { node, link };
+					}
+					search.push({ node, link });
+				}
+
+				for (const { link, node } of search) {
+					const r = node.getFirstReroutedOutput(link.target_slot);
+					if (r) {
+						return r;
+					}
+				}
+			};
+		}
+
+		if (nodeData.name === REROUTE_PRIMITIVE) {
 			const configure = nodeType.prototype.configure || LGraphNode.prototype.configure;
 			const onConnectionsChange = nodeType.prototype.onConnectionsChange;
-			const graphConfigure = LGraph.prototype.configure;
 			const onAdded = nodeType.prototype.onAdded;
 
 			nodeType.title_mode = LiteGraph.NO_TITLE;
@@ -21,18 +65,6 @@ app.registerExtension({
 				}
 				return false;
 			}
-
-			// On graph configure, fire onGraphConfigured to create widgets
-			LGraph.prototype.configure = function () {
-				const r = graphConfigure.apply(this, arguments);
-				for (const n of app.graph._nodes) {
-					if (n.type === NODE_ID) {
-						n.onGraphConfigured();
-					}
-				}
-
-				return r;
-			};
 
 			// Remove input text
 			nodeType.prototype.onAdded = function () {
@@ -68,7 +100,7 @@ app.registerExtension({
 						if (input.widget) {
 							config = input.widget.config;
 						}
-						ComfyWidgets[widgetType](this, "value", config);
+						ComfyWidgets[widgetType](this, "value", config, app);
 					}
 				} else if (this.widgets) {
 					this.widgets.length = 0;
@@ -81,7 +113,7 @@ app.registerExtension({
 			nodeType.prototype.getReroutedInputs = function (slot) {
 				let nodes = [{ node: this }];
 				let node = this;
-				while (node?.type === NODE_ID) {
+				while (node?.type === REROUTE_PRIMITIVE) {
 					const input = node.inputs[slot];
 					if (input.link) {
 						const link = app.graph.links[input.link];
@@ -99,30 +131,7 @@ app.registerExtension({
 				return nodes;
 			};
 
-			// Finds the first non reroute output node down the chain
-			nodeType.prototype.getFirstReroutedOutput = function (slot) {
-				const links = this.outputs[slot].links;
-				if (!links) return null;
-
-				const search = [];
-				for (const l of links) {
-					const link = app.graph.links[l];
-					if (!link) continue;
-
-					const node = app.graph.getNodeById(link.target_id);
-					if (node.type !== NODE_ID) {
-						return { node, link };
-					}
-					search.push({ node, link });
-				}
-
-				for (const { link, node } of search) {
-					const r = node.getFirstReroutedOutput(link.target_slot);
-					if (r) {
-						return r;
-					}
-				}
-			};
+			addOutputHandler();
 
 			// Update the type of all reroutes in a chain
 			nodeType.prototype.changeRerouteType = function (slot, type, label) {
@@ -181,7 +190,7 @@ app.registerExtension({
 				const inputPath = this.getReroutedInputs(slot);
 				const rootInput = inputPath[inputPath.length - 1];
 				const outputNode = this.getFirstReroutedOutput(slot);
-				if (rootInput.node.type === NODE_ID) {
+				if (rootInput.node.type === REROUTE_PRIMITIVE) {
 					// Our input node is a reroute, so see if we have an output
 					if (outputNode) {
 						targetType = outputNode.link.type;
@@ -202,7 +211,7 @@ app.registerExtension({
 					this.widgets.length = 0;
 				}
 
-				if (outputNode) {
+				if (outputNode && rootInput.node.checkPrimitiveWidget) {
 					// We have an output, check if we need to create a widget
 					targetLabel = rootInput.node.checkPrimitiveWidget(outputNode);
 				}
@@ -247,6 +256,18 @@ app.registerExtension({
 			nodeType.prototype.onBounding = function (area) {
 				if (this.flags?.collapsed) {
 					area[1] -= 15;
+				}
+			};
+		} else if (nodeData.name === MULTI_PRIMITIVE) {
+			addOutputHandler();
+			nodeType.prototype.onConnectionsChange = function (type, _, connected, link_info) {
+				for (let i = 0; i < this.inputs.length - 1; i++) {
+					if (!this.inputs[i].link) {
+						this.removeInput(i--);
+					}
+				}
+				if (this.inputs[this.inputs.length - 1].link) {
+					this.addInput("v" + +new Date(), this.inputs[0].type).label = "value";
 				}
 			};
 		}

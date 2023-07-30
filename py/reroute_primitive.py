@@ -27,10 +27,33 @@ class ReroutePrimitive:
         return (value,)
 
 
+class MultiPrimitive:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {},
+            "optional": {"value": (any, )},
+        }
+
+    @classmethod
+    def VALIDATE_INPUTS(s, **kwargs):
+        return True
+
+    RETURN_TYPES = (any,)
+    FUNCTION = "listify"
+    CATEGORY = "utils"
+    OUTPUT_IS_LIST = (True,)
+
+    def listify(self, **kwargs):
+        return (list(kwargs.values()),)
+
+
 NODE_CLASS_MAPPINGS = {
     "ReroutePrimitive|pysssss": ReroutePrimitive,
+    # "MultiPrimitive|pysssss": MultiPrimitive,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "ReroutePrimitive|pysssss": "Reroute Primitive 🐍",
+    # "MultiPrimitive|pysssss": "Multi Primitive 🐍",
 }

@@ -161,7 +161,7 @@ $el("style", {
 		justify-content: center;
 		gap: 4px;
 		grid-auto-rows: min-content;
-		grid-template-columns: repeat( auto-fit, minmax(calc(var(--img-sz) * 1%), 1fr));
+		grid-template-columns: repeat(var(--img-sz, 3), 1fr);
 		transition: 100ms linear;
 	}
 	.pysssss-image-feed-list div {
@@ -333,16 +333,17 @@ app.registerExtension({
 								$el("span", { textContent: "Image Size...", }),
 								$el("input", {
 									type: "range",
-									min: 5,
-									max: 51,
+									min: 1,
+									max: 10,
+									step: 1,
 									oninput: (e) => {
-										e.target.parentElement.title = `Controls the maximum size images in the feed (${e.target.value}%)`;
+										e.target.parentElement.title = `Controls the maximum size images in the feed (${e.target.value} columns)`;
 										imageFeed.style.setProperty("--img-sz", e.target.value);
 										saveVal("ImageSize", e.target.value);
 									},
 									$: (el) => {
 										requestAnimationFrame(() => {
-											el.value = getVal("ImageSize", 25);
+											el.value = getVal("ImageSize", 4);
 											el.oninput({ target: el });
 										});
 									},

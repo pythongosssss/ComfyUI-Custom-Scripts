@@ -9,7 +9,6 @@ $el("style", {
 	.pysssss-image-feed {
 		position: absolute;
 		background: #333;
-		overflow: auto;
 		z-index: 99;
 		font-family: sans-serif;
 		font-size: 12px;
@@ -20,7 +19,6 @@ $el("style", {
 		width: 100vw;
 		min-height: 30px;
 		max-height: calc(var(--max-size, 20) * 1vh);
-		transition: max-height .2s ease-in;
 	}
 	.pysssss-image-feed--top {
 		top: 0;
@@ -34,7 +32,6 @@ $el("style", {
 		height: 100vh;
 		min-width: 200px;
 		max-width: calc(var(--max-size, 10) * 1vw);
-		transition: max-width .2s ease-in;
 	}
 	.pysssss-image-feed--left {
 		left: 0;
@@ -72,6 +69,9 @@ $el("style", {
 		flex: 0 1 fit-content;
 		text-decoration:none;
 	}
+	.pysssss-image-feed-btn.sizing-btn:checked {
+		filter: invert();
+	}
 	.pysssss-image-feed-btn.clear-btn {
 		padding: 5px 20px;
 	}
@@ -88,7 +88,6 @@ $el("style", {
 	}
 	
 	.pysssss-image-feed-menu section {
-		flex: 1 1 auto;
 		border-radius: 5px;
 		background: rgba(0,0,0,0.6);
 		padding: 0 5px;
@@ -105,11 +104,50 @@ $el("style", {
 		background: rgba(0,0,0,0.6);
 		border-radius: 5px;
 		overflow: hidden;
-		transition: max-width .2s ease-in;
 		z-index: 100;
 	}
-	.pysssss-image-feed--right .pysssss-image-feed-menu section input {
-		direction: rtl;
+
+	.sizing-menu {
+		position: relative;
+	}
+
+	.size-controls-flyout {
+		position: absolute;
+		transform: scaleX(0%);
+		transition: 200ms ease-out;
+		transition-delay: 500ms;
+		z-index: 101;
+		width: 300px;
+	}
+
+	.sizing-menu:hover .size-controls-flyout {
+		transform: scale(1, 1);
+		transition: 200ms linear;
+		transition-delay: 0;
+	}
+	.pysssss-image-feed--bottom .size-controls-flyout  {
+		transform: scale(1,0);
+		transform-origin: bottom;
+		bottom: 0;
+		left: 0;
+	}
+	.pysssss-image-feed--top .size-controls-flyout  {
+		transform: scale(1,0);
+		transform-origin: top;
+		top: 0;
+		left: 0;
+	}
+	.pysssss-image-feed--left .size-controls-flyout  {
+		transform: scale(0, 1);
+		transform-origin: left;
+		top: 0;
+		left: 0;
+	}
+	.pysssss-image-feed--right .size-controls-flyout  {
+		transform: scale(0, 1);
+		transform-origin: right;
+		top: 0;
+		right: 0;
 	}
 	
 	.pysssss-image-feed-menu > * {
@@ -121,8 +159,10 @@ $el("style", {
 		display: grid;
 		align-items: center;
 		justify-content: center;
-		grid-template-columns: repeat( auto-fit, minmax(calc(var(--img-sz) * 1vh), 1fr));
-		transition: 300ms;
+		gap: 4px;
+		grid-auto-rows: min-content;
+		grid-template-columns: repeat( auto-fit, minmax(calc(var(--img-sz) * 1%), 1fr));
+		transition: 100ms linear;
 	}
 	.pysssss-image-feed-list div {
 		text-align: center;
@@ -131,7 +171,6 @@ $el("style", {
 		object-fit: var(--img-fit, contain);
 		max-width: 100%;
 		max-height: calc(var(--max-size) * 1vh);
-		transition: max-height .2s ease-in;
 	}
 	.pysssss-image-feed-list img:hover {
 		filter: brightness(1.2);
@@ -259,54 +298,59 @@ app.registerExtension({
 
 		imageFeed.append(
 			$el("div.pysssss-image-feed-menu", [
-				$el(
-					"section",
-					{},
-					[
-						$el("span", {
-							textContent: "Feed Size...",
-						}),
-						$el("input", {
-							type: "range",
-							min: 10,
-							max: 80,
-							onchange: (e) => {
-								e.target.parentElement.title = `Controls the maximum size of the image feed panel (${e.target.value}vh)`;
-								imageFeed.style.setProperty("--max-size", e.target.value);
-								saveVal("FeedSize", e.target.value);
-							},
-							$: (el) => {
-								requestAnimationFrame(() => {
-									el.value = getVal("FeedSize", 25);
-									el.onchange({ target: el });
-								});
-							},
-						}),
-					]
-				),
-				$el(
-					"section",
-					{},
-					[
-						$el("span", {textContent: "Image Size...",}),
-						$el("input", {
-							type: "range",
-							min: 5,
-							max: 100,
-							onchange: (e) => {
-								e.target.parentElement.title = `Controls the maximum size images in the feed (${e.target.value}vw)`;
-								imageFeed.style.setProperty("--img-sz", e.target.value);
-								saveVal("ImageSize", e.target.value);
-							},
-							$: (el) => {
-								requestAnimationFrame(() => {
-									el.value = getVal("ImageSize", 25);
-									el.onchange({ target: el });
-								});
-							},
-						}),
-					]
-				),
+				$el("section.sizing-menu", {}, [
+					$el('label.size-control-handle', { textContent: '↹ Resize Feed' }),
+					$el('div.size-controls-flyout', {}, [
+						$el(
+							"section.size-control.feed-size-control",
+							{},
+							[
+								$el("span", {
+									textContent: "Feed Size...",
+								}),
+								$el("input", {
+									type: "range",
+									min: 10,
+									max: 80,
+									oninput: (e) => {
+										e.target.parentElement.title = `Controls the maximum size of the image feed panel (${e.target.value}vh)`;
+										imageFeed.style.setProperty("--max-size", e.target.value);
+										saveVal("FeedSize", e.target.value);
+									},
+									$: (el) => {
+										requestAnimationFrame(() => {
+											el.value = getVal("FeedSize", 25);
+											el.oninput({ target: el });
+										});
+									},
+								}),
+							]
+						),
+						$el(
+							"section.size-control.image-size-control",
+							{},
+							[
+								$el("span", { textContent: "Image Size...", }),
+								$el("input", {
+									type: "range",
+									min: 5,
+									max: 51,
+									oninput: (e) => {
+										e.target.parentElement.title = `Controls the maximum size images in the feed (${e.target.value}%)`;
+										imageFeed.style.setProperty("--img-sz", e.target.value);
+										saveVal("ImageSize", e.target.value);
+									},
+									$: (el) => {
+										requestAnimationFrame(() => {
+											el.value = getVal("ImageSize", 25);
+											el.oninput({ target: el });
+										});
+									},
+								}),
+							]
+						),
+					])
+				]),
 				$el("div.pysssss-image-feed-btn-group", {}, [
 					clearButton,
 					hideButton,
@@ -328,9 +372,8 @@ app.registerExtension({
 		api.addEventListener("executed", ({ detail }) => {
 			if (detail?.output?.images) {
 				for (const src of detail.output.images) {
-					const href = `/view?filename=${encodeURIComponent(src.filename)}&type=${
-						src.type
-					}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
+					const href = `/view?filename=${encodeURIComponent(src.filename)}&type=${src.type
+						}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
 
 					const method = feedDirection.value === "newest first" ? "prepend" : "append";
 					imageList[method](

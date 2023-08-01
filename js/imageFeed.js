@@ -8,7 +8,8 @@ $el("style", {
 	textContent: `
 	.pysssss-image-feed {
 		position: absolute;
-		background: #333;
+		background: var(--comfy-menu-bg);
+		color: var(--fg-color);
 		z-index: 99;
 		font-family: sans-serif;
 		font-size: 12px;
@@ -60,10 +61,10 @@ $el("style", {
 		justify-content: flex-end;
 	}
 	.pysssss-image-feed-btn {
-		background-color:#666666;
+		background-color:var(--comfy-input-bg);
 		border-radius:5px;
-		border:1px solid #ffffff;
-		color:#ffffff;
+		border:2px solid var(--border-color);
+		color: var(--fg-color);
 		cursor:pointer;
 		display:inline-block;
 		flex: 0 1 fit-content;
@@ -80,7 +81,7 @@ $el("style", {
 		aspect-ratio: 1 / 1;
 	}
 	.pysssss-image-feed-btn:hover {
-		background-color:#3d3d3d;
+		filter: brightness(1.2);
 	}
 	.pysssss-image-feed-btn:active {
 		position:relative;

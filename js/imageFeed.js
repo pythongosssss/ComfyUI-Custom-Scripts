@@ -330,14 +330,14 @@ app.registerExtension({
 							"section.size-control.image-size-control",
 							{},
 							[
-								$el("span", { textContent: "Image Size...", }),
+								$el("span", { textContent: "Column count...", }),
 								$el("input", {
 									type: "range",
 									min: 1,
 									max: 10,
 									step: 1,
 									oninput: (e) => {
-										e.target.parentElement.title = `Controls the maximum size images in the feed (${e.target.value} columns)`;
+										e.target.parentElement.title = `Controls the number of columns in the feed (${e.target.value} columns)`;
 										imageFeed.style.setProperty("--img-sz", e.target.value);
 										saveVal("ImageSize", e.target.value);
 									},

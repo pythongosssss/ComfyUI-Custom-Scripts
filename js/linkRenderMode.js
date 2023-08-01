@@ -28,7 +28,7 @@ const ext = {
 								oninput: (e) => {
 									setting.value = e.target.value;
 									app.canvas.links_render_mode = +e.target.value;
-									app.graph.setDirtyCanvas(true);
+									app.graph.setDirtyCanvas(true, true);
 								},
 							},
 							LiteGraph.LINK_RENDER_MODES.map((m, i) =>

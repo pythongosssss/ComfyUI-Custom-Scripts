@@ -23,6 +23,10 @@ to your ComfyUI `custom_nodes` directory
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/04b06081-ca6f-4c0f-8584-d0a157c36747)  
 Adds a menu option to auto arrange the graph in order of execution, this makes very wide graphs!
 
+## Always Snap to Grid
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/66f36d1f-e579-4959-9880-9a9624922e3a)  
+Adds a setting to make moving nodes always snap to grid.
+
 ## Constrain Image
 Adds a node for resizing an image to a max & min size optionally cropping if required.
 
@@ -125,6 +129,14 @@ Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 
 ---
 <br>
+
+# Changelog
+## 2023-08-2
+### New
+- ✨ Add "Always snap to grid" setting that does the same as holding shift, aligning nodes to the grid.
+### Minor
+- 🚨 No longer populates image feed when its closed
+- 🐛 Allow lock/unlock of multiple selected nodes
 
 # Changelog
 ## 2023-08-01

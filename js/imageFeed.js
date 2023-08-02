@@ -182,6 +182,7 @@ $el("style", {
 app.registerExtension({
 	name: "pysssss.ImageFeed",
 	setup() {
+		let visible = true;
 		const showButton = $el("button.comfy-settings-btn", {
 			textContent: "🖼️",
 			style: {
@@ -301,63 +302,52 @@ app.registerExtension({
 		imageFeed.append(
 			$el("div.pysssss-image-feed-menu", [
 				$el("section.sizing-menu", {}, [
-					$el('label.size-control-handle', { textContent: '↹ Resize Feed' }),
-					$el('div.size-controls-flyout', {}, [
-						$el(
-							"section.size-control.feed-size-control",
-							{},
-							[
-								$el("span", {
-									textContent: "Feed Size...",
-								}),
-								$el("input", {
-									type: "range",
-									min: 10,
-									max: 80,
-									oninput: (e) => {
-										e.target.parentElement.title = `Controls the maximum size of the image feed panel (${e.target.value}vh)`;
-										imageFeed.style.setProperty("--max-size", e.target.value);
-										saveVal("FeedSize", e.target.value);
-									},
-									$: (el) => {
-										requestAnimationFrame(() => {
-											el.value = getVal("FeedSize", 25);
-											el.oninput({ target: el });
-										});
-									},
-								}),
-							]
-						),
-						$el(
-							"section.size-control.image-size-control",
-							{},
-							[
-								$el("span", { textContent: "Column count...", }),
-								$el("input", {
-									type: "range",
-									min: 1,
-									max: 10,
-									step: 1,
-									oninput: (e) => {
-										e.target.parentElement.title = `Controls the number of columns in the feed (${e.target.value} columns)`;
-										imageFeed.style.setProperty("--img-sz", e.target.value);
-										saveVal("ImageSize", e.target.value);
-									},
-									$: (el) => {
-										requestAnimationFrame(() => {
-											el.value = getVal("ImageSize", 4);
-											el.oninput({ target: el });
-										});
-									},
-								}),
-							]
-						),
-					])
+					$el("label.size-control-handle", { textContent: "↹ Resize Feed" }),
+					$el("div.size-controls-flyout", {}, [
+						$el("section.size-control.feed-size-control", {}, [
+							$el("span", {
+								textContent: "Feed Size...",
+							}),
+							$el("input", {
+								type: "range",
+								min: 10,
+								max: 80,
+								oninput: (e) => {
+									e.target.parentElement.title = `Controls the maximum size of the image feed panel (${e.target.value}vh)`;
+									imageFeed.style.setProperty("--max-size", e.target.value);
+									saveVal("FeedSize", e.target.value);
+								},
+								$: (el) => {
+									requestAnimationFrame(() => {
+										el.value = getVal("FeedSize", 25);
+										el.oninput({ target: el });
+									});
+								},
+							}),
+						]),
+						$el("section.size-control.image-size-control", {}, [
+							$el("span", { textContent: "Column count..." }),
+							$el("input", {
+								type: "range",
+								min: 1,
+								max: 10,
+								step: 1,
+								oninput: (e) => {
+									e.target.parentElement.title = `Controls the number of columns in the feed (${e.target.value} columns)`;
+									imageFeed.style.setProperty("--img-sz", e.target.value);
+									saveVal("ImageSize", e.target.value);
+								},
+								$: (el) => {
+									requestAnimationFrame(() => {
+										el.value = getVal("ImageSize", 4);
+										el.oninput({ target: el });
+									});
+								},
+							}),
+						]),
+					]),
 				]),
-				$el("div.pysssss-image-feed-btn-group", {}, [
-					clearButton,
-					hideButton,
-				]),
+				$el("div.pysssss-image-feed-btn-group", {}, [clearButton, hideButton]),
 			]),
 			imageList
 		);
@@ -376,8 +366,9 @@ app.registerExtension({
 		api.addEventListener("executed", ({ detail }) => {
 			if (visible && detail?.output?.images) {
 				for (const src of detail.output.images) {
-					const href = `/view?filename=${encodeURIComponent(src.filename)}&type=${src.type
-						}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
+					const href = `/view?filename=${encodeURIComponent(src.filename)}&type=${
+						src.type
+					}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
 
 					const method = feedDirection.value === "newest first" ? "prepend" : "append";
 					imageList[method](

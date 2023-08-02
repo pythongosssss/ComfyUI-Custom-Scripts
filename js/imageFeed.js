@@ -294,6 +294,7 @@ app.registerExtension({
 				imageFeed.style.display = "none";
 				showButton.style.display = "unset";
 				saveVal("Visible", 0);
+				visible = false;
 			},
 		});
 
@@ -364,6 +365,7 @@ app.registerExtension({
 			imageFeed.style.display = "block";
 			showButton.style.display = "none";
 			saveVal("Visible", 1);
+			visible = true;
 		};
 		document.querySelector(".comfy-settings-btn").after(showButton);
 
@@ -372,7 +374,7 @@ app.registerExtension({
 		}
 
 		api.addEventListener("executed", ({ detail }) => {
-			if (detail?.output?.images) {
+			if (visible && detail?.output?.images) {
 				for (const src of detail.output.images) {
 					const href = `/view?filename=${encodeURIComponent(src.filename)}&type=${src.type
 						}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;

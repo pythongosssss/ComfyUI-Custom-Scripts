@@ -79,27 +79,47 @@ app.registerExtension({
 		};
 	},
 	async beforeRegisterNodeDef(nodeType) {
-		function lockNode(node) {
-			node[LOCKED] = true;
-			// Same hack as above
-			lockArray(node.pos, () => !!node[LOCKED]);
+		const nodesArray = (nodes) => {
+			if (nodes) {
+				if (nodes instanceof Array) {
+					return nodes;
+				}
+				return [nodes];
+			}
+			return Object.values(app.canvas.selected_nodes);
+		};
+		function unlockNode(nodes) {
+			nodes = nodesArray(nodes);
+			for (const node of nodes) {
+				delete node[LOCKED];
+			}
+		}
+		function lockNode(nodes) {
+			nodes = nodesArray(nodes);
+			for (const node of nodes) {
+				if (node[LOCKED]) continue;
 
-			// Size is set by both replacing the value and setting individual values
-			// So define a new property that can prevent reassignment
-			const sz = [node.size[0], node.size[1]];
-			Object.defineProperty(node, "size", {
-				get() {
-					return sz;
-				},
-				set(value) {
-					if (!node[LOCKED]) {
-						sz[0] = value[0];
-						sz[1] = value[1];
-					}
-				},
-			});
-			// And then lock each element if required
-			lockArray(sz, () => !!node[LOCKED]);
+				node[LOCKED] = true;
+				// Same hack as above
+				lockArray(node.pos, () => !!node[LOCKED]);
+
+				// Size is set by both replacing the value and setting individual values
+				// So define a new property that can prevent reassignment
+				const sz = [node.size[0], node.size[1]];
+				Object.defineProperty(node, "size", {
+					get() {
+						return sz;
+					},
+					set(value) {
+						if (!node[LOCKED]) {
+							sz[0] = value[0];
+							sz[1] = value[1];
+						}
+					},
+				});
+				// And then lock each element if required
+				lockArray(sz, () => !!node[LOCKED]);
+			}
 		}
 
 		// Add menu options for lock/unlock
@@ -115,12 +135,12 @@ app.registerExtension({
 					? {
 							content: "Unlock",
 							callback: () => {
-								delete this[LOCKED];
+								unlockNode();
 							},
 					  }
 					: {
 							content: "Lock",
-							callback: () => lockNode(this),
+							callback: () => lockNode(),
 					  }
 			);
 

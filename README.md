@@ -27,7 +27,7 @@ Adds a menu option to auto arrange the graph in order of execution, this makes v
 Adds a node for resizing an image to a max & min size optionally cropping if required.
 
 ## Custom Colors
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/fa7883f3-f81c-49f6-9ab6-9526e4debab6)
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/fa7883f3-f81c-49f6-9ab6-9526e4debab6)  
 Adds a custom color picker to nodes & groups
 
 ## Favicon Status
@@ -97,8 +97,8 @@ Supports appending and replacing text
 Provides basic support for touch screen devices, its not perfect but better than nothing
 
 ## Widget Defaults
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/3d675032-2b19-4da8-a7d7-fa2d7c555daa)
-Allows you to specify default values for widgets when adding new nodes, the values are configured via the settings menu
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/3d675032-2b19-4da8-a7d7-fa2d7c555daa)  
+Allows you to specify default values for widgets when adding new nodes, the values are configured via the settings menu  
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/7b57a3d8-98d3-46e9-9b33-6645c0da41e7)
 
 ## Workflows
@@ -127,6 +127,13 @@ Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 <br>
 
 # Changelog
+## 2023-08-01
+### Minor
+- 🎨 Image feed now uses comfy theme variables for colors
+- 🐛 Link render mode redraws graph on change of setting instead of requiring mouse move
+
+## 2023-07-30
+- 🎨 Update to image feed to make more user friendly, change image size to column count, various other tweaks (thanks @DrJKL)
 
 ## 2023-07-30
 ### Major

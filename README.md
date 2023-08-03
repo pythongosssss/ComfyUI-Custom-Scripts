@@ -40,7 +40,7 @@ Adds a custom color picker to nodes & groups
 Adds a favicon and title to the window, favicon changes color while generating and the window title includes the number of prompts in the queue
 
 ## Image Feed
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/06aaf682-6d98-4a97-95eb-f1e2d0b7a1f3)  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/caea0d48-85b9-4ca9-9771-5c795db35fbc)
 Adds a panel showing images that have been generated in the current session, you can control the direction that images are added and the position of the panel via the ComfyUI settings screen and the size of the panel and the images via the sliders at the top of the panel.  
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/ca093d38-41a3-4647-9223-5bd0b9ee4f1e)
 

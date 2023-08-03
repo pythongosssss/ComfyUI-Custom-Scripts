@@ -6,7 +6,7 @@ const MULTI_PRIMITIVE = "MultiPrimitive|pysssss";
 
 app.registerExtension({
 	name: "pysssss.ReroutePrimitive",
-	async beforeRegisterNodeDef(nodeType, nodeData, app) {
+	init() {
 		// On graph configure, fire onGraphConfigured to create widgets
 		const graphConfigure = LGraph.prototype.configure;
 		LGraph.prototype.configure = function () {
@@ -19,7 +19,8 @@ app.registerExtension({
 
 			return r;
 		};
-
+	},
+	async beforeRegisterNodeDef(nodeType, nodeData, app) {
 		function addOutputHandler() {
 			// Finds the first non reroute output node down the chain
 			nodeType.prototype.getFirstReroutedOutput = function (slot) {

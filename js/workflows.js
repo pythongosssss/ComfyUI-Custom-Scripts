@@ -146,12 +146,14 @@ class PysssssWorkflows {
 			return [
 				{
 					title: "Save as",
-					callback() {
-						let filename = prompt("Enter filename", "workflow");
+					callback: () => {
+						let filename = prompt("Enter filename", this.workflowName || "workflow");
 						if (filename) {
 							if (!filename.toLowerCase().endsWith(".json")) {
 								filename += ".json";
 							}
+
+							this.workflowName = filename;
 
 							const json = JSON.stringify(app.graph.serialize(), null, 2); // convert the data to a JSON string
 							const blob = new Blob([json], { type: "application/json" });
@@ -173,8 +175,10 @@ class PysssssWorkflows {
 				{
 					title: "Save to workflows",
 					callback: async () => {
-						const name = prompt("Enter filename", "workflow");
+						const name = prompt("Enter filename", this.workflowName || "workflow");
 						if (name) {
+							this.workflowName = name;
+
 							const data = app.graph.serialize();
 							if (!(await saveWorkflow(name, data))) {
 								if (confirm("A workspace with this name already exists, do you want to overwrite it?")) {
@@ -190,6 +194,17 @@ class PysssssWorkflows {
 			];
 		});
 		this.load();
+
+		const handleFile = app.handleFile;
+		const self = this;
+		app.handleFile = function (file) {
+			if (file?.name?.endsWith(".json")) {
+				self.workflowName = file.name;
+			} else {
+				self.workflowName = null;
+			}
+			return handleFile.apply(this, arguments);
+		};
 	}
 }
 

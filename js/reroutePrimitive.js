@@ -3,6 +3,7 @@ import { ComfyWidgets } from "/scripts/widgets.js";
 
 const REROUTE_PRIMITIVE = "ReroutePrimitive|pysssss";
 const MULTI_PRIMITIVE = "MultiPrimitive|pysssss";
+const LAST_TYPE = Symbol("LastType");
 
 app.registerExtension({
 	name: "pysssss.ReroutePrimitive",
@@ -97,11 +98,19 @@ app.registerExtension({
 
 				if (widgetType in ComfyWidgets) {
 					if (!this.widgets?.length) {
+						let v;
+						if (this.widgets_values?.length) {
+							v = this.widgets_values[0];
+						}
 						let config = [link.type, {}];
 						if (input.widget) {
 							config = input.widget.config;
 						}
-						ComfyWidgets[widgetType](this, "value", config, app);
+						const { widget } = ComfyWidgets[widgetType](this, "value", config, app);
+						if (v !== undefined && (!this[LAST_TYPE] || this[LAST_TYPE] === widgetType)) {
+							widget.value = v;
+						}
+						this[LAST_TYPE] = widgetType;
 					}
 				} else if (this.widgets) {
 					this.widgets.length = 0;

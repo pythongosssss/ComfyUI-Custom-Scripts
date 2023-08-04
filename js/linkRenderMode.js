@@ -5,6 +5,10 @@ const id = "pysssss.LinkRenderMode";
 const ext = {
 	name: id,
 	async setup(app) {
+		if (app.extensions.find((ext) => ext.name === "Comfy.LinkRenderMode")) {
+			console.log("%c[🐍 pysssss]", "color: limegreen", "Skipping LinkRenderMode as core extension found");
+			return;
+		}
 		const setting = app.ui.settings.addSetting({
 			id,
 			name: "🐍 Link Render Mode",

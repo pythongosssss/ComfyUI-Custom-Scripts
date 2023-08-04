@@ -92,7 +92,7 @@ Takes input from a node that produces a string and displays it, useful for thing
 Shows the current generating image on the menu at the bottom, you can disable this via the settings menu.
 
 ## String Function
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/01107137-8a93-4765-bae0-fcc110a09091)
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/01107137-8a93-4765-bae0-fcc110a09091)  
 Supports appending and replacing text  
 `tidy_tags` will add commas between parts when in `append` mode.  
 `replace` mode supports regex replace by using `/your regex here/` and you can reference capturing groups using `\number` e.g. `\1`
@@ -131,9 +131,15 @@ Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 <br>
 
 # Changelog
-## 2023-08-2
+## 2023-08-03
+### Minor
+- ✨ Always snap to grid now applies on node resize
+- 🐛 Fix reroute primitive widget value not being restored on reload
+- ✨ Workflows now reuse last filename from load & save - save must be done by the submenu
+
+## 2023-08-02
 ### New
-- ✨ Add "Always snap to grid" setting that does the same as holding shift, aligning nodes to the grid.
+- ✨ Add "Always snap to grid" setting that does the same as holding shift, aligning nodes to the grid
 ### Minor
 - 🚨 No longer populates image feed when its closed
 - 🐛 Allow lock/unlock of multiple selected nodes

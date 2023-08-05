@@ -81,7 +81,7 @@ Adds a node that lets you save and use text presets (e.g. for your 'normal' nega
 Adds various menu items to some nodes for quickly setting up common parts of graphs
 
 ## Play Sound
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/6e615663-ab55-4b78-82d9-4881769db9c5)  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/9bcf9fb3-5898-4432-a974-fb1e17d3b7e8)  
 Plays a sound when the node is executed, either after each prompt or only when the queue is empty for queuing multiple prompts.  
 You can customize the sound by replacing the mp3 file `web/extensions/pysssss/CustomScripts/assets\notify.mp3`
 

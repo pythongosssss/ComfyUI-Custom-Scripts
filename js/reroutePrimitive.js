@@ -20,6 +20,57 @@ app.registerExtension({
 
 			return r;
 		};
+
+		const graphToPrompt = app.graphToPrompt;
+		app.graphToPrompt = async function () {
+			const res = await graphToPrompt.apply(this, arguments);
+
+			const multiOutputs = [];
+			for (const nodeId in res.output) {
+				const output = res.output[nodeId];
+				if (output.class_type === MULTI_PRIMITIVE) {
+					multiOutputs.push({ id: nodeId, inputs: output.inputs });
+				}
+			}
+
+			function permute(outputs) {
+				function generatePermutations(inputs, currentIndex, currentPermutation, result) {
+					if (currentIndex === inputs.length) {
+						result.push({ ...currentPermutation });
+						return;
+					}
+
+					const input = inputs[currentIndex];
+
+					for (const k in input) {
+						currentPermutation[currentIndex] = input[k];
+						generatePermutations(inputs, currentIndex + 1, currentPermutation, result);
+					}
+				}
+
+				const inputs = outputs.map((output) => output.inputs);
+				const result = [];
+				const current = new Array(inputs.length);
+
+				generatePermutations(inputs, 0, current, result);
+
+				return outputs.map((output, index) => ({
+					...output,
+					inputs: result.reduce((p, permutation) => {
+						const count = Object.keys(p).length;
+						p["value" + (count || "")] = permutation[index];
+						return p;
+					}, {}),
+				}));
+			}
+
+			const permutations = permute(multiOutputs);
+			for (let i = 0; i < permutations.length; i++) {
+				res.output[multiOutputs[i].id].inputs = permutations[i].inputs;
+			}
+
+			return res;
+		};
 	},
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
 		function addOutputHandler() {

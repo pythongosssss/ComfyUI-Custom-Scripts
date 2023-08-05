@@ -80,6 +80,11 @@ Adds a node that lets you save and use text presets (e.g. for your 'normal' nega
 ![image](https://user-images.githubusercontent.com/125205205/230174266-5232831a-a03b-4bf7-bc8b-c45466a0bc64.png)  
 Adds various menu items to some nodes for quickly setting up common parts of graphs
 
+## Play Sound
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/6e615663-ab55-4b78-82d9-4881769db9c5)  
+Plays a sound when the node is executed, either after each prompt or only when the queue is empty for queuing multiple prompts.  
+You can customize the sound by replacing the mp3 file `web/extensions/pysssss/CustomScripts/assets\notify.mp3`
+
 ## Show Text
 ![image](https://user-images.githubusercontent.com/125205205/230174888-c004fd48-da78-4de9-81c2-93a866fcfcd1.png)  
 Takes input from a node that produces a string and displays it, useful for things like interrogator, prompt generators, etc.
@@ -136,6 +141,7 @@ Allows you to control the rendering of the links between nodes between straight,
 - 🚨 The ComfyUI Lora Loader no longer has subfolders, due to compatibility issues you need to use my Lora Loader if you want subfolers, these can be enabled/disabled on the node via a setting (🐍 Enable submenu in custom nodes)
 ### New
 - ✨ Add custom Checkpoint Loader supporting images & subfolders
+- ✨ Add Play Sound node for notifying when a prompt is finished
 ### Minor
 - ✨ Quick Nodes supports new LoRA loader ("Add 🐍 LoRA")
 - ♻️ Disable link render mode if ComfyUI has native support

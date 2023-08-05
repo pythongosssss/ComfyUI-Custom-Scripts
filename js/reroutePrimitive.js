@@ -187,7 +187,7 @@ app.registerExtension({
 
 			Object.defineProperty(nodeType, "title_mode", {
 				get() {
-					return app.canvas.current_node.widgets?.length ? LiteGraph.NORMAL_TITLE : LiteGraph.NO_TITLE;
+					return app.canvas.current_node?.widgets?.length ? LiteGraph.NORMAL_TITLE : LiteGraph.NO_TITLE;
 				},
 			});
 

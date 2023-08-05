@@ -2,15 +2,6 @@ import { app } from "/scripts/app.js";
 
 // Adds a bunch of context menu entries for quickly adding common steps
 
-// Any node with VAE input: "Use Vae" - Will find or add a VAE Loader and attach it
-// KSampler: "Add Blank Input" - Connects an EmptyLatentImage
-// KSampler: "Add Hi-res Fix" - Connects a LatentUpscale + second KSampler
-// KSampler: "Add 2nd Pass" - Connects a new Ckpt Loader, CLIP Texts, Upscale and Sampler
-// KSampler: "Add Save Image" - Connects a VAEDecode + SaveImage
-// CheckpointLoaderSimple: "Add Clip Skip" - Connects a CLIPSetLastLayer node
-// CheckpointLoaderSimple, CheckpointLoader, LoraLoader - "Add LORA" - Connects a new LoraLoader
-// CheckpointLoaderSimple, CheckpointLoader, LoraLoader - "Add Promps" - Connects two new CLIPTextEncodes
-
 function addMenuHandler(nodeType, cb) {
 	const getOpts = nodeType.prototype.getExtraMenuOptions;
 	nodeType.prototype.getExtraMenuOptions = function () {
@@ -146,7 +137,7 @@ app.registerExtension({
 						for (const clipLink of clipLinks) {
 							clipSkipNode.connect(0, clipLink.target_id, clipLink.target_slot);
 						}
-					}
+					},
 				});
 			});
 		}
@@ -154,32 +145,38 @@ app.registerExtension({
 		if (
 			nodeData.name === "CheckpointLoaderSimple" ||
 			nodeData.name === "CheckpointLoader" ||
-			nodeData.name === "LoraLoader"
+			nodeData.name === "LoraLoader" ||
+			nodeData.name === "LoraLoader|pysssss"
 		) {
 			addMenuHandler(nodeType, function (_, options) {
+				function addLora(type) {
+					const loraNode = addNode(type, this);
+
+					const modelLinks = this.outputs[0].links ? this.outputs[0].links.map((l) => ({ ...graph.links[l] })) : [];
+					const clipLinks = this.outputs[1].links ? this.outputs[1].links.map((l) => ({ ...graph.links[l] })) : [];
+
+					this.disconnectOutput(0);
+					this.disconnectOutput(1);
+
+					this.connect(0, loraNode, 0);
+					this.connect(1, loraNode, 1);
+
+					for (const modelLink of modelLinks) {
+						loraNode.connect(0, modelLink.target_id, modelLink.target_slot);
+					}
+
+					for (const clipLink of clipLinks) {
+						loraNode.connect(1, clipLink.target_id, clipLink.target_slot);
+					}
+				}
 				options.unshift(
 					{
-						content: "Add LORA",
-						callback: () => {
-							const loraNode = addNode("LoraLoader", this);
-
-							const modelLinks = this.outputs[0].links ? this.outputs[0].links.map((l) => ({ ...graph.links[l] })) : [];
-							const clipLinks = this.outputs[1].links ? this.outputs[1].links.map((l) => ({ ...graph.links[l] })) : [];
-
-							this.disconnectOutput(0);
-							this.disconnectOutput(1);
-
-							this.connect(0, loraNode, 0);
-							this.connect(1, loraNode, 1);
-
-							for (const modelLink of modelLinks) {
-								loraNode.connect(0, modelLink.target_id, modelLink.target_slot);
-							}
-
-							for (const clipLink of clipLinks) {
-								loraNode.connect(1, clipLink.target_id, clipLink.target_slot);
-							}
-						},
+						content: "Add LoRA",
+						callback: () => addLora.call(this, "LoraLoader"),
+					},
+					{
+						content: "Add 🐍 LoRA",
+						callback: () => addLora.call(this, "LoraLoader|pysssss"),
 					},
 					{
 						content: "Add Prompts",

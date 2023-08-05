@@ -2,6 +2,19 @@ import { app } from "/scripts/app.js";
 app.registerExtension({
 	name: "pysssss.ContextMenuHook",
 	init() {
+		const getOrSet = (target, name, create) => {
+			if (name in target) return target[name];
+			return (target[name] = create());
+		};
+		const symbol = getOrSet(window, "__pysssss__", () => Symbol("__pysssss__"));
+		const store = getOrSet(window, symbol, () => ({}));
+		const contextMenuHook = getOrSet(store, "contextMenuHook", () => ({}));
+		for (const e of ["ctor", "preAddItem", "addItem"]) {
+			if (!contextMenuHook[e]) {
+				contextMenuHook[e] = [];
+			}
+		}
+
 		// Big ol' hack to get allow customizing the context menu
 		// Replace the addItem function with our own that wraps the context of "this" with a proxy
 		// That proxy then replaces the constructor with another proxy
@@ -11,6 +24,18 @@ app.registerExtension({
 				return new LiteGraph.ContextMenu(...args);
 			},
 		});
+
+		function triggerCallbacks(name, getArgs, handler) {
+			const callbacks = contextMenuHook[name];
+			if (callbacks && callbacks instanceof Array) {
+				for (const cb of callbacks) {
+					const r = cb(...getArgs());
+					handler?.call(this, r);
+				}
+			} else {
+				console.warn("[pysssss 🐍]", `invalid ${name} callbacks`, callbacks, name in contextMenuHook);
+			}
+		}
 
 		const addItem = LiteGraph.ContextMenu.prototype.addItem;
 		LiteGraph.ContextMenu.prototype.addItem = function () {
@@ -23,20 +48,28 @@ app.registerExtension({
 				},
 			});
 			proxy.__target__ = this;
-			let el = addItem.apply(proxy, arguments);
-			const callbacks = LiteGraph.ContextMenu["pysssss:addItem"];
-			if (callbacks && callbacks instanceof Array) {
-				for (const cb of callbacks) {
-					el = cb(el, this, arguments) || el;
+
+			let el;
+			let args = arguments;
+			triggerCallbacks(
+				"preAddItem",
+				() => [el, this, args],
+				(r) => {
+					if (r !== undefined) el = r;
 				}
-			} else {
-				console.warn(
-					"[pysssss 🐍]",
-					"invalid addItem callbacks",
-					callbacks,
-					"pysssss:addItem" in LiteGraph.ContextMenu
-				);
+			);
+
+			if (el === undefined) {
+				el = addItem.apply(proxy, arguments);
 			}
+
+			triggerCallbacks(
+				"addItem",
+				() => [el, this, args],
+				(r) => {
+					if (r !== undefined) el = r;
+				}
+			);
 			return el;
 		};
 
@@ -48,22 +81,10 @@ app.registerExtension({
 					options.parentMenu = options.parentMenu.__target__;
 				}
 			}
-			const callbacks = LiteGraph.ContextMenu["pysssss:ctor"];
-			if (callbacks && callbacks instanceof Array) {
-				for (const cb of callbacks) {
-					cb(values, options);
-				}
-			} else {
-				console.warn("[pysssss 🐍]", "invalid ctor callbacks", callbacks, "pysssss:ctor" in LiteGraph.ContextMenu);
-			}
+
+			triggerCallbacks("ctor", () => [values, options]);
 			ctxMenu.call(this, values, options);
 		};
 		LiteGraph.ContextMenu.prototype = ctxMenu.prototype;
-		if (!LiteGraph.ContextMenu["pysssss:ctor"]) {
-			LiteGraph.ContextMenu["pysssss:ctor"] = [];
-		}
-		if (!LiteGraph.ContextMenu["pysssss:addItem"]) {
-			LiteGraph.ContextMenu["pysssss:addItem"] = [];
-		}
 	},
 });

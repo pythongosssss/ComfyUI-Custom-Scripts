@@ -17,6 +17,7 @@ app.registerExtension({
 				}
 				const url = new URL(`assets/notify.mp3`, import.meta.url);
 				const audio = new Audio(url);
+				audio.volume = this.widgets[1].value;
 				audio.play();
 			};
 		}

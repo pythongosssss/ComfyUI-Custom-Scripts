@@ -14,6 +14,7 @@ class PlaySound:
         return {"required": {
             "any": (any, {}),
             "mode": (["always", "on empty queue"], {}),
+            "volume": ("FLOAT", {"min": 0, "max": 1, "step": 0.1, "default": 0.5})
         }}
 
     FUNCTION = "nop"
@@ -26,8 +27,8 @@ class PlaySound:
     def IS_CHANGED(self, **kwargs):
         return float("NaN")
 
-    def nop(self, any, mode):
-        return {"ui": {"a":[]}, "result": ()}
+    def nop(self, any, mode, volume):
+        return {"ui": {"a": []}, "result": ()}
 
 
 NODE_CLASS_MAPPINGS = {

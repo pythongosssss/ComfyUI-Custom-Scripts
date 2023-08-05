@@ -27,6 +27,12 @@ Adds a menu option to auto arrange the graph in order of execution, this makes v
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/66f36d1f-e579-4959-9880-9a9624922e3a)  
 Adds a setting to make moving nodes always snap to grid.
 
+## [Testing] "Better" Loader Lists
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/664caa71-f25f-4a96-a04a-1466d6b2b8b4)  
+Adds custom Lora and Checkpoint loader nodes, these have the ability to show preview images, just place a png or jpg next to the file and it'll display in the list on hover (e.g. sdxl.safetensors and sdxl.png).  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/e15b5e83-4f9d-4d57-8324-742bedf75439)  
+Optionally enable subfolders via the settings, subfolders currently don't support filtering but support should be coming soon!  
+
 ## Constrain Image
 Adds a node for resizing an image to a max & min size optionally cropping if required.
 
@@ -48,15 +54,6 @@ Adds a panel showing images that have been generated in the current session, you
 Provides a simple method to set custom denoise on the advanced sampler  
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/42946bd8-0078-4c7a-bfe9-7adb1382b5e2)
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/7cfccb22-f155-4848-934b-a2b2a6efe16f)
-
-## Link Render Mode
-Allows you to control the rendering of the links between nodes.
-Straight:  
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/ad3be76b-43b1-455e-a64a-bf2a6571facf)  
-Linear:  
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/cadf7ccf-a6fe-4467-b063-5a32c1d1d633)  
-Spline (default):  
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/e967b59d-2b69-468c-a4ab-ac2fe0cb439e)
 
 ## Lock Nodes & Groups
 ![image](https://user-images.githubusercontent.com/125205205/230172868-5c5a943c-ade1-4799-bf80-cc931da5d4b2.png)  
@@ -113,25 +110,37 @@ Adds options to the menu for saving + loading workflows:
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/06453fd2-c020-46ee-a7db-2b8bf5bcba7e)  
 Adds menu options for importing/exporting the graph as SVG and PNG showing a view of the nodes
 
-## [Testing] Lora Loader with Images
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/4a0a5244-2201-4c1f-b5f0-7ac18eacb19a)  
-Adds a custom Lora Loader node that supports showing images on hover, currently does not support subfolder navigation.
-
-## [Testing] Reroute Primitive
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/8b870eef-d572-43f9-b394-cfa7abbd2f98)  
-Provides a node that allows rerouting primitives.  
+## (Testing) Reroute Primitive
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/8b870eef-d572-43f9-b394-cfa7abbd2f98)  Provides a node that allows rerouting primitives.  
 The node can also be collapsed to a single point that you can drag around.  
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/a9bd0112-cf8f-44f3-af6d-f9a8fed152a7)  
 Warning: Don't use normal reroutes or primitives with these nodes, it isn't tested and this node replaces their functionality.
 
+<br>
+<br>
+
+
 ## WD14 Tagger
 Moved to: https://github.com/pythongosssss/ComfyUI-WD14-Tagger
 
----
+## Link Render Mode  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/ad3be76b-43b1-455e-a64a-bf2a6571facf)  
+Allows you to control the rendering of the links between nodes between straight, linear & spline, e.g. Straight. 
+
+<br>
 <br>
 
 # Changelog
-## 2023-08-03
+## 2023-08-05
+### Major
+- 🚨 The ComfyUI Lora Loader no longer has subfolders, due to compatibility issues you need to use my Lora Loader if you want subfolers, these can be enabled/disabled on the node via a setting (🐍 Enable submenu in custom nodes)
+### New
+- ✨ Add custom Checkpoint Loader supporting images & subfolders
+### Minor
+- ✨ Quick Nodes supports new LoRA loader ("Add 🐍 LoRA")
+- ♻️ Disable link render mode if ComfyUI has native support
+
+## 2023-08-04
 ### Minor
 - ✨ Always snap to grid now applies on node resize
 - 🐛 Fix reroute primitive widget value not being restored on reload

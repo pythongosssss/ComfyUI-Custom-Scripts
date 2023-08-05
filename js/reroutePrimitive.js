@@ -185,6 +185,12 @@ app.registerExtension({
 				return r;
 			};
 
+			Object.defineProperty(nodeType, "title_mode", {
+				get() {
+					return app.canvas.current_node.widgets?.length ? LiteGraph.NORMAL_TITLE : LiteGraph.NO_TITLE;
+				},
+			});
+
 			nodeType.prototype.onConnectionsChange = function (type, _, connected, link_info) {
 				// If configuring treat everything as OK as links may not be set by litegraph yet
 				if (configuring) return;

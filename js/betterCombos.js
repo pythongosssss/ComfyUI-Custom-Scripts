@@ -51,8 +51,6 @@ app.registerExtension({
 		// Simple check for what separator to split by
 		const splitBy = (navigator.platform || navigator.userAgent).includes("Win") ? "\\" : "/";
 
-		// TODO: Once filtering submenus is fixed uncomment this
-		/*
 		contextMenuHook["ctor"].push(function (values, options) {
 			// Copy the class from the parent so if we are dark we are also dark
 			// this enables the filter box
@@ -60,7 +58,6 @@ app.registerExtension({
 				options.className = "dark";
 			}
 		});
-		*/
 
 		// After an element is created for an item, add an image if it has one
 		contextMenuHook["addItem"].push(function (el, menu, [name, value, options]) {

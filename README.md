@@ -31,7 +31,7 @@ Adds a setting to make moving nodes always snap to grid.
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/664caa71-f25f-4a96-a04a-1466d6b2b8b4)  
 Adds custom Lora and Checkpoint loader nodes, these have the ability to show preview images, just place a png or jpg next to the file and it'll display in the list on hover (e.g. sdxl.safetensors and sdxl.png).  
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/e15b5e83-4f9d-4d57-8324-742bedf75439)  
-Optionally enable subfolders via the settings, subfolders currently don't support filtering but support should be coming soon!  
+Optionally enable subfolders via the settings 
 
 ## Constrain Image
 Adds a node for resizing an image to a max & min size optionally cropping if required.
@@ -58,10 +58,6 @@ Provides a simple method to set custom denoise on the advanced sampler
 ## Lock Nodes & Groups
 ![image](https://user-images.githubusercontent.com/125205205/230172868-5c5a943c-ade1-4799-bf80-cc931da5d4b2.png)  
 Adds a lock option to nodes & groups that prevents you from moving them until unlocked
-
-## Lora Subfolders
-![image](https://user-images.githubusercontent.com/125205205/230173454-9ade50fb-6f08-435a-8c30-e87e8043de48.png)  
-Changes the lora menu into a dropdown of subfolders, not currently compatible with the searching/filtering (the search won't appear on submenus)
 
 ## Math Expression
 Allows for evaluating complex expressions using values from the graph.  
@@ -136,6 +132,10 @@ Allows you to control the rendering of the links between nodes between straight,
 <br>
 
 # Changelog
+## 2023-08-11
+### Minor
+- ✨ Enable filter box on submenus
+  
 ## 2023-08-05
 ### Major
 - 🚨 The ComfyUI Lora Loader no longer has subfolders, due to compatibility issues you need to use my Lora Loader if you want subfolers, these can be enabled/disabled on the node via a setting (🐍 Enable submenu in custom nodes)

@@ -24,9 +24,9 @@ async def view_image(request):
 def populate_images(names, type):
     for idx, item_name in enumerate(names):
 
-        item_name = os.path.splitext(item_name)[0]
+        file_name = os.path.splitext(item_name)[0]
         for ext in ["png", "jpg", "preview.png"]:
-            item_image = f"{item_name}.{ext}"
+            item_image = f"{file_name}.{ext}"
             item_image_path = folder_paths.get_full_path(type, item_image)
             if item_image_path:
                 break

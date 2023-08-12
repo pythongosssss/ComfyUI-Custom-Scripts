@@ -23,12 +23,13 @@ async def view_image(request):
 
 def populate_images(names, type):
     for idx, item_name in enumerate(names):
-        item_image = os.path.splitext(item_name)[0] + ".png"
-        item_image_path = folder_paths.get_full_path(type, item_image)
-        if not item_image_path:
-            item_image = os.path.splitext(item_name)[0] + ".jpg"
-            item_image_path = folder_paths.get_full_path(
-                type, item_image)
+
+        item_name = os.path.splitext(item_name)[0]
+        for ext in ["png", "jpg", "preview.png"]:
+            item_image = f"{item_name}.{ext}"
+            item_image_path = folder_paths.get_full_path(type, item_image)
+            if item_image_path:
+                break
 
         names[idx] = {"content": item_name,
                       "image": f"{type}/{item_image}" if item_image_path else None, }
@@ -42,7 +43,7 @@ class LoraLoaderWithImages(LoraLoader):
         names = types["required"]["lora_name"][0]
         populate_images(names, "loras")
         return types
-    
+
     def load_lora(self, **kwargs):
         kwargs["lora_name"] = kwargs["lora_name"]["content"]
         return super().load_lora(**kwargs)
@@ -55,7 +56,7 @@ class CheckpointLoaderSimpleWithImages(CheckpointLoaderSimple):
         names = types["required"]["ckpt_name"][0]
         populate_images(names, "checkpoints")
         return types
-    
+
     def load_checkpoint(self, **kwargs):
         kwargs["ckpt_name"] = kwargs["ckpt_name"]["content"]
         return super().load_checkpoint(**kwargs)

@@ -133,6 +133,12 @@ Allows you to control the rendering of the links between nodes between straight,
 
 # Changelog
 ## 2023-08-11
+### New
+- 🎨 Image feed now uses a lightbox for showing images
+### Minor
+- 🎨 Better loader lists now supports images named `{name}.preview.png`
+
+## 2023-08-11
 ### Minor
 - ✨ Enable filter box on submenus
   

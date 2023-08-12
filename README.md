@@ -132,7 +132,7 @@ Allows you to control the rendering of the links between nodes between straight,
 <br>
 
 # Changelog
-## 2023-08-11
+## 2023-08-12
 ### New
 - 🎨 Image feed now uses a lightbox for showing images
 ### Minor

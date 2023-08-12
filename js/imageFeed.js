@@ -1,8 +1,7 @@
 import { api } from "/scripts/api.js";
 import { app } from "/scripts/app.js";
 import { $el } from "/scripts/ui.js";
-
-// Adds a list of images that are generated to the bottom of the page
+import { lightbox } from "./common/lightbox.js";
 
 $el("style", {
 	textContent: `
@@ -378,6 +377,11 @@ app.registerExtension({
 								{
 									target: "_blank",
 									href,
+									onclick: (e) => {
+										const imgs = [...imageList.querySelectorAll("img")].map((img) => img.getAttribute("src"));
+										lightbox.show(imgs, imgs.indexOf(href));
+										e.preventDefault();
+									},
 								},
 								[$el("img", { src: href })]
 							),

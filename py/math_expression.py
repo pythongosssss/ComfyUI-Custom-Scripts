@@ -1,4 +1,5 @@
 import ast
+import math
 import operator as op
 
 operators = {
@@ -11,6 +12,21 @@ operators = {
     ast.BitXor: op.xor,
     ast.USub: op.neg,
     ast.Mod: op.mod
+}
+
+functions = {
+    "round": {
+        "args": (1, 2),
+        "call": lambda a, b = None: round(a, b)
+    },
+    "ceil": {
+        "args": (1, 1),
+        "call": lambda a : math.ceil(a)
+    },
+    "floor": {
+        "args": (1, 1),
+        "call": lambda a: math.floor(a)
+    }
 }
 
 
@@ -80,6 +96,18 @@ class MathExpression:
                 if node.id == "c":
                     return c
                 raise NameError(f"Name not found: {node.id}")
+            elif isinstance(node, ast.Call):
+                if node.func.id in functions:
+                    fn = functions[node.func.id]
+                    l = len(node.args)
+                    if l < fn["args"][0] or l > fn["args"][1]:
+                        raise SyntaxError(
+                            f"Invalid function call: {node.func.id} requires {fn['args'][0]} to {fn['args'][1]} arguments")
+                    args = []
+                    for arg in node.args:
+                        args.append(eval_expr(arg))
+                    return fn["call"](*args)
+                raise NameError(f"Invalid function call: {node.func.id}")
             else:
                 raise TypeError(node)
 

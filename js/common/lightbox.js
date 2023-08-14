@@ -1,4 +1,4 @@
-import { $el } from "/scripts/ui.js";
+import { $el } from "../../../../scripts/ui.js";
 import { addStylesheet, getUrl, loadImage } from "./utils.js";
 import { createSpinner } from "./spinner.js";
 

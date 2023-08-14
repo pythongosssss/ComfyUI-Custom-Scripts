@@ -1,5 +1,5 @@
-import { api } from "/scripts/api.js";
-import { app } from "/scripts/app.js";
+import { api } from "../../../scripts/api.js";
+import { app } from "../../../scripts/app.js";
 
 // Simple script that adds the current queue size to the window title
 // Adds a favicon that changes color while active

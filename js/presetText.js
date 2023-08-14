@@ -1,4 +1,4 @@
-import { app } from "/scripts/app.js";
+import { app } from "../../../scripts/app.js";
 
 // Allows you to manage preset tags for e.g. common negative prompt
 // Also performs replacements on any text field e.g. allowing you to use preset text in CLIP Text encode fields

@@ -1,5 +1,5 @@
-import { app } from "/scripts/app.js";
-import { ComfyWidgets } from "/scripts/widgets.js";
+import { app } from "../../../scripts/app.js";
+import { ComfyWidgets } from "../../../scripts/widgets.js";
 
 const REROUTE_PRIMITIVE = "ReroutePrimitive|pysssss";
 const MULTI_PRIMITIVE = "MultiPrimitive|pysssss";

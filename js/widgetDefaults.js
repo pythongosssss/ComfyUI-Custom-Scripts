@@ -1,5 +1,5 @@
-import { app } from "/scripts/app.js";
-import { $el, ComfyDialog } from "/scripts/ui.js";
+import { app } from "../../../scripts/app.js";
+import { $el, ComfyDialog } from "../../../scripts/ui.js";
 
 // Allows you to specify custom default values for any widget on any node
 

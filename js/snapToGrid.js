@@ -1,4 +1,4 @@
-import { app } from "/scripts/app.js";
+import { app } from "../../../scripts/app.js";
 
 let setting;
 const id = "pysssss.SnapToGrid";

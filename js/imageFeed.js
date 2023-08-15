@@ -1,6 +1,6 @@
-import { api } from "/scripts/api.js";
-import { app } from "/scripts/app.js";
-import { $el } from "/scripts/ui.js";
+import { api } from "../../../scripts/api.js";
+import { app } from "../../../scripts/app.js";
+import { $el } from "../../../scripts/ui.js";
 import { lightbox } from "./common/lightbox.js";
 
 $el("style", {

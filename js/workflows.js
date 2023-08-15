@@ -1,5 +1,6 @@
-import { app } from "/scripts/app.js";
-import { $el } from "/scripts/ui.js";
+import { app } from "../../../scripts/app.js";
+import { api } from "../../../scripts/api.js"
+import { $el } from "../../../scripts/ui.js";
 
 // Adds workflow management
 // Original implementation by https://github.com/i-h4x
@@ -47,18 +48,18 @@ const style = `
 `;
 
 async function getWorkflows() {
-	const response = await fetch("/pysssss/workflows", { cache: "no-store" });
+	const response = await api.fetchApi("/pysssss/workflows", { cache: "no-store" });
 	return await response.json();
 }
 
 async function getWorkflow(name) {
-	const response = await fetch(`/pysssss/workflows/${encodeURIComponent(name)}`, { cache: "no-store" });
+	const response = await api.fetchApi(`/pysssss/workflows/${encodeURIComponent(name)}`, { cache: "no-store" });
 	return await response.json();
 }
 
 async function saveWorkflow(name, workflow, overwrite) {
 	try {
-		const response = await fetch("/pysssss/workflows", {
+		const response = await api.fetchApi("/pysssss/workflows", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

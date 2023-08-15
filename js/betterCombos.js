@@ -1,6 +1,6 @@
-import { app } from "/scripts/app.js";
-import { ComfyWidgets } from "/scripts/widgets.js";
-import { $el } from "/scripts/ui.js";
+import { app } from "../../../scripts/app.js";
+import { ComfyWidgets } from "../../../scripts/widgets.js";
+import { $el } from "../../../scripts/ui.js";
 
 app.registerExtension({
 	name: "pysssss.Combo++",

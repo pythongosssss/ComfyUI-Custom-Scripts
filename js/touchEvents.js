@@ -1,4 +1,4 @@
-import { app } from "/scripts/app.js";
+import { app } from "../../../scripts/app.js";
 
 // Adds mapping of touch events to mouse events for mobile. This isnt great but it is somewhat usable
 

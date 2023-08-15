@@ -1,4 +1,4 @@
-import { $el } from "/scripts/ui.js";
+import { $el } from "../../../../scripts/ui.js";
 
 export function addStylesheet(url) {
 	$el("link", {

@@ -1,5 +1,6 @@
 import ast
 import math
+import random
 import operator as op
 
 operators = {
@@ -21,11 +22,15 @@ functions = {
     },
     "ceil": {
         "args": (1, 1),
-        "call": lambda a : math.ceil(a)
+        "call": lambda a: math.ceil(a)
     },
     "floor": {
         "args": (1, 1),
         "call": lambda a: math.floor(a)
+    },
+    "randomint": {
+        "args": (2, 2),
+        "call": lambda a, b: random.randint(a, b)
     }
 }
 
@@ -50,6 +55,14 @@ class MathExpression:
     RETURN_TYPES = ("INT", "FLOAT", "STRING", )
     FUNCTION = "evaluate"
     CATEGORY = "utils"
+
+    
+    @classmethod
+    def IS_CHANGED(s, expression, **kwargs):
+        if "random" in expression:
+            return float("nan")
+        return expression
+
 
     def get_widget_value(self, extra_pnginfo, prompt, node_name, widget_name):
         workflow = extra_pnginfo["workflow"]

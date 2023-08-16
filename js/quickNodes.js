@@ -145,6 +145,7 @@ app.registerExtension({
 		if (
 			nodeData.name === "CheckpointLoaderSimple" ||
 			nodeData.name === "CheckpointLoader" ||
+			nodeData.name === "CheckpointLoader|pysssss" ||
 			nodeData.name === "LoraLoader" ||
 			nodeData.name === "LoraLoader|pysssss"
 		) {

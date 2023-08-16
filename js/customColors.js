@@ -1,5 +1,5 @@
-import { app } from "/scripts/app.js";
-import { $el } from "/scripts/ui.js";
+import { app } from "../../../scripts/app.js";
+import { $el } from "../../../scripts/ui.js";
 
 const colorShade = (col, amt) => {
 	col = col.replace(/^#/, "");

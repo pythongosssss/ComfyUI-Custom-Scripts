@@ -1,4 +1,4 @@
-import { app } from "/scripts/app.js";
+import { app } from "../../../scripts/app.js";
 
 // Adds lock/unlock menu item for nodes + groups to prevent moving / resizing them
 

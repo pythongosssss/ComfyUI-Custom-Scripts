@@ -65,7 +65,7 @@ Allows for evaluating complex expressions using values from the graph.
 Other nodes values can be referenced via the `Node name for S&R` via the `Properties` menu item on a node, or the node title.  
 The above example evaluates as `(10 * 512) / 2 + 1000`.  
 Supported operators: `+ - * /` (basic ops) `//` (floor division) `**` (power) `^` (xor) `%` (mod)  
-Supported functions `floor(num, dp?)` `floor(num)` `ceil(num)`  
+Supported functions `floor(num, dp?)` `floor(num)` `ceil(num)` `randomint(min,max)`  
 
 ## Node Finder
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/177d2b67-acbc-4ec3-ab31-7c295a98c194)  
@@ -83,6 +83,12 @@ Adds various menu items to some nodes for quickly setting up common parts of gra
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/9bcf9fb3-5898-4432-a974-fb1e17d3b7e8)  
 Plays a sound when the node is executed, either after each prompt or only when the queue is empty for queuing multiple prompts.  
 You can customize the sound by replacing the mp3 file `web/extensions/pysssss/CustomScripts/assets\notify.mp3`
+
+## [WIP] Repeater
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/ec0dac25-14e4-4d44-b975-52193656709d)
+Node allows you to either create a list of N repeats of the input node, or create N outputs from the input node.  
+You can optionally decide if you want to reuse the input node, or create a new instance each time (e.g. a Checkpoint Loader would want to be re-used, but a random number would want to be unique)
+TODO: Type safety on the wildcard outputs to require match with input
 
 ## Show Text
 ![image](https://user-images.githubusercontent.com/125205205/230174888-c004fd48-da78-4de9-81c2-93a866fcfcd1.png)  
@@ -135,6 +141,14 @@ Allows you to control the rendering of the links between nodes between straight,
 <br>
 
 # Changelog
+## 2023-08-16
+### New
+- ✨ Add repeater node for generating lists or quickly duplicating nodes
+### Minor
+- 🐛 Support quick Add LoRA on custom Checkpoint Loader
+- ✨ Support `randomint(min,max)` function in math node
+- 🎨 Use relative imports to support proxied urls not on root path (thanks to @mcmonkey4eva)
+
 ## 2023-08-13
 ### Minor
 - ✨ Support `round` `floor` `ceil` functions in math node

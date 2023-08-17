@@ -47,7 +47,7 @@ class ConstrainImage:
                 if crop_if_required:
                     constrained_width = int(current_width / (current_height / constrained_height))
 
-            resized_image = img.resize((constrained_width, constrained_height), Image.ANTIALIAS)
+            resized_image = img.resize((constrained_width, constrained_height), Image.LANCZOS)
 
             if crop_if_required and (constrained_width > max_width or constrained_height > max_height):
                 left = max((constrained_width - max_width) // 2, 0)

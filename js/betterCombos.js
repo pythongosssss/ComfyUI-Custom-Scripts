@@ -1,6 +1,17 @@
 import { app } from "../../../scripts/app.js";
 import { ComfyWidgets } from "../../../scripts/widgets.js";
 import { $el } from "../../../scripts/ui.js";
+import { api } from "../../../scripts/api.js";
+
+const CHECKPOINT_LOADER = "CheckpointLoader|pysssss";
+const LORA_LOADER = "LoraLoader|pysssss";
+
+function getType(node) {
+	if (node.comfyClass === CHECKPOINT_LOADER) {
+		return "checkpoints";
+	}
+	return "loras";
+}
 
 app.registerExtension({
 	name: "pysssss.Combo++",
@@ -167,6 +178,133 @@ app.registerExtension({
 			}
 
 			return res;
+		};
+	},
+	async beforeRegisterNodeDef(nodeType, nodeData, app) {
+		const isCkpt = nodeType.comfyClass === CHECKPOINT_LOADER;
+		const isLora = nodeType.comfyClass === LORA_LOADER;
+		if (isCkpt || isLora) {
+			const onAdded = nodeType.prototype.onAdded;
+			nodeType.prototype.onAdded = function () {
+				onAdded?.apply(this, arguments);
+				const { widget: exampleList } = ComfyWidgets["COMBO"](this, "example", [[""]], app);
+
+				let exampleWidget;
+
+				const get = async (route, suffix) => {
+					const url = encodeURIComponent(`${getType(nodeType)}${suffix || ""}`);
+					return await api.fetchApi(`/pysssss/${route}/${url}`);
+				};
+
+				const getExample = async () => {
+					if (exampleList.value === "[none]") {
+						if (exampleWidget) {
+							exampleWidget.inputEl.remove();
+							exampleWidget = null;
+							this.widgets.length -= 1;
+						}
+						return;
+					}
+
+					const v = this.widgets[0].value.content;
+					const pos = v.lastIndexOf(".");
+					const name = v.substr(0, pos);
+
+					const example = await (await get("view", `/${name}/${exampleList.value}`)).text();
+					if (!exampleWidget) {
+						exampleWidget = ComfyWidgets["STRING"](this, "prompt", ["STRING", { multiline: true }], app).widget;
+						exampleWidget.inputEl.readOnly = true;
+						exampleWidget.inputEl.style.opacity = 0.6;
+					}
+					exampleWidget.value = example;
+				};
+
+				const exampleCb = exampleList.callback;
+				exampleList.callback = function () {
+					getExample();
+					return exampleCb?.apply(this, arguments) ?? exampleList.value;
+				};
+
+				const listExamples = async () => {
+					exampleList.disabled = true;
+					exampleList.options.values = ["[none]"];
+					exampleList.value = "[none]";
+					const examples = await (await get("examples", `/${this.widgets[0].value.content}`)).json();
+					exampleList.options.values = ["[none]", ...examples];
+					exampleList.callback();
+					exampleList.disabled = !examples.length;
+					app.graph.setDirtyCanvas(true, true);
+				};
+
+				const modelWidget = this.widgets[0];
+				const modelCb = modelWidget.callback;
+				let prev = undefined;
+				modelWidget.callback = function () {
+					const ret = modelCb?.apply(this, arguments) ?? modelWidget.value;
+					let v = ret;
+					if ("content" in ret) {
+						v = ret.content;
+					}
+					if (prev !== v) {
+						listExamples();
+						prev = v;
+					}
+					return ret;
+				};
+				setTimeout(() => {
+					modelWidget.callback();
+				}, 30);
+			};
+		}
+
+		const getExtraMenuOptions = nodeType.prototype.getExtraMenuOptions;
+		nodeType.prototype.getExtraMenuOptions = function (_, options) {
+			if (this.imgs) {
+				// If this node has images then we add an open in new tab item
+				let img;
+				if (this.imageIndex != null) {
+					// An image is selected so select that
+					img = this.imgs[this.imageIndex];
+				} else if (this.overIndex != null) {
+					// No image is selected but one is hovered
+					img = this.imgs[this.overIndex];
+				}
+				if (img) {
+					const nodes = app.graph._nodes.filter(
+						(n) => n.comfyClass === LORA_LOADER || n.comfyClass === CHECKPOINT_LOADER
+					);
+					if (nodes.length) {
+						options.unshift({
+							content: "Save as Preview",
+							submenu: {
+								options: nodes.map((n) => ({
+									content: n.widgets[0].value.content,
+									callback: async () => {
+										const url = new URL(img.src);
+										const { image } = await api.fetchApi(
+											"/pysssss/save/" + encodeURIComponent(`${getType(n)}/${n.widgets[0].value.content}`),
+											{
+												method: "POST",
+												body: JSON.stringify({
+													filename: url.searchParams.get("filename"),
+													subfolder: url.searchParams.get("subfolder"),
+													type: url.searchParams.get("type"),
+												}),
+												headers: {
+													"content-type": "application/json",
+												},
+											}
+										);
+										n.widgets[0].value.image = image;
+										app.refreshComboInNodes();
+									},
+								})),
+							},
+						});
+					}
+				}
+			}
+			return getExtraMenuOptions?.apply(this, arguments);
 		};
 	},
 });

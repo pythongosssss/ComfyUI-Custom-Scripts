@@ -78,6 +78,18 @@ app.registerExtension({
 			return opts;
 		};
 	},
+	setup() {
+		const drawNodeShape = LGraphCanvas.prototype.drawNodeShape;
+		LGraphCanvas.prototype.drawNodeShape = function (node, ctx, size, fgcolor, bgcolor, selected, mouse_over) {
+			const res = drawNodeShape.apply(this, arguments);
+
+			if (node[LOCKED]) {
+				ctx.fillText("🔒", node.size[0] - 20, -10);
+			}
+
+			return res;
+		};
+	},
 	async beforeRegisterNodeDef(nodeType) {
 		const nodesArray = (nodes) => {
 			if (nodes) {
@@ -93,6 +105,7 @@ app.registerExtension({
 			for (const node of nodes) {
 				delete node[LOCKED];
 			}
+			app.graph.setDirtyCanvas(true, false);
 		}
 		function lockNode(nodes) {
 			nodes = nodesArray(nodes);
@@ -120,6 +133,8 @@ app.registerExtension({
 				// And then lock each element if required
 				lockArray(sz, () => !!node[LOCKED]);
 			}
+
+			app.graph.setDirtyCanvas(true, false);
 		}
 
 		// Add menu options for lock/unlock

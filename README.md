@@ -63,6 +63,7 @@ Provides a simple method to set custom denoise on the advanced sampler
 
 ## Lock Nodes & Groups
 ![image](https://user-images.githubusercontent.com/125205205/230172868-5c5a943c-ade1-4799-bf80-cc931da5d4b2.png)  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/cfca09d9-38e5-4ecd-8b73-1455009fcd67)  
 Adds a lock option to nodes & groups that prevents you from moving them until unlocked
 
 ## Math Expression
@@ -147,6 +148,13 @@ Allows you to control the rendering of the links between nodes between straight,
 <br>
 
 # Changelog
+## 2023-08-19
+### New
+- ✨ Add support for importing JPG files with embedded metadata (e.g. from Civitai)
+### Minor
+- 🐛 Fix crash on graph arrange where LiteGraph sometimes stores links to deleted nodes
+- 🐛 Fix a couple of rendering issues in workflow export
+
 ## 2023-08-18
 ### New
 - ✨ Add "example" widget to custom LoRA + Checkpoint loader allowing you to quickly view saved prompts, triggers, etc

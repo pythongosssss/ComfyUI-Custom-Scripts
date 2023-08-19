@@ -53,10 +53,11 @@ class WorkflowImage {
 		app.canvas.ds.offset = [-bounds[0], -bounds[1]];
 	}
 
-	getDrawTextConfig() {
+	getDrawTextConfig(_, widget) {
 		return {
 			x: 10,
-			y: LiteGraph.NODE_TITLE_HEIGHT,
+			y: widget.last_y + 10,
+			resetTransform: false,
 		};
 	}
 
@@ -539,6 +540,7 @@ app.registerExtension({
 				const draw = w.widget.draw;
 				w.widget.draw = function (ctx) {
 					draw.apply(this, arguments);
+					if (this.inputEl.hidden) return;
 
 					if (getDrawTextConfig) {
 						const config = getDrawTextConfig(ctx, this);

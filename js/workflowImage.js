@@ -1,4 +1,5 @@
 import { app } from "../../../scripts/app.js";
+import { importA1111 } from "../../../scripts/pnginfo.js";
 import { ComfyWidgets } from "../../../scripts/widgets.js";
 
 let getDrawTextConfig = null;
@@ -177,6 +178,188 @@ class PngWorkflowImage extends WorkflowImage {
 	}
 }
 
+class DataReader {
+	/**	@type {DataView} */
+	view;
+	/** @type {boolean | undefined} */
+	littleEndian;
+	offset = 0;
+
+	/**
+	 * @param {DataView} view
+	 */
+	constructor(view) {
+		this.view = view;
+	}
+
+	/**
+	 * Reads N bytes and increments the offset
+	 * @param {1 | 2 | 4 | 8} size
+	 */
+	read(size, signed = false, littleEndian = undefined) {
+		const v = this.peek(size, signed, littleEndian);
+		this.offset += size;
+		return v;
+	}
+
+	/**
+	 * Reads N bytes
+	 * @param {1 | 2 | 4 | 8} size
+	 */
+	peek(size, signed = false, littleEndian = undefined) {
+		this.view.getBigInt64;
+		let m = "";
+		if (size === 8) m += "Big";
+		m += signed ? "Int" : "Uint";
+		m += size * 8;
+		m = "get" + m;
+		if (!this.view[m]) {
+			throw new Error("Method not found: " + m);
+		}
+
+		return this.view[m](this.offset, littleEndian == null ? this.littleEndian : littleEndian);
+	}
+
+	/**
+	 * Seeks to the specified position or by the number of bytes specified relative to the current offset
+	 * @param {number} pos
+	 * @param {boolean} relative
+	 */
+	seek(pos, relative = true) {
+		if (relative) {
+			this.offset += pos;
+		} else {
+			this.offset = pos;
+		}
+	}
+}
+
+class Tiff {
+	/** @type {DataReader} */
+	#reader;
+	#start;
+
+	readExif(reader) {
+		const TIFF_MARKER = 0x2a;
+		const EXIF_IFD = 0x8769;
+
+		this.#reader = reader;
+		this.#start = this.#reader.offset;
+		this.#readEndianness();
+
+		if (!this.#reader.read(2) === TIFF_MARKER) {
+			throw new Error("Invalid TIFF: Marker not found.");
+		}
+
+		const dirOffset = this.#reader.read(4);
+		this.#reader.seek(this.#start + dirOffset, false);
+
+		for (const t of this.#readTags()) {
+			if (t.id === EXIF_IFD) {
+				return this.#readExifTag(t);
+			}
+		}
+		throw new Error("No EXIF: TIFF Exif IFD tag not found");
+	}
+
+	#readUserComment(tag) {
+		this.#reader.seek(this.#start + tag.offset, false);
+		const encoding = this.#reader.read(8);
+		if (encoding !== 0x45444f43494e55n) {
+			throw new Error("Unable to read non-Unicode data");
+		}
+		const decoder = new TextDecoder("utf-16be");
+		return decoder.decode(new DataView(this.#reader.view.buffer, this.#reader.offset, tag.count - 8));
+	}
+
+	#readExifTag(exifTag) {
+		const EXIF_USER_COMMENT = 0x9286;
+
+		this.#reader.seek(this.#start + exifTag.offset, false);
+		for (const t of this.#readTags()) {
+			if (t.id === EXIF_USER_COMMENT) {
+				return this.#readUserComment(t);
+			}
+		}
+		throw new Error("No embedded data: UserComment Exif tag not found");
+	}
+
+	*#readTags() {
+		const count = this.#reader.read(2);
+		for (let i = 0; i < count; i++) {
+			yield {
+				id: this.#reader.read(2),
+				type: this.#reader.read(2),
+				count: this.#reader.read(4),
+				offset: this.#reader.read(4),
+			};
+		}
+	}
+
+	#readEndianness() {
+		const II = 0x4949;
+		const MM = 0x4d4d;
+		const endianness = this.#reader.read(2);
+		if (endianness === II) {
+			this.#reader.littleEndian = true;
+		} else if (endianness === MM) {
+			this.#reader.littleEndian = false;
+		} else {
+			throw new Error("Invalid JPEG: Endianness marker not found.");
+		}
+	}
+}
+
+class Jpeg {
+	/** @type {DataReader} */
+	#reader;
+
+	/**
+	 * @param {ArrayBuffer} buffer
+	 */
+	readExif(buffer) {
+		const JPEG_MARKER = 0xffd8;
+		const EXIF_SIG = 0x45786966;
+
+		this.#reader = new DataReader(new DataView(buffer));
+		if (!this.#reader.read(2) === JPEG_MARKER) {
+			throw new Error("Invalid JPEG: SOI not found.");
+		}
+
+		const app0 = this.#readAppMarkerId();
+		if (app0 !== 0) {
+			throw new Error(`Invalid JPEG: APP0 not found [found: ${app0}].`);
+		}
+
+		this.#consumeAppSegment();
+		const app1 = this.#readAppMarkerId();
+		if (app1 !== 1) {
+			throw new Error(`No EXIF: APP1 not found [found: ${app0}].`);
+		}
+
+		// Skip size
+		this.#reader.seek(2);
+
+		if (this.#reader.read(4) !== EXIF_SIG) {
+			throw new Error(`No EXIF: Invalid EXIF header signature.`);
+		}
+		if (this.#reader.read(2) !== 0) {
+			throw new Error(`No EXIF: Invalid EXIF header.`);
+		}
+
+		return new Tiff().readExif(this.#reader);
+	}
+
+	#readAppMarkerId() {
+		const APP0_MARKER = 0xffe0;
+		return this.#reader.read(2) - APP0_MARKER;
+	}
+
+	#consumeAppSegment() {
+		this.#reader.seek(this.#reader.read(2) - 2);
+	}
+}
+
 class SvgWorkflowImage extends WorkflowImage {
 	static accept = ".svg,image/svg+xml";
 	extension = "svg";
@@ -184,7 +367,7 @@ class SvgWorkflowImage extends WorkflowImage {
 	static init() {
 		// Override file handling to allow drag & drop of SVG
 		const handleFile = app.handleFile;
-		app.handleFile = function (file) {
+		app.handleFile = async function (file) {
 			if (file && (file.type === "image/svg+xml" || file.name?.endsWith(".svg"))) {
 				const reader = new FileReader();
 				reader.onload = () => {
@@ -199,9 +382,33 @@ class SvgWorkflowImage extends WorkflowImage {
 					}
 				};
 				reader.readAsText(file);
-			} else {
-				return handleFile.apply(this, arguments);
+				return;
+			} else if (file && (file.type === "image/jpeg" || file.name?.endsWith(".jpg") || file.name?.endsWith(".jpeg"))) {
+				if (
+					await new Promise((r) => {
+						try {
+							// This shouldnt go in here but it's easier than refactoring handleFile
+							const reader = new FileReader();
+							reader.onload = async () => {
+								try {
+									const value = new Jpeg().readExif(reader.result);
+									importA1111(app.graph, value);
+									resolve(true);
+								} catch (error) {
+									resolve(false);
+								}
+							};
+							reader.onerror = () => resolve(false);
+							reader.readAsArrayBuffer(file);
+						} catch (error) {
+							resolve(false);
+						}
+					})
+				) {
+					return;
+				}
 			}
+			return handleFile.apply(this, arguments);
 		};
 	}
 

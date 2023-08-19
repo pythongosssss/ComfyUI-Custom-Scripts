@@ -1,7 +1,5 @@
 import { app } from "../../../scripts/app.js";
 
-// Adds right click -> arrange to the canvas
-
 app.registerExtension({
 	name: "pysssss.GraphArrange",
 	setup(app) {
@@ -27,6 +25,7 @@ app.registerExtension({
 								if (out.links) {
 									for (const link of out.links) {
 										const outNode = app.graph.getNodeById(app.graph.links[link].target_id);
+										if (!outNode) continue;
 										var l = outNode._level - 1;
 										if (max === null) max = l;
 										else if (l < max) max = l;

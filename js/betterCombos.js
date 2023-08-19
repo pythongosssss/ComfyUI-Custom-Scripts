@@ -242,7 +242,7 @@ app.registerExtension({
 				modelWidget.callback = function () {
 					const ret = modelCb?.apply(this, arguments) ?? modelWidget.value;
 					let v = ret;
-					if ("content" in ret) {
+					if (ret.content) {
 						v = ret.content;
 					}
 					if (prev !== v) {

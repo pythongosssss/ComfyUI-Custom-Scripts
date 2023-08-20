@@ -168,7 +168,7 @@ app.registerExtension({
 						return value;
 					},
 					set(v) {
-						if (v.submenu) {
+						if (v?.submenu) {
 							// Dont allow selection of submenus
 							return;
 						}
@@ -229,7 +229,12 @@ app.registerExtension({
 					exampleList.disabled = true;
 					exampleList.options.values = ["[none]"];
 					exampleList.value = "[none]";
-					const examples = await (await get("examples", `/${this.widgets[0].value.content}`)).json();
+					let examples = [];
+					if (this.widgets[0].value?.content) {
+						try {
+							examples = await (await get("examples", `/${this.widgets[0].value.content}`)).json();
+						} catch (error) {}
+					}
 					exampleList.options.values = ["[none]", ...examples];
 					exampleList.callback();
 					exampleList.disabled = !examples.length;
@@ -242,7 +247,7 @@ app.registerExtension({
 				modelWidget.callback = function () {
 					const ret = modelCb?.apply(this, arguments) ?? modelWidget.value;
 					let v = ret;
-					if (ret.content) {
+					if (ret?.content) {
 						v = ret.content;
 					}
 					if (prev !== v) {

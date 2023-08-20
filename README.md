@@ -66,6 +66,11 @@ Provides a simple method to set custom denoise on the advanced sampler
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/cfca09d9-38e5-4ecd-8b73-1455009fcd67)  
 Adds a lock option to nodes & groups that prevents you from moving them until unlocked
 
+## LoRA Info
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/5539b7a4-559e-4e35-9aa1-51b06e11c772)
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/32405df6-b367-404f-a5df-2d4347089a9e)  
+Adds "View Info" menu option to view details about the selected LoRA
+
 ## Math Expression
 Allows for evaluating complex expressions using values from the graph.  
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/c0047cbd-8512-46ae-841f-f570b93f700b)  
@@ -148,6 +153,12 @@ Allows you to control the rendering of the links between nodes between straight,
 <br>
 
 # Changelog
+## 2023-08-20
+### New
+- ✨ Add LoRA Info menu option for displaying LoRA metadata
+### Minor
+- 🐛 Fix crash on preset text replacement (thanks to @sjuxax)
+
 ## 2023-08-19
 ### New
 - ✨ Add support for importing JPG files with embedded metadata (e.g. from Civitai)

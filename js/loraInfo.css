@@ -1,0 +1,81 @@
+.pysssss-lora-info {
+	color: white;
+	font-family: sans-serif;
+	max-width: 90vw;
+}
+.pysssss-lora-content {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+.pysssss-lora-info h2 {
+	text-align: center;
+	margin: 0 0 10px 0;
+}
+.pysssss-lora-info p {
+	margin: 5px 0;
+}
+.pysssss-lora-info a {
+	color: dodgerblue;
+}
+.pysssss-lora-info a:hover {
+	text-decoration: underline;
+}
+.pysssss-lora-tags-list {
+	display: flex;
+	flex-wrap: wrap;
+	list-style: none;
+	gap: 10px;
+	max-height: 200px;
+	overflow: auto;
+	margin: 10px 0;
+	padding: 0;
+}
+.pysssss-lora-tag {
+	background-color: rgb(128, 213, 247);
+	color: #000;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	border-radius: 5px;
+	padding: 2px 5px;
+	cursor: pointer;
+}
+.pysssss-lora-tag--selected span::before {
+	content: "✅";
+	position: absolute;
+	background-color: dodgerblue;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	text-align: center;
+}
+.pysssss-lora-tag:hover {
+	outline: 2px solid dodgerblue;
+}
+.pysssss-lora-tag p {
+	margin: 0;
+}
+.pysssss-lora-tag span {
+	text-align: center;
+	border-radius: 5px;
+	background-color: dodgerblue;
+	color: #fff;
+	padding: 2px;
+	position: relative;
+	min-width: 20px;
+	overflow: hidden;
+}
+
+.pysssss-lora-metadata .comfy-modal-content {
+	max-width: 100%;
+}
+.pysssss-lora-metadata label {
+	margin-right: 1ch;
+	color: #ccc;
+}
+
+.pysssss-lora-metadata span {
+	color: dodgerblue;
+}

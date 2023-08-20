@@ -182,7 +182,7 @@ app.registerExtension({
 				const callbacks = [
 					() => {
 						let prompt = widget.value;
-						if (replaceRegex) {
+						if (replaceRegex && typeof prompt.replace !== 'undefined') {
 							prompt = prompt.replace(replaceRegex, (match, p1, p2, index, text, groups) => {
 								if (!groups.replace || !groups.id) return match; // No match, bad regex?
 

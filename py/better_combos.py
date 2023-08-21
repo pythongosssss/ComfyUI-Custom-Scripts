@@ -78,6 +78,11 @@ def populate_items(names, type):
 
         file_name = os.path.splitext(item_name)[0]
         file_path = folder_paths.get_full_path(type, item_name)
+
+        if file_path is None:
+            print(f"(pysssss:better_combos) Unable to get path for {type} {item_name}")
+            continue
+
         file_path_no_ext = os.path.splitext(file_path)[0]
 
         for ext in ["png", "jpg", "preview.png"]:

@@ -1,8 +1,9 @@
+import hashlib
 import json
 from aiohttp import web
 from server import PromptServer
 import folder_paths
-
+import os
 
 def get_metadata(filepath):
     with open(filepath, "rb") as file:
@@ -32,6 +33,25 @@ async def load_metadata(request):
         type, name)
     if not file_path:
         return web.Response(status=404)
-
+    
     meta = get_metadata(file_path)
+
+    file_no_ext = os.path.splitext(file_path)[0]
+
+    info_file = file_no_ext + ".txt"
+    if os.path.isfile(info_file):
+        with open(info_file, "r") as f:
+            meta["pysssss.notes"] = f.read()
+
+    hash_file = file_no_ext + ".sha256"
+    if os.path.isfile(hash_file):
+        with open(hash_file, "rt") as f:
+            meta["pysssss.sha256"] = f.read()
+    else:
+        with open(file_path, "rb") as f:
+            meta["pysssss.sha256"] = hashlib.sha256(f.read()).hexdigest()
+        with open(hash_file, "wt") as f:
+            f.write(meta["pysssss.sha256"])
+            
+
     return web.json_response(meta)

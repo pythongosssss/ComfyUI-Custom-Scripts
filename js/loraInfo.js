@@ -72,6 +72,14 @@ class LoraInfoDialog extends ComfyDialog {
 		return res;
 	}
 
+	get customNotes() {
+		return this.#metadata["pysssss.notes"];
+	}
+
+	get hash() {
+		return this.#metadata["pysssss.sha256"];
+	}
+
 	getTagList(tags) {
 		return tags.map((t) =>
 			$el(
@@ -136,6 +144,21 @@ class LoraInfoDialog extends ComfyDialog {
 			),
 		]);
 
+		let notes = null;
+		if (this.customNotes?.startsWith("http")) {
+			notes = $el("p", { textContent: "Notes: " }, [
+				$el("a", {
+					href: this.customNotes,
+					textContent: this.customNotes,
+					target: "_blank",
+				}),
+			]);
+		} else {
+			notes = $el("p", {
+				textContent: "Notes: " + (this.customNotes ?? `Add custom notes in ${name.split(".")[0] + ".txt"}`),
+			});
+		}
+
 		this.content = $el(
 			"div.pysssss-lora-content",
 			[
@@ -150,10 +173,56 @@ class LoraInfoDialog extends ComfyDialog {
 					textContent: "Clip Skip: " + (metadata.ss_clip_skip || "⚠️ Unknown"),
 				}),
 				resolutions,
+				notes,
+				this.createCivitaiInfo(),
 				this.tags,
 				hasMore,
 			].filter(Boolean)
 		);
+	}
+
+	createCivitaiInfo() {
+		if (!this.hash) return;
+
+		const info = $el("span", { textContent: "ℹ️ Loading..." });
+		const el = $el("p", [
+			$el("img", {
+				style: {
+					width: "18px",
+					position: "relative",
+					top: "3px",
+					marginRight: "5px",
+				},
+				src: "https://civitai.com/favicon.ico",
+			}),
+			$el("span", { textContent: "Civitai: " }),
+			info,
+		]);
+
+		(async () => {
+			try {
+				const req = await fetch("https://civitai.com/api/v1/model-versions/by-hash/" + this.hash);
+				if (req.status === 200) {
+					const res = await req.json();
+					info.replaceChildren(
+						$el("a", {
+							href: "https://civitai.com/models/" + res.modelId,
+							textContent: "View " + res.model.name,
+							target: "_blank",
+						})
+					);
+				} else if (req.status === 404) {
+					info.textContent = "⚠️ Model not found";
+				} else {
+					info.textContent = `⚠️ Error loading info (${req.status}) ` + req.statusText;
+				}
+			} catch (error) {
+				console.error(error);
+				info.textContent = "⚠️ Error loading info";
+			}
+		})();
+
+		return el;
 	}
 
 	createButtons() {

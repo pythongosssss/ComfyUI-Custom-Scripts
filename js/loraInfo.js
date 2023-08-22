@@ -51,9 +51,11 @@ class LoraInfoDialog extends ComfyDialog {
 	get resolutions() {
 		let res = [];
 		if (this.#metadata.ss_bucket_info) {
-			const { buckets } = JSON.parse(this.#metadata.ss_bucket_info);
-			for (const { resolution, count } of Object.values(buckets)) {
-				res.push([count, `${resolution.join("x")} * ${count}`]);
+			const parsed = JSON.parse(this.#metadata.ss_bucket_info);
+			if (parsed?.buckets) {
+				for (const { resolution, count } of Object.values(parsed.buckets)) {
+					res.push([count, `${resolution.join("x")} * ${count}`]);
+				}
 			}
 		}
 		res = res.sort((a, b) => b[0] - a[0]).map((a) => a[1]);

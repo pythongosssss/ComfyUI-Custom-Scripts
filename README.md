@@ -153,6 +153,16 @@ Allows you to control the rendering of the links between nodes between straight,
 <br>
 
 # Changelog
+## 2023-08-22
+### New
+- ✨ Math Expression now supports IMAGE and LATENT inputs, to access the dimensions use `a.width`, `b.height`
+- 🎨 Removed STRING output on Math Expression, now draws the result onto the node
+
+## 2023-08-21
+### New
+- ✨ Allow custom note (named {file}.txt) to show in LoRA info
+- ✨ Query Civita API using the model hash to provide link
+  
 ## 2023-08-20
 ### New
 - ✨ Add LoRA Info menu option for displaying LoRA metadata

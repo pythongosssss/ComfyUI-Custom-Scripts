@@ -5,6 +5,7 @@ from server import PromptServer
 import folder_paths
 import os
 
+
 def get_metadata(filepath):
     with open(filepath, "rb") as file:
         # https://github.com/huggingface/safetensors#format
@@ -33,8 +34,10 @@ async def load_metadata(request):
         type, name)
     if not file_path:
         return web.Response(status=404)
-    
+
     meta = get_metadata(file_path)
+    if meta is None:
+        meta = {}
 
     file_no_ext = os.path.splitext(file_path)[0]
 
@@ -52,6 +55,5 @@ async def load_metadata(request):
             meta["pysssss.sha256"] = hashlib.sha256(f.read()).hexdigest()
         with open(hash_file, "wt") as f:
             f.write(meta["pysssss.sha256"])
-            
 
     return web.json_response(meta)

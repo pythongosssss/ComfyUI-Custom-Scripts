@@ -11,4 +11,25 @@ app.registerExtension({
 			return r;
 		};
 	},
+	beforeRegisterNodeDef(nodeType) {
+		if (nodeType.comfyClass === "MathExpression|pysssss") {
+			const onDrawForeground = nodeType.prototype.onDrawForeground;
+			nodeType.prototype.onDrawForeground = function (ctx) {
+				const r = onDrawForeground?.apply?.(this, arguments);
+
+				const v = app.nodeOutputs?.[this.id + ""];
+				if (!this.flags.collapsed && v) {
+					const text = v.value[0] + "";
+					ctx.save();
+					ctx.font = "bold 12px sans-serif";
+					ctx.fillStyle = "dodgerblue";
+					const sz = ctx.measureText(text);
+					ctx.fillText(text, this.size[0] - sz.width - 5, LiteGraph.NODE_SLOT_HEIGHT * 3);
+					ctx.restore();
+				}
+
+				return r;
+			};
+		}
+	},
 });

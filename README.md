@@ -1,5 +1,7 @@
 # ComfyUI-Custom-Scripts
 
+> &#x26a0;&#xfe0f; **2023-06-23**: This repo has been updated to support native serving of web files in ComfyUI, preventing the need to copy files around, this is a new feature so please report any issues.
+
 # Installation
 
 1. Clone the repository:
@@ -72,12 +74,12 @@ Adds a lock option to nodes & groups that prevents you from moving them until un
 Adds "View Info" menu option to view details about the selected LoRA
 
 ## Math Expression
-Allows for evaluating complex expressions using values from the graph.  
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/c0047cbd-8512-46ae-841f-f570b93f700b)  
+Allows for evaluating complex expressions using values from the graph. You can input `INT`, `FLOAT`, `IMAGE` and `LATENT` values.  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/1593edde-67b8-45d8-88cb-e75f52dba039)  
 Other nodes values can be referenced via the `Node name for S&R` via the `Properties` menu item on a node, or the node title.  
-The above example evaluates as `(10 * 512) / 2 + 1000`.  
 Supported operators: `+ - * /` (basic ops) `//` (floor division) `**` (power) `^` (xor) `%` (mod)  
 Supported functions `floor(num, dp?)` `floor(num)` `ceil(num)` `randomint(min,max)`  
+If using a `LATENT` or `IMAGE` you can get the dimensions using `a.width` or `a.height` where `a` is the input name.
 
 ## Node Finder
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/177d2b67-acbc-4ec3-ab31-7c295a98c194)  
@@ -153,6 +155,10 @@ Allows you to control the rendering of the links between nodes between straight,
 <br>
 
 # Changelog
+## 2023-08-23
+### Major
+- 🚨 Update to use `WEB_DIRECTORY` feature instead of manual linking/copying web files
+
 ## 2023-08-22
 ### New
 - ✨ Math Expression now supports IMAGE and LATENT inputs, to access the dimensions use `a.width`, `b.height`

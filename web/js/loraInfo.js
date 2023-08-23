@@ -161,29 +161,58 @@ class LoraInfoDialog extends ComfyDialog {
 			});
 		}
 
+		const img = $el("img", {
+			style: {
+				display: "hidden",
+				maxHeight: "300px",
+				marginLeft: "10px",
+			},
+		});
+
+		let triggers = $el("div");
+
+		let main;
+		const civitaiInfo = this.createCivitaiInfo((images, words, description) => {
+			const image = images.find((img) => img.nsfw === "None") || images[0];
+			img.src = image.url;
+			img.style.display = "block";
+			triggers.append(words);
+			// triggers.append(description);
+		});
+
+		main = $el(
+			"main",
+			{
+				style: {
+					display: "flex",
+				},
+			},
+			[
+				$el("div", [
+					$el("p", {
+						textContent: "Output Name: " + (metadata.ss_output_name || "⚠️ Unknown"),
+					}),
+					$el("p", {
+						textContent: "Base Model: " + (metadata.ss_sd_model_name || "⚠️ Unknown"),
+					}),
+					$el("p", {
+						textContent: "Clip Skip: " + (metadata.ss_clip_skip || "⚠️ Unknown"),
+					}),
+					resolutions,
+					notes,
+					civitaiInfo,
+				]),
+				img,
+			]
+		);
+
 		this.content = $el(
 			"div.pysssss-lora-content",
-			[
-				$el("h2", { textContent: name }),
-				$el("p", {
-					textContent: "Output Name: " + (metadata.ss_output_name || "⚠️ Unknown"),
-				}),
-				$el("p", {
-					textContent: "Base Model: " + (metadata.ss_sd_model_name || "⚠️ Unknown"),
-				}),
-				$el("p", {
-					textContent: "Clip Skip: " + (metadata.ss_clip_skip || "⚠️ Unknown"),
-				}),
-				resolutions,
-				notes,
-				this.createCivitaiInfo(),
-				this.tags,
-				hasMore,
-			].filter(Boolean)
+			[$el("h2", { textContent: name }), main, triggers, this.tags, hasMore].filter(Boolean)
 		);
 	}
 
-	createCivitaiInfo() {
+	createCivitaiInfo(loadCallback) {
 		if (!this.hash) return;
 
 		const info = $el("span", { textContent: "ℹ️ Loading..." });
@@ -211,7 +240,28 @@ class LoraInfoDialog extends ComfyDialog {
 							href: "https://civitai.com/models/" + res.modelId,
 							textContent: "View " + res.model.name,
 							target: "_blank",
-						})
+						}),
+						$el("br"),
+						$el("br")
+					);
+
+					loadCallback(
+						res.images,
+						$el("p", { textContent: "Trained Words: " }, [
+							$el("pre", {
+								textContent: res.trainedWords.join(", "),
+								style: {
+									whiteSpace: "pre-wrap",
+									margin: "10px 0",
+									background: "#222",
+									padding: "5px",
+									borderRadius: "5px",
+									maxHeight: "250px",
+									overflow: "auto",
+								},
+							}),
+						]),
+						$el("div", { innerHTML: res.description, style: { maxHeight: "250px", overflow: "auto" } })
 					);
 				} else if (req.status === 404) {
 					info.textContent = "⚠️ Model not found";

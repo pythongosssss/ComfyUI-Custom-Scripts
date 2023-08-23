@@ -177,7 +177,7 @@ class LoraInfoDialog extends ComfyDialog {
 			img.src = image.url;
 			img.style.display = "block";
 			triggers.append(words);
-			// triggers.append(description);
+			triggers.append(description);
 		});
 
 		main = $el(

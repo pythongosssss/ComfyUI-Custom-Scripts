@@ -1,6 +1,6 @@
 # ComfyUI-Custom-Scripts
 
-> &#x26a0;&#xfe0f; **2023-06-23**: This repo has been updated to support native serving of web files in ComfyUI, preventing the need to copy files around, this is a new feature so please report any issues.
+> &#x26a0;&#xfe0f; **2023-08-23**: This repo has been updated to support native serving of web files in ComfyUI, preventing the need to copy files around, this is a new feature so please report any issues.
 
 # Installation
 

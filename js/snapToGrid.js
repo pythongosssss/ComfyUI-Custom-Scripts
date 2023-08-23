@@ -35,7 +35,7 @@ const ext = {
 			// Override node added to add a resize handler to force grid alignment
 			const onNodeAdded = app.graph.onNodeAdded;
 			app.graph.onNodeAdded = function (node) {
-				const r = onNodeAdded.apply(this, arguments);
+				const r = onNodeAdded?.apply(this, arguments);
 				const onResize = node.onResize;
 				node.onResize = function () {
 					if (setting?.value) {

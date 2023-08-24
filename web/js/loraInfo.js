@@ -146,15 +146,48 @@ class LoraInfoDialog extends ComfyDialog {
 			),
 		]);
 
-		let notes = null;
-		if (this.customNotes?.startsWith("http")) {
-			notes = $el("p", { textContent: "Notes: " }, [
-				$el("a", {
-					href: this.customNotes,
-					textContent: this.customNotes,
-					target: "_blank",
-				}),
-			]);
+		let notes = [];
+
+		if (this.customNotes) {
+			const r = new RegExp("(\\bhttps?:\\/\\/[^\\s]+)", "g");
+			let end = 0;
+			let m;
+			do {
+				m = r.exec(this.customNotes);
+				let pos;
+				let fin = 0;
+				if (m) {
+					pos = m.index;
+					fin = m.index + m[0].length;
+				} else {
+					pos = this.customNotes.length;
+				}
+
+				let pre = this.customNotes.substring(end, pos);
+				if (pre) {
+					pre = pre.replaceAll("\n", "<br>");
+					notes.push(
+						$el("span", {
+							innerHTML: pre,
+						})
+					);
+				}
+				if (m) {
+					notes.push(
+						$el("a", {
+							href: m[0],
+							textContent: m[0],
+							target: "_blank",
+						})
+					);
+				}
+
+				end = fin;
+			} while (m);
+		}
+
+		if (notes.length) {
+			notes = $el("p", { textContent: "Notes: " }, notes);
 		} else {
 			notes = $el("p", {
 				textContent: "Notes: " + (this.customNotes ?? `Add custom notes in ${name.split(".")[0] + ".txt"}`),

@@ -9,10 +9,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {}
 
 if init():
     py = get_ext_dir("py")
-    files = glob.glob("*.py", root_dir=py, recursive=False)
+    files = glob.glob(os.path.join(py, "*.py"), recursive=False)
     for file in files:
         name = os.path.splitext(file)[0]
-        spec = importlib.util.spec_from_file_location(name, os.path.join(py, file))
+        spec = importlib.util.spec_from_file_location(name, file)
         module = importlib.util.module_from_spec(spec)
         sys.modules[name] = module
         spec.loader.exec_module(module)

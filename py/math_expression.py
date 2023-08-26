@@ -109,7 +109,7 @@ class MathExpression:
             if isinstance(node, ast.Num):
                 return node.n
             elif isinstance(node, ast.BinOp):
-                return operators[type(node.op)](eval_expr(node.left), eval_expr(node.right))
+                return operators[type(node.op)](float(eval_expr(node.left)), float(eval_expr(node.right)))
             elif isinstance(node, ast.UnaryOp):
                 return operators[type(node.op)](eval_expr(node.operand))
             elif isinstance(node, ast.Attribute):

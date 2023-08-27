@@ -30,8 +30,24 @@ async def load_metadata(request):
     type = name[0:pos]
     name = name[pos+1:]
 
-    file_path = folder_paths.get_full_path(
-        type, name)
+    file_path = None
+    if type == "embeddings":
+        name = name.lower()
+        files = folder_paths.get_filename_list(type)
+        for f in files:
+            lower_f = f.lower()
+            if lower_f == name:
+                file_path = folder_paths.get_full_path(type, f)
+            else:
+                n = os.path.splitext(f)[0].lower()
+                if n == name:
+                    file_path = folder_paths.get_full_path(type, f)
+
+            if file_path is not None:
+                break
+    else:
+        file_path = folder_paths.get_full_path(
+            type, name)
     if not file_path:
         return web.Response(status=404)
 

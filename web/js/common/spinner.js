@@ -1,6 +1,6 @@
-import { addStylesheet, getUrl } from "./utils.js";
+import { addStylesheet } from "./utils.js";
 
-addStylesheet(getUrl("spinner.css", import.meta.url));
+addStylesheet(import.meta.url);
 
 export function createSpinner() {
 	const div = document.createElement("div");

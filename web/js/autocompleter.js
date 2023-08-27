@@ -41,7 +41,24 @@ app.registerExtension({
 			TextAreaAutoComplete.updateWords("pysssss.embeddings", words);
 		}
 
-		addEmbeddings();
+		async function addCustomWords() {
+			const resp = await api.fetchApi("/pysssss/autocomplete", { cache: "no-store" });
+			if (resp.status === 200) {
+				const text = await resp.text();
+				if (text) {
+					TextAreaAutoComplete.updateWords(
+						"pysssss.customwords",
+						text.split("\n").reduce((p, n) => {
+							n = n.trim();
+							p[n] = { text: n };
+							return p;
+						}, {})
+					);
+				}
+			}
+		}
+
+		Promise.all([addEmbeddings(), addCustomWords()]);
 
 		const STRING = ComfyWidgets.STRING;
 		ComfyWidgets.STRING = function (node, inputName, inputData) {

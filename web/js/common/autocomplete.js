@@ -341,23 +341,19 @@ export class TextAreaAutoComplete {
 			switch (e.key) {
 				case "ArrowUp":
 					e.preventDefault();
-					this.selected.el.classList.remove("pysssss-autocomplete-item--selected");
 					if (this.selected.index) {
 						this.#setSelected(this.currentWords[this.selected.index - 1]);
 					} else {
 						this.#setSelected(this.currentWords[this.currentWords.length - 1]);
 					}
-					this.selected.el.classList.add("pysssss-autocomplete-item--selected");
 					break;
 				case "ArrowDown":
 					e.preventDefault();
-					this.selected.el.classList.remove("pysssss-autocomplete-item--selected");
 					if (this.selected.index === this.currentWords.length - 1) {
 						this.#setSelected(this.currentWords[0]);
 					} else {
 						this.#setSelected(this.currentWords[this.selected.index + 1]);
 					}
-					this.selected.el.classList.add("pysssss-autocomplete-item--selected");
 					break;
 				case "Tab":
 					e.preventDefault();

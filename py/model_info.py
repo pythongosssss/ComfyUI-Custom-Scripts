@@ -35,7 +35,11 @@ async def load_metadata(request):
     if not file_path:
         return web.Response(status=404)
 
-    meta = get_metadata(file_path)
+    try:
+        meta = get_metadata(file_path)
+    except:
+        meta = None
+
     if meta is None:
         meta = {}
 

@@ -1,27 +1,32 @@
-.pysssss-lora-info {
+.pysssss-model-info {
 	color: white;
 	font-family: sans-serif;
 	max-width: 90vw;
 }
-.pysssss-lora-content {
+.pysssss-model-content {
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
 }
-.pysssss-lora-info h2 {
+.pysssss-model-info h2 {
 	text-align: center;
 	margin: 0 0 10px 0;
 }
-.pysssss-lora-info p {
+.pysssss-model-info main img {
+	max-height: 300px;
+	margin-left: 10px;
+	max-width: 50%;
+}
+.pysssss-model-info p {
 	margin: 5px 0;
 }
-.pysssss-lora-info a {
+.pysssss-model-info a {
 	color: dodgerblue;
 }
-.pysssss-lora-info a:hover {
+.pysssss-model-info a:hover {
 	text-decoration: underline;
 }
-.pysssss-lora-tags-list {
+.pysssss-model-tags-list {
 	display: flex;
 	flex-wrap: wrap;
 	list-style: none;
@@ -31,7 +36,7 @@
 	margin: 10px 0;
 	padding: 0;
 }
-.pysssss-lora-tag {
+.pysssss-model-tag {
 	background-color: rgb(128, 213, 247);
 	color: #000;
 	display: flex;
@@ -41,7 +46,7 @@
 	padding: 2px 5px;
 	cursor: pointer;
 }
-.pysssss-lora-tag--selected span::before {
+.pysssss-model-tag--selected span::before {
 	content: "✅";
 	position: absolute;
 	background-color: dodgerblue;
@@ -51,13 +56,13 @@
 	bottom: 0;
 	text-align: center;
 }
-.pysssss-lora-tag:hover {
+.pysssss-model-tag:hover {
 	outline: 2px solid dodgerblue;
 }
-.pysssss-lora-tag p {
+.pysssss-model-tag p {
 	margin: 0;
 }
-.pysssss-lora-tag span {
+.pysssss-model-tag span {
 	text-align: center;
 	border-radius: 5px;
 	background-color: dodgerblue;
@@ -68,14 +73,14 @@
 	overflow: hidden;
 }
 
-.pysssss-lora-metadata .comfy-modal-content {
+.pysssss-model-metadata .comfy-modal-content {
 	max-width: 100%;
 }
-.pysssss-lora-metadata label {
+.pysssss-model-metadata label {
 	margin-right: 1ch;
 	color: #ccc;
 }
 
-.pysssss-lora-metadata span {
+.pysssss-model-metadata span {
 	color: dodgerblue;
 }

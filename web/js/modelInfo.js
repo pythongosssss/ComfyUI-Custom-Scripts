@@ -120,7 +120,11 @@ class ModelInfoDialog extends ComfyDialog {
 			} while (m);
 			return $el("span", notes);
 		} else {
-			return `Add custom notes in ${this.name.split(".")[0] + ".txt"}`;
+			let last = this.name.lastIndexOf(".");
+			if (last === -1) {
+				last = this.name.length;
+			}
+			return `Add custom notes in ${this.name.substring(0, last) + ".txt"}`;
 		}
 	}
 

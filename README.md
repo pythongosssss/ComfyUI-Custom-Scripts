@@ -21,6 +21,13 @@ to your ComfyUI `custom_nodes` directory
 
 # Features
 
+## Autocomplete
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/b5971135-414f-4f4e-a6cf-2650dc01085f)  
+Provides embedding and custom word autocomplete. Define your list of custom words via the settings. You can view embedding details by clicking on the info icon on the list.  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/160ef61c-7d7e-49d0-b60f-5a1501b74c9d)  
+You can quickly default to danbooru tags using the Load button, or load/manage other custom word lists.  
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/cc180b35-5f45-442f-9285-3ddf3fa320d0)
+
 ## Auto Arrange Graph
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/04b06081-ca6f-4c0f-8584-d0a157c36747)  
 Adds a menu option to auto arrange the graph in order of execution, this makes very wide graphs!
@@ -40,6 +47,10 @@ These should be stored in a folder matching the name of the model, e.g. if it is
 To quickly save a generated image as the preview to use for the model, you can right click on an image on a node, and select Save as Preview and choose the model to save the preview for:  
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/9fa8e9db-27b3-45cb-85c2-0860a238fd3a)
 
+## Checkpoint/LoRA/Embedding Info
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/6b67bf40-ee17-4fa6-a0c1-7947066bafc2)
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/32405df6-b367-404f-a5df-2d4347089a9e)  
+Adds "View Info" menu option to view details about the selected LoRA or Checkpoint. To view embedding details, click the info button when using embedding autocomplete.
 
 ## Constrain Image
 Adds a node for resizing an image to a max & min size optionally cropping if required.
@@ -67,11 +78,6 @@ Provides a simple method to set custom denoise on the advanced sampler
 ![image](https://user-images.githubusercontent.com/125205205/230172868-5c5a943c-ade1-4799-bf80-cc931da5d4b2.png)  
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/cfca09d9-38e5-4ecd-8b73-1455009fcd67)  
 Adds a lock option to nodes & groups that prevents you from moving them until unlocked
-
-## LoRA Info
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/5539b7a4-559e-4e35-9aa1-51b06e11c772)
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/32405df6-b367-404f-a5df-2d4347089a9e)  
-Adds "View Info" menu option to view details about the selected LoRA
 
 ## Math Expression
 Allows for evaluating complex expressions using values from the graph. You can input `INT`, `FLOAT`, `IMAGE` and `LATENT` values.  
@@ -155,6 +161,34 @@ Allows you to control the rendering of the links between nodes between straight,
 <br>
 
 # Changelog
+
+## 2023-08-28
+### New
+- ✨ Add custom autocomplete word list setting
+- ✨ Support autocomplete word priority sorting
+- ✨ Support autocomplete matching anywhere in word rather than requiring starts with
+
+## 2023-08-27
+### New
+- ✨ Add Checkpoint info
+- ✨ Add embedding autocomplete
+- ✨ Add embedding info
+### Major
+- ♻️ Refactor LoRA info
+
+## 2023-08-26
+### Minor
+- 🐛 Fix using text widget values in Math Expression not casting to number
+- 🎨 Fix padding on lightbox next arrow
+ 
+## 2023-08-25
+### Minor
+- ♻️ Support older versions of python
+  
+## 2023-08-24
+### Minor
+- 🐛 Fix extracting links from LoRA info notes
+
 ## 2023-08-23
 ### Major
 - 🚨 Update to use `WEB_DIRECTORY` feature instead of manual linking/copying web files

@@ -65,19 +65,69 @@ class CustomWordsDialog extends ComfyDialog {
 				height: "70vh",
 			},
 		});
+
+		const input = $el("input", {
+			style: {
+				flex: "auto",
+			},
+			value:
+				"https://gist.githubusercontent.com/pythongosssss/1d3efa6050356a08cea975183088159a/raw/a18fb2f94f9156cf4476b0c24a09544d6c0baec6/danbooru-tags.txt",
+		});
+
 		super.show(
-			$el("div", [
-				$el("h2", {
-					textContent: "Custom Autocomplete Words",
+			$el(
+				"div",
+				{
 					style: {
-						color: "#fff",
-						marginTop: 0,
-						textAlign: "center",
-						fontFamily: "sans-serif",
+						display: "flex",
+						flexDirection: "column",
+						overflow: "hidden",
+						maxHeight: "100%",
 					},
-				}),
-				this.words,
-			])
+				},
+				[
+					$el("h2", {
+						textContent: "Custom Autocomplete Words",
+						style: {
+							color: "#fff",
+							marginTop: 0,
+							textAlign: "center",
+							fontFamily: "sans-serif",
+						},
+					}),
+					$el(
+						"div",
+						{
+							style: {
+								color: "#fff",
+								fontFamily: "sans-serif",
+								display: "flex",
+								alignItems: "center",
+								gap: "5px",
+							},
+						},
+						[
+							$el("label", { textContent: "Load Custom List: " }),
+							input,
+							$el("button", {
+								textContent: "Load",
+								onclick: async () => {
+									try {
+										const res = await fetch(input.value);
+										if (res.status !== 200) {
+											throw new Error("Error loading: " + res.status + " " + res.statusText);
+										}
+										this.words.value = await res.text();
+									} catch (error) {
+										alert("Error loading custom list, try manually copy + pasting the list");
+									}
+								},
+							}),
+						]
+					),
+					this.words,
+				]
+			)
 		);
 	}
 

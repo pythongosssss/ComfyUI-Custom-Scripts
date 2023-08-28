@@ -284,16 +284,13 @@ class TextAreaCaretHelper {
 		return this.el.value.substring(this.el.selectionEnd);
 	}
 
-	insertAtCursor(value) {
-		if (document.selection) {
-			this.el.focus();
-			sel = document.selection.createRange();
-			sel.text = value;
-		} else if (this.el.selectionStart) {
+	insertAtCursor(value, offset) {
+		if (this.el.selectionStart != null) {
 			const startPos = this.el.selectionStart;
 			const endPos = this.el.selectionEnd;
+
 			this.el.value =
-				this.el.value.substring(0, startPos) + value + this.el.value.substring(endPos, this.el.value.length);
+				this.el.value.substring(0, startPos + offset) + value + this.el.value.substring(endPos, this.el.value.length);
 			this.el.selectionStart = startPos + value.length;
 			this.el.selectionEnd = startPos + value.length;
 		} else {
@@ -518,7 +515,7 @@ export class TextAreaAutoComplete {
 				{
 					onclick: () => {
 						this.el.focus();
-						this.helper.insertAtCursor(wordInfo.text.substr(before.length));
+						this.helper.insertAtCursor(wordInfo.text, -before.length);
 						setTimeout(() => {
 							this.#update();
 						}, 150);

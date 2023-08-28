@@ -302,6 +302,8 @@ class TextAreaCaretHelper {
 /*********************/
 
 export class TextAreaAutoComplete {
+	static enabled = true;
+
 	static groups = {};
 
 	/** @type {Record<string, {text: string, priority?: number; info?: Function}>} */
@@ -333,6 +335,8 @@ export class TextAreaAutoComplete {
 	 * @param {KeyboardEvent} e
 	 */
 	#keyDown(e) {
+		if (!TextAreaAutoComplete.enabled) return;
+
 		if (this.dropdown.parentElement) {
 			// We are visible
 			switch (e.key) {
@@ -364,6 +368,7 @@ export class TextAreaAutoComplete {
 	 * @param {KeyboardEvent} e
 	 */
 	#keyPress(e) {
+		if (!TextAreaAutoComplete.enabled) return;
 		if (this.dropdown.parentElement) {
 			// We are visible
 			switch (e.key) {
@@ -380,6 +385,7 @@ export class TextAreaAutoComplete {
 	}
 
 	#keyUp(e) {
+		if (!TextAreaAutoComplete.enabled) return;
 		if (this.dropdown.parentElement) {
 			// We are visible
 			switch (e.key) {

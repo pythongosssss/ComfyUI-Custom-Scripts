@@ -50,7 +50,16 @@ app.registerExtension({
 						"pysssss.customwords",
 						text.split("\n").reduce((p, n) => {
 							n = n.trim();
-							p[n] = { text: n };
+							const pos = n.lastIndexOf(",");
+							let priority = undefined;
+							if (pos > -1) {
+								const v = parseInt(n.substr(pos + 1).trim());
+								if (!isNaN(v)) {
+									priority = v;
+									n = n.substr(0, pos).trim();
+								}
+							}
+							p[n] = { text: n, priority };
 							return p;
 						}, {})
 					);

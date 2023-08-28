@@ -4,6 +4,7 @@
 	position: absolute;
 	font-family: sans-serif;
 	box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.4);
+	z-index: 9999;
 }
 
 .pysssss-autocomplete-item {
@@ -22,6 +23,26 @@
 	font-weight: bold;
 	text-decoration: underline;
 	text-decoration-color: dodgerblue;
+}
+
+.pysssss-autocomplete-priority {
+	margin-left: auto;
+	font-size: 10px;
+	color: #fff;
+	padding: 2px 4px 2px 14px;
+	position: relative;
+}
+
+.pysssss-autocomplete-priority::after {
+	content: "";
+	display: block;
+	background: rgba(255, 255, 255, 0.25);
+	width: calc(100% - 10px);
+	height: 100%;
+	position: absolute;
+	left: 10px;
+	top: 0;
+	border-radius: 5px;
 }
 
 .pysssss-autocomplete-item-info {

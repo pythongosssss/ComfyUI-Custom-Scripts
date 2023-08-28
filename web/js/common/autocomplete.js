@@ -306,6 +306,8 @@ class TextAreaCaretHelper {
 
 export class TextAreaAutoComplete {
 	static groups = {};
+
+	/** @type {Record<string, {text: string, priority?: number; info?: Function}>} */
 	static words = {};
 
 	/** @type {HTMLTextAreaElement} */
@@ -320,8 +322,6 @@ export class TextAreaAutoComplete {
 		this.dropdown = $el("div.pysssss-autocomplete");
 
 		this.#setup();
-
-		setTimeout(() => this.#update(), 100);
 	}
 
 	#setup() {
@@ -342,17 +342,17 @@ export class TextAreaAutoComplete {
 				case "ArrowUp":
 					e.preventDefault();
 					if (this.selected.index) {
-						this.#setSelected(this.currentWords[this.selected.index - 1]);
+						this.#setSelected(this.currentWords[this.selected.index - 1].wordInfo);
 					} else {
-						this.#setSelected(this.currentWords[this.currentWords.length - 1]);
+						this.#setSelected(this.currentWords[this.currentWords.length - 1].wordInfo);
 					}
 					break;
 				case "ArrowDown":
 					e.preventDefault();
 					if (this.selected.index === this.currentWords.length - 1) {
-						this.#setSelected(this.currentWords[0]);
+						this.#setSelected(this.currentWords[0].wordInfo);
 					} else {
-						this.#setSelected(this.currentWords[this.selected.index + 1]);
+						this.#setSelected(this.currentWords[this.selected.index + 1].wordInfo);
 					}
 					break;
 				case "Tab":
@@ -413,14 +413,45 @@ export class TextAreaAutoComplete {
 
 	#getFilteredWords(term) {
 		term = term.toLocaleLowerCase();
-		return Object.keys(TextAreaAutoComplete.words)
-			.filter((w) => {
-				const t = w.toLocaleLowerCase();
-				return t !== term && t.startsWith(term);
-			})
-			.sort((a, b) => a.length - b.length)
-			.slice(0, 20)
-			.map((k) => TextAreaAutoComplete.words[k]);
+
+		const priorityMatches = [];
+		const prefixMatches = [];
+		const includesMatches = [];
+		for (const word of Object.keys(TextAreaAutoComplete.words)) {
+			const lowerWord = word.toLocaleLowerCase();
+			if (lowerWord === term) {
+				// Dont include exact matches
+				continue;
+			}
+
+			const pos = lowerWord.indexOf(term);
+			if (pos === -1) {
+				// No match
+				continue;
+			}
+
+			const wordInfo = TextAreaAutoComplete.words[word];
+			if (wordInfo.priority) {
+				priorityMatches.push({ pos, wordInfo });
+			} else if (pos) {
+				includesMatches.push({ pos, wordInfo });
+			} else {
+				prefixMatches.push({ pos, wordInfo });
+			}
+		}
+
+		priorityMatches.sort(
+			(a, b) =>
+				b.wordInfo.priority - a.wordInfo.priority ||
+				a.wordInfo.text.length - b.wordInfo.text.length ||
+				a.wordInfo.text.localeCompare(b.wordInfo.text)
+		);
+
+		const top = priorityMatches.length * 0.2;
+		return priorityMatches
+			.slice(0, top)
+			.concat(prefixMatches, priorityMatches.slice(top), includesMatches)
+			.slice(0, 20);
 	}
 
 	#update() {
@@ -448,23 +479,35 @@ export class TextAreaAutoComplete {
 		this.dropdown.style.display = "";
 
 		let hasSelected = false;
-		const items = this.currentWords.map((w, i) => {
+		const items = this.currentWords.map(({ wordInfo, pos }, i) => {
 			const parts = [
+				$el("span", {
+					textContent: wordInfo.text.substr(0, pos),
+				}),
 				$el("span.pysssss-autocomplete-highlight", {
-					textContent: w.text.substring(0, before.length),
+					textContent: wordInfo.text.substr(pos, before.length),
 				}),
 				$el("span", {
-					textContent: w.text.substring(before.length),
+					textContent: wordInfo.text.substr(pos + before.length),
 				}),
 			];
-			if (w.info) {
+
+			if (wordInfo.priority) {
+				parts.push(
+					$el("span.pysssss-autocomplete-priority", {
+						textContent: wordInfo.priority,
+					})
+				);
+			}
+
+			if (wordInfo.info) {
 				parts.push(
 					$el("a.pysssss-autocomplete-item-info", {
 						textContent: "ℹ️",
 						title: "View info...",
 						onclick: (e) => {
 							e.stopPropagation();
-							w.info();
+							wordInfo.info();
 							e.preventDefault();
 						},
 					})
@@ -475,29 +518,29 @@ export class TextAreaAutoComplete {
 				{
 					onclick: () => {
 						this.el.focus();
-						this.helper.insertAtCursor(w.text.substr(before.length));
+						this.helper.insertAtCursor(wordInfo.text.substr(before.length));
 						setTimeout(() => {
 							this.#update();
 						}, 150);
 					},
 					onmousemove: () => {
-						this.#setSelected(w);
+						this.#setSelected(wordInfo);
 					},
 				},
 				parts
 			);
 
-			if (w === this.selected) {
+			if (wordInfo === this.selected) {
 				hasSelected = true;
 			}
 
-			w.index = i;
-			w.el = item;
+			wordInfo.index = i;
+			wordInfo.el = item;
 
 			return item;
 		});
 
-		this.#setSelected(hasSelected ? this.selected : this.currentWords[0]);
+		this.#setSelected(hasSelected ? this.selected : this.currentWords[0].wordInfo);
 		this.dropdown.replaceChildren(...items);
 
 		if (!this.dropdown.parentElement) {

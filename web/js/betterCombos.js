@@ -60,7 +60,7 @@ app.registerExtension({
 		// // Checks if this is a custom combo item
 		const isCustomItem = (value) => value && typeof value === "object" && "image" in value && value.content;
 		// Simple check for what separator to split by
-		const splitBy = (navigator.platform || navigator.userAgent).includes("Win") ? "\\" : "/";
+		const splitBy = (navigator.platform || navigator.userAgent).includes("Win") ? /\/|\\/ : /\//;
 
 		contextMenuHook["ctor"].push(function (values, options) {
 			// Copy the class from the parent so if we are dark we are also dark

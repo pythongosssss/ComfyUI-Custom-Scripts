@@ -160,6 +160,11 @@ Allows you to control the rendering of the links between nodes between straight,
 <br>
 
 # Changelog
+## 2023-08-29
+### Minor
+- ✨ Option to auto insert `, ` after autocomplete
+- 🎨 Exclude arrow keys from triggering autocomplete
+- 🐛 Split paths by `\` and `/` on Windows for submenus
 
 ## 2023-08-28
 ### New

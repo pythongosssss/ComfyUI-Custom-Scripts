@@ -302,6 +302,7 @@ class TextAreaCaretHelper {
 /*********************/
 
 export class TextAreaAutoComplete {
+	static separator = "";
 	static enabled = true;
 
 	static groups = {};
@@ -521,7 +522,7 @@ export class TextAreaAutoComplete {
 				{
 					onclick: () => {
 						this.el.focus();
-						this.helper.insertAtCursor(wordInfo.text, -before.length);
+						this.helper.insertAtCursor(wordInfo.text + TextAreaAutoComplete.separator, -before.length);
 						setTimeout(() => {
 							this.#update();
 						}, 150);

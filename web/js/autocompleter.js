@@ -193,6 +193,7 @@ app.registerExtension({
 			return r;
 		};
 
+		TextAreaAutoComplete.separator = localStorage.getItem(id + ".AutoSeparate") ?? ", ";
 		app.ui.settings.addSetting({
 			id,
 			name: "🐍 Text Autocomplete",
@@ -206,16 +207,48 @@ app.registerExtension({
 						}),
 					]),
 					$el("td", [
-						$el("input", {
-							id: id.replaceAll(".", "-"),
-							type: "checkbox",
-							checked: value,
-							onchange: (event) => {
-								const checked = !!event.target.checked;
-								TextAreaAutoComplete.enabled = checked;
-								setter(checked);
+						$el(
+							"label",
+							{
+								textContent: "Enabled ",
+								style: {
+									display: "block",
+								},
 							},
-						}),
+							[
+								$el("input", {
+									id: id.replaceAll(".", "-"),
+									type: "checkbox",
+									checked: value,
+									onchange: (event) => {
+										const checked = !!event.target.checked;
+										TextAreaAutoComplete.enabled = checked;
+										setter(checked);
+									},
+								}),
+							]
+						),
+						$el(
+							"label",
+							{
+								textContent: "Auto-insert comma ",
+								style: {
+									display: "block",
+								},
+							},
+							[
+								$el("input", {
+									id: id.replaceAll(".", "-"),
+									type: "checkbox",
+									checked: !!TextAreaAutoComplete.separator,
+									onchange: (event) => {
+										const checked = !!event.target.checked;
+										TextAreaAutoComplete.separator = checked ? ", " : "";
+										localStorage.setItem(id + ".AutoSeparate", TextAreaAutoComplete.separator);
+									},
+								}),
+							]
+						),
 						$el("button", {
 							textContent: "Manage Custom Words",
 							onclick: () => {

@@ -58,6 +58,7 @@ const ext = {
 		});
 
 		api.addEventListener("b_preview", ({ detail }) => {
+			if (!enabled) return;
 			show(URL.createObjectURL(detail), app.runningNodeId);
 		});
 

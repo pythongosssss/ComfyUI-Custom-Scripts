@@ -7,11 +7,7 @@ app.registerExtension({
 	name: "pysssss.ShowText",
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
 		if (nodeData.name === "ShowText|pysssss") {
-			// When the node is executed we will be sent the input text, display this in the widget
-			const onExecuted = nodeType.prototype.onExecuted;
-			nodeType.prototype.onExecuted = function (message) {
-				onExecuted?.apply(this, arguments);
-
+			function populate(text) {
 				if (this.widgets) {
 					const pos = this.widgets.findIndex((w) => w.name === "text");
 					if (pos !== -1) {
@@ -22,14 +18,31 @@ app.registerExtension({
 					}
 				}
 
-				for (const list of message.text) {
+				for (const list of text) {
 					const w = ComfyWidgets["STRING"](this, "text", ["STRING", { multiline: true }], app).widget;
 					w.inputEl.readOnly = true;
 					w.inputEl.style.opacity = 0.6;
 					w.value = list;
 				}
 
-				this.onResize?.(this.size);
+				requestAnimationFrame(() => {
+					this.onResize?.(this.computeSize());
+				});
+			}
+
+			// When the node is executed we will be sent the input text, display this in the widget
+			const onExecuted = nodeType.prototype.onExecuted;
+			nodeType.prototype.onExecuted = function (message) {
+				onExecuted?.apply(this, arguments);
+				populate.call(this, message.text);
+			};
+
+			const onConfigure = nodeType.prototype.onConfigure;
+			nodeType.prototype.onConfigure = function () {
+				onConfigure?.apply(this, arguments);
+				if (this.widgets_values?.length) {
+					populate.call(this, this.widgets_values);
+				}
 			};
 		}
 	},

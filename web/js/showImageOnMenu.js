@@ -19,10 +19,11 @@ const ext = {
 			"a",
 			{
 				style: {
-					position: "absolute",
-					bottom: 0,
 					width: "100%",
 					height: "150px",
+					marginTop: "10px",
+					order: 100, // Place this item last (until someone else has a higher order)
+					display: "none",
 				},
 				href: "#",
 				onclick: (e) => {
@@ -37,13 +38,12 @@ const ext = {
 			[img]
 		);
 
+		app.ui.menuContainer.append(link);
+
 		const show = (src, node) => {
 			img.src = src;
-			nodeId = +node;
-			if (!link.parentNode) {
-				app.ui.menuContainer.style.paddingBottom = "150px";
-				app.ui.menuContainer.append(link);
-			}
+			nodeId = Number(node);
+			link.style.display = "unset";
 		};
 
 		api.addEventListener("executed", ({ detail }) => {
@@ -69,12 +69,8 @@ const ext = {
 			type: "boolean",
 			onChange(value) {
 				enabled = value;
-				if (!value) {
-					app.ui.menuContainer.style.removeProperty("padding-bottom");
-					if (link.parentNode) {
-						link.parentNode.removeChild(link);
-					}
-				}
+
+				if (!enabled) link.style.display = "none";
 			},
 		});
 	},

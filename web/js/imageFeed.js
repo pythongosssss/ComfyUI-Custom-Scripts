@@ -163,15 +163,36 @@ $el("style", {
 		grid-auto-rows: min-content;
 		grid-template-columns: repeat(var(--img-sz, 3), 1fr);
 		transition: 100ms linear;
+		scrollbar-gutter: stable both-edges;
+		padding: 5px;
+		background: var(--comfy-input-bg);
+		border-radius: 5px;
+		margin: 5px;
+		margin-top: 0px;
 	}
 	.pysssss-image-feed-list div {
 		height: 100%;
 		text-align: center;
 	}
+	.pysssss-image-feed-list::-webkit-scrollbar {
+		background: var(--comfy-input-bg);
+		border-radius: 5px;
+	}
+	.pysssss-image-feed-list::-webkit-scrollbar-thumb {
+		background:var(--comfy-menu-bg);
+		border: 5px solid transparent;
+		border-radius: 8px;
+		background-clip: content-box;
+	}
+	.pysssss-image-feed-list::-webkit-scrollbar-thumb:hover {
+		background: var(--border-color);
+		background-clip: content-box;
+	}
 	.pysssss-image-feed-list img {
 		object-fit: var(--img-fit, contain);
 		max-width: 100%;
 		max-height: calc(var(--max-size) * 1vh);
+		border-radius: 4px;
 	}
 	.pysssss-image-feed-list img:hover {
 		filter: brightness(1.2);

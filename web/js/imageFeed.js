@@ -26,6 +26,7 @@ $el("style", {
 	.pysssss-image-feed--bottom {
 		bottom: 0;
 		flex-direction: column-reverse;
+		padding-top: 5px;
 	}
 	.pysssss-image-feed--left, .pysssss-image-feed--right {
 		top: 0;

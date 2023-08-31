@@ -165,6 +165,7 @@ $el("style", {
 		transition: 100ms linear;
 	}
 	.pysssss-image-feed-list div {
+		height: 100%;
 		text-align: center;
 	}
 	.pysssss-image-feed-list img {

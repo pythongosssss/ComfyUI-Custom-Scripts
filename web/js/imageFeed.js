@@ -171,6 +171,9 @@ $el("style", {
 		margin: 5px;
 		margin-top: 0px;
 	}
+	.pysssss-image-feed-list:empty {
+		display: none;
+	}
 	.pysssss-image-feed-list div {
 		height: 100%;
 		text-align: center;

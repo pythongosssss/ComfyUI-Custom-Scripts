@@ -44,9 +44,9 @@ class MathExpression:
                 "expression": ("STRING", {"multiline": True, "dynamicPrompts": False}),
             },
             "optional": {
-                "a": ("INT,FLOAT,IMAGE,LATENT", {"forceInput": True}),
-                "b": ("INT,FLOAT,IMAGE,LATENT", {"forceInput": True}),
-                "c": ("INT,FLOAT,IMAGE,LATENT", {"forceInput": True}),
+                "a": ("INT,FLOAT,IMAGE,LATENT", ),
+                "b": ("INT,FLOAT,IMAGE,LATENT",),
+                "c": ("INT,FLOAT,IMAGE,LATENT", ),
             },
             "hidden": {"extra_pnginfo": "EXTRA_PNGINFO",
                        "prompt": "PROMPT"},
@@ -96,8 +96,8 @@ class MathExpression:
         else:
             # Image
             if property == "width":
-                return target.shape[2] 
-            return target.shape[1] 
+                return target.shape[2]
+            return target.shape[1]
 
     def evaluate(self, expression, extra_pnginfo, prompt, a=None, b=None, c=None):
         expression = expression.replace('\n', ' ').replace('\r', '')
@@ -124,7 +124,8 @@ class MathExpression:
                     if isinstance(val, (int, float, complex)):
                         return val
                     else:
-                        raise TypeError(f"Compex types (LATENT/IMAGE) need to reference their width/height, e.g. {node.id}.width")
+                        raise TypeError(
+                            f"Compex types (LATENT/IMAGE) need to reference their width/height, e.g. {node.id}.width")
                 raise NameError(f"Name not found: {node.id}")
             elif isinstance(node, ast.Call):
                 if node.func.id in functions:

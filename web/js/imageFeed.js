@@ -493,7 +493,6 @@ app.registerExtension({
 				paddingSize = (imageFeedRootSize - parseFloat(getComputedStyle(imageFeed).height)) * 16;
 			}
 
-
 			[...imageList.querySelectorAll("img")].map((img) => {
 				img.setAttribute("draggable", false);
 			});
@@ -508,7 +507,6 @@ app.registerExtension({
 			}
 			
 			var newSize = 0;
-
 			if (isVertical) {
 				const deltaX = e.clientX - initialSize;
 				newSize = feedLocation.value == "left" ? imageFeedRootSize + deltaX : imageFeedRootSize - deltaX;
@@ -517,9 +515,20 @@ app.registerExtension({
 				newSize = feedLocation.value == "top" ? imageFeedRootSize + deltaY : imageFeedRootSize - deltaY;
 			}
 
+			/* Change image size */
+			if (e.shiftKey && !e.ctrlKey) {
+				let newImageSize = parseInt(getVal("ImageSize")) + (isVertical ? e.movementX : e.movementY);
+				newImageSize = Math.min(Math.max(32, newImageSize), 512);
+
+				saveVal("ImageSize", newImageSize);
+				imageFeedRoot.style.setProperty("--image-size", `${newImageSize}px`);
+				/* Update settings slider */
+				document.querySelector("section.size-control.feed-size-control input").value = newImageSize;
+			}
+			
 			const minSize = getVal("ImageSize", 128);
 			const maxSize = isVertical ?  window.innerWidth : window.innerHeight;
-
+			
 			/* Snap to closest image-size multiple for a cleaner list */
 			if (e.ctrlKey) { 
 				let steps = Math.round(newSize / minSize)
@@ -531,7 +540,6 @@ app.registerExtension({
 			if (newSize >= minSize && newSize <= maxSize) {
 				if (isVertical) {
 					imageFeedRoot.style.width = `max(calc(var(--image-size) + 76px), ${newSize}px, 200px)`;
-
 				} else {
 					imageFeedRoot.style.height = `max(calc(var(--image-size) + 76px), ${newSize}px, 200px)`;
 				}

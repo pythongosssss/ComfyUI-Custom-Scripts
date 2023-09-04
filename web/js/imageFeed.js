@@ -497,6 +497,8 @@ app.registerExtension({
 				img.setAttribute("draggable", false);
 			});
 
+			document.documentElement.style.cursor = isVertical ? "col-resize" : "row-resize";
+
 			document.addEventListener('mousemove', resizeContainer);
 			document.addEventListener('mouseup', stopResize);
 		});
@@ -550,6 +552,8 @@ app.registerExtension({
 			isResizing = false;
 			document.removeEventListener('mousemove', resizeContainer);
 			document.removeEventListener('mouseup', stopResize);
+
+			document.documentElement.style.cursor = "default";
 
 			[...imageList.querySelectorAll("img")].map((img) => {
 				img.setAttribute("draggable", true);

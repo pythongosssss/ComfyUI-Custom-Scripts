@@ -186,7 +186,7 @@ app.registerExtension({
 		ComfyWidgets.STRING = function (node, inputName, inputData) {
 			const r = STRING.apply(this, arguments);
 
-			if (inputData[1]?.multiline) {
+			if (inputData[1]?.multiline && inputData[1]?.["pysssss.autocomplete"] !== false) {
 				new TextAreaAutoComplete(r.widget.inputEl);
 			}
 

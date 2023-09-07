@@ -5,6 +5,59 @@ import { $el, ComfyDialog } from "../../../../scripts/ui.js";
 import { TextAreaAutoComplete } from "./common/autocomplete.js";
 import { ModelInfoDialog } from "./common/modelInfoDialog.js";
 
+function parseCSV(csvText) {
+	const rows = [];
+	const delimiter = ",";
+	const quote = '"';
+	let currentField = "";
+	let inQuotedField = false;
+
+	function pushField() {
+		rows[rows.length - 1].push(currentField);
+		currentField = "";
+		inQuotedField = false;
+	}
+
+	rows.push([]); // Initialize the first row
+
+	for (let i = 0; i < csvText.length; i++) {
+		const char = csvText[i];
+		const nextChar = csvText[i + 1];
+
+		if (!inQuotedField) {
+			if (char === quote) {
+				inQuotedField = true;
+			} else if (char === delimiter) {
+				pushField();
+			} else if (char === "\r" || char === "\n" || i === csvText.length - 1) {
+				pushField();
+				if (nextChar === "\n") {
+					i++; // Handle Windows line endings (\r\n)
+				}
+				rows.push([]); // Start a new row
+			} else {
+				currentField += char;
+			}
+		} else {
+			if (char === quote && nextChar === quote) {
+				currentField += quote;
+				i++; // Skip the next quote
+			} else if (char === quote) {
+				inQuotedField = false;
+			} else {
+				currentField += char;
+			}
+		}
+	}
+
+	// Remove the last row if it's empty
+	if (rows[rows.length - 1].length === 0) {
+		rows.pop();
+	}
+
+	return rows;
+}
+
 async function getCustomWords() {
 	const resp = await api.fetchApi("/pysssss/autocomplete", { cache: "no-store" });
 	if (resp.status === 200) {
@@ -20,18 +73,37 @@ async function addCustomWords(text) {
 	if (text) {
 		TextAreaAutoComplete.updateWords(
 			"pysssss.customwords",
-			text.split("\n").reduce((p, n) => {
-				n = n.trim();
-				const pos = n.lastIndexOf(",");
-				let priority = undefined;
-				if (pos > -1) {
-					const v = parseInt(n.substr(pos + 1).trim());
-					if (!isNaN(v)) {
-						priority = v;
-						n = n.substr(0, pos).trim();
-					}
+			parseCSV(text).reduce((p, n) => {
+				let text;
+				let priority;
+				let value;
+				let num;
+				switch (n.length) {
+					case 0:
+						return;
+					case 1:
+						// Single word
+						text = n[0];
+						break;
+					case 2:
+						// Word,[priority|alias]
+						num = +n[1];
+						if (isNaN(num)) {
+							text = n[1];
+							value = n[0];
+						} else {
+							text = n[0];
+							priority = num;
+						}
+						break;
+					default:
+						// Word,alias,priority
+						text = n[1];
+						value = n[0];
+						priority = +n[2];
+						break;
 				}
-				p[n] = { text: n, priority };
+				p[text] = { text, priority, value };
 				return p;
 			}, {})
 		);

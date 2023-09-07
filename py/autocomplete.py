@@ -17,6 +17,6 @@ async def get_autocomplete(request):
 
 @PromptServer.instance.routes.post("/pysssss/autocomplete")
 async def update_autocomplete(request):
-    with open(file, "w") as f:
+    with open(file, "w", encoding="utf-8") as f:
         f.write(await request.text())
     return web.Response(status=200)

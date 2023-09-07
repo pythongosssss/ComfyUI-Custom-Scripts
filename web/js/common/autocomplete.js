@@ -462,7 +462,7 @@ export class TextAreaAutoComplete {
 	#update() {
 		let before = this.helper.getBeforeCursor();
 		if (before?.length) {
-			const m = before.match(/\b([\w-_:\\\/]+)$/);
+			const m = before.match(/([^\s|,|;|"]+)$/);
 			if (m) {
 				before = m[0];
 			} else {
@@ -523,7 +523,10 @@ export class TextAreaAutoComplete {
 				{
 					onclick: () => {
 						this.el.focus();
-						this.helper.insertAtCursor(wordInfo.text + TextAreaAutoComplete.separator, -before.length);
+						this.helper.insertAtCursor(
+							(wordInfo.value ?? wordInfo.text) + TextAreaAutoComplete.separator,
+							-before.length
+						);
 						setTimeout(() => {
 							this.#update();
 						}, 150);
@@ -563,6 +566,7 @@ export class TextAreaAutoComplete {
 	}
 
 	static updateWords(id, words) {
+		console.log(id, words);
 		const isUpdate = id in TextAreaAutoComplete.groups;
 		TextAreaAutoComplete.groups[id] = words;
 		if (isUpdate) {

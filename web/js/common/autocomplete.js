@@ -566,7 +566,6 @@ export class TextAreaAutoComplete {
 	}
 
 	static updateWords(id, words) {
-		console.log(id, words);
 		const isUpdate = id in TextAreaAutoComplete.groups;
 		TextAreaAutoComplete.groups[id] = words;
 		if (isUpdate) {

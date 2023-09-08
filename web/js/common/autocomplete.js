@@ -499,8 +499,16 @@ export class TextAreaAutoComplete {
 
 			if (wordInfo.priority) {
 				parts.push(
-					$el("span.pysssss-autocomplete-priority", {
+					$el("span.pysssss-autocomplete-pill", {
 						textContent: wordInfo.priority,
+					})
+				);
+			}
+
+			if (wordInfo.value && wordInfo.text !== wordInfo.value) {
+				parts.push(
+					$el("span.pysssss-autocomplete-pill", {
+						textContent: wordInfo.value,
 					})
 				);
 			}

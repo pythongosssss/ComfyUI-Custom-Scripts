@@ -2,6 +2,7 @@ import { api } from "../../../scripts/api.js";
 import { app } from "../../../scripts/app.js";
 import { $el } from "../../../scripts/ui.js";
 import { lightbox } from "./common/lightbox.js";
+import { PopUp } from "./common/popup.js";
 
 $el("style", {
 	textContent: `
@@ -397,36 +398,45 @@ app.registerExtension({
 			},
 		});
 
+		const settingsButton = $el("button.pysssss-image-feed-btn.settings-btn", {}, [
+			$el("label.size-control-handle", { textContent: "⚙️" })
+		]);
+
+		const settingsPopup = new PopUp(settingsButton, {
+			name: "Feed Settings",
+			activeOnHover: true,
+		});
+		settingsPopup.setContent( (content) => {
+			content.append(
+				$el("section.size-control.feed-size-control", {}, [
+					$el("span", {
+						textContent: "Image Size",
+					}),
+					$el("input", {
+						type: "range",
+						min: 32,
+						max: 512,
+						step: 12,
+						oninput: (e) => {
+							e.target.parentElement.title = `Controls the maximum size of the images in the feed panel (${e.target.value}px/512px)`;
+							imageFeedRoot.style.setProperty("--image-size", `${e.target.value}px` );
+							saveVal("ImageSize", e.target.value);
+							e.target.textContent = `${e.target.value}px/512px`;
+						},
+						$: (el) => {
+							requestAnimationFrame(() => {
+								el.value = getVal("ImageSize", 128);
+								el.oninput({ target: el });
+							});
+						},
+					}),
+				]),
+			)
+		});
+
 		imageFeed.append(
 			$el("div.pysssss-image-feed-menu", [
-				$el("section.sizing-menu", {}, [
-					$el("label.size-control-handle", { textContent: "⚙️" }),
-					$el("div.size-controls-flyout", {}, [
-						$el("section.size-control.feed-size-control", {}, [
-							$el("span", {
-								textContent: "Image Size",
-							}),
-							$el("input", {
-								type: "range",
-								min: 32,
-								max: 512,
-								step: 12,
-								oninput: (e) => {
-									e.target.parentElement.title = `Controls the maximum size of the images in the feed panel (${e.target.value}px/512px)`;
-									imageFeedRoot.style.setProperty("--image-size", `${e.target.value}px` );
-									saveVal("ImageSize", e.target.value);
-									e.target.textContent = `${e.target.value}px/512px`;
-								},
-								$: (el) => {
-									requestAnimationFrame(() => {
-										el.value = getVal("ImageSize", 128);
-										el.oninput({ target: el });
-									});
-								},
-							}),
-						]),
-					]),
-				]),
+				settingsButton,
 				$el("div.pysssss-image-feed-btn-group", {}, [clearButton, hideButton]),
 			]),
 			imageList

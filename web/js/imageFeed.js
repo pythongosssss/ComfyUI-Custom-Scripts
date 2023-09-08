@@ -324,6 +324,15 @@ app.registerExtension({
 			},
 		});
 
+		let columnInput;
+		function updateColumnCount(v) {
+			columnInput.parentElement.title = `Controls the number of columns in the feed (${v} columns).\nClick label to set custom value.`;
+			imageFeed.style.setProperty("--img-sz", v);
+			saveVal("ImageSize", v);
+			columnInput.max = Math.max(10, v, columnInput.max);
+			columnInput.value = v;
+		}
+
 		imageFeed.append(
 			$el("div.pysssss-image-feed-menu", [
 				$el("section.sizing-menu", {}, [
@@ -351,21 +360,31 @@ app.registerExtension({
 							}),
 						]),
 						$el("section.size-control.image-size-control", {}, [
-							$el("span", { textContent: "Column count..." }),
+							$el("a", {
+								textContent: "Column count...",
+								style: {
+									cursor: "pointer",
+									textDecoration: "underline",
+								},
+								onclick: () => {
+									const v = +prompt("Enter custom column count", 20);
+									if (!isNaN(v)) {
+										updateColumnCount(v);
+									}
+								},
+							}),
 							$el("input", {
 								type: "range",
 								min: 1,
 								max: 10,
 								step: 1,
 								oninput: (e) => {
-									e.target.parentElement.title = `Controls the number of columns in the feed (${e.target.value} columns)`;
-									imageFeed.style.setProperty("--img-sz", e.target.value);
-									saveVal("ImageSize", e.target.value);
+									updateColumnCount(e.target.value);
 								},
 								$: (el) => {
+									columnInput = el;
 									requestAnimationFrame(() => {
-										el.value = getVal("ImageSize", 4);
-										el.oninput({ target: el });
+										updateColumnCount(getVal("ImageSize", 4));
 									});
 								},
 							}),

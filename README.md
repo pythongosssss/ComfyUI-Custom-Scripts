@@ -159,7 +159,35 @@ Allows you to control the rendering of the links between nodes between straight,
 <br>
 <br>
 
+
 # Changelog
+## 2023-09-08
+### New
+- ✨ Add Load + Save Text file nodes, you can configure the allowed directories in the `user/text_file_dirs.json` file
+### Minor
+- 🎨 Show autocomplete alias word on popup
+- ✨ Add setting to disable middle click from adding a reroute node
+- 🎨 Add prompt for setting custom column count on image feed  (click the column count label)
+
+## 2023-09-07
+### New
+- ✨ Support Unicode (e.g. Chinese) and word aliases in autocomplete.
+
+## 2023-09-05
+### Minor
+- 🎨 Disable autocomplete on math node
+- 🐛 Fix Show Text node always resizing on update
+
+### Minor
+- 🎨 Better adding of preview image to menu (thanks to @zeroeightysix)
+- 🎨 UX improvements for image feed (thanks to @birdddev)
+- 🐛 Fix Math Expression expression not showing on updated ComfyUI
+- 
+## 2023-08-30
+### Minor
+- 🎨 Allow jpeg lora/checkpoint preview images
+- ✨ Save ShowText value to embedded image metadata
+  
 ## 2023-08-29
 ### Minor
 - ✨ Option to auto insert `, ` after autocomplete
@@ -238,7 +266,6 @@ Allows you to control the rendering of the links between nodes between straight,
 - ✨ Support `round` `floor` `ceil` functions in math node
 - 🐛 Fix floor division in math node
 
-# Changelog
 ## 2023-08-12
 ### New
 - 🎨 Image feed now uses a lightbox for showing images
@@ -272,7 +299,6 @@ Allows you to control the rendering of the links between nodes between straight,
 - 🚨 No longer populates image feed when its closed
 - 🐛 Allow lock/unlock of multiple selected nodes
 
-# Changelog
 ## 2023-08-01
 ### Minor
 - 🎨 Image feed now uses comfy theme variables for colors

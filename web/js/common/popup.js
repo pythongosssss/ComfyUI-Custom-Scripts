@@ -96,6 +96,8 @@ export class PopUp {
         let rect = this.attachedElement.getBoundingClientRect();
         let computedStyle = getComputedStyle(this.container);
         
+        let buttonWidth = rect.right - rect.left;
+        let buttonHeight = rect.top - rect.bottom;
         let windowWidth = window.innerWidth;
         let windowHeight = window.innerHeight;
         let containerWidth = parseFloat(computedStyle.width); 
@@ -105,15 +107,15 @@ export class PopUp {
         let y = rect.top;
 
         this.container.style.left = `${x}px`;
-        this.container.style.top = `${y - (rect.top - rect.bottom) + 4}px`;
+        this.container.style.top = `${y - buttonHeight + 2}px`;
 
         /* Make sure popup is fully inside window */
         if (x + containerWidth > windowWidth) {
-            this.container.style.left = `${windowWidth - containerWidth * 2.0 - (rect.left - rect.right) * 2.0}px`;
+            this.container.style.left = `${windowWidth - containerWidth * 2.0 + buttonWidth}px`;
         }
 
-        if (y + containerHeight > windowHeight) {
-            this.container.style.top = `${windowHeight - containerHeight * 2.0 - 4}px`;
+        if (y + containerHeight * 2.0 + (buttonHeight) > windowHeight) {
+            this.container.style.top = `${windowHeight - containerHeight * 2.0 + buttonHeight / 2.0 - 2.0}px`;
         }
     }
 }

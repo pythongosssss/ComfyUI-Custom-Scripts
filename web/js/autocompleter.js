@@ -50,6 +50,10 @@ function parseCSV(csvText) {
 		}
 	}
 
+	if (currentField || csvText[csvText.length - 1] === ",") {
+		pushField();
+	}
+
 	// Remove the last row if it's empty
 	if (rows[rows.length - 1].length === 0) {
 		rows.pop();
@@ -96,6 +100,18 @@ async function addCustomWords(text) {
 							priority = num;
 						}
 						break;
+					case 4:
+						// a1111 csv format?
+						value = n[0];
+						priority = +n[2];
+						const aliases = n[3];
+						if (aliases) {
+							const split = aliases.split(",");
+							for (const text of split) {
+								p[text] = { text, priority, value };
+							}
+						}
+						text = value;
 					default:
 						// Word,alias,priority
 						text = n[1];

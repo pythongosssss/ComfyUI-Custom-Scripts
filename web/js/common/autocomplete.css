@@ -45,6 +45,10 @@
 	border-radius: 5px;
 }
 
+.pysssss-autocomplete-pill + .pysssss-autocomplete-pill {
+	margin-left: 0;
+}
+
 .pysssss-autocomplete-item-info {
 	margin-left: auto;
 	transition: filter 0.2s;

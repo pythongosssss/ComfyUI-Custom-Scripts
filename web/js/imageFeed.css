@@ -1,0 +1,197 @@
+.pysssss-image-feed-root {
+    --image-size: 128px;
+    --image-gap-size: 4px;
+
+    --image-feed-radius: 5px;
+    --image-feed-theme-handle: #333;
+    
+
+    align-items: stretch;
+    display: flex;
+    font-size: 12px;
+    position: absolute;
+    text-align: center;
+    vertical-align: top;
+    z-index: 99;
+}
+.pysssss-image-feed-root--left, .pysssss-image-feed-root--right {
+    top: 0;
+    height: 100vh;
+}
+.pysssss-image-feed-root--left {
+    left: 0;
+}
+.pysssss-image-feed-root--right {
+    right: 0;
+    flex-direction: row-reverse;
+}
+.pysssss-image-feed-root--top, .pysssss-image-feed-root--bottom {
+    left: 0;
+    width: 100vw;
+}
+.pysssss-image-feed-root--top {
+    top: 0;
+    flex-direction: column;
+}
+.pysssss-image-feed-root--bottom {
+    bottom: 0;
+    flex-direction: column-reverse;
+}
+.pysssss-image-feed {
+    flex: 1;
+    background: var(--comfy-menu-bg);
+    color: var(--fg-color);
+    font-family: sans-serif;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+}
+.pysssss-image-feed--left, .pysssss-image-feed--right {
+    top: 0;
+    height: 100vh;
+}
+
+.pysssss-image-feed--top, .pysssss-image-feed--bottom {
+    left: 0;
+    width: 100vw;
+}
+
+.pysssss-image-feed-header {
+    position: relative;
+    display: flex;
+    gap: 5px;
+    padding: 5px;
+    justify-content: space-between;
+}
+.pysssss-image-feed-btn-group {
+    align-items: stretch;
+    display: flex;
+    gap: .5rem;
+    flex: 0 1 fit-content;
+    justify-content: flex-end;
+}
+.pysssss-image-feed-btn {
+    background-color:var(--comfy-input-bg);
+    border-radius: var(--image-feed-radius);
+    border:2px solid var(--border-color);
+    color: var(--fg-color);
+    cursor:pointer;
+    display:inline-block;
+    flex: 0 1 fit-content;
+    text-decoration:none;
+}
+.pysssss-image-feed-btn.sizing-btn:checked {
+    filter: invert();
+}
+.pysssss-image-feed-btn.clear-btn {
+    padding: 5px 20px;
+}
+.pysssss-image-feed-btn.hide-btn {
+    padding: 5px;
+    aspect-ratio: 1 / 1;
+}
+.pysssss-image-feed-btn:hover {
+    filter: brightness(1.2);
+}
+.pysssss-image-feed-btn:active {
+    position:relative;
+    top:1px;
+}
+
+.pysssss-image-feed-header > * {
+    min-height: 24px;
+}
+.pysssss-image-feed-list {
+    flex: 1;
+    align-content: flex-start;
+    overflow-y: auto;
+    display: grid;
+    gap: var(--image-gap-size);
+    justify-items: center;
+    transition: 100ms linear;
+    scrollbar-gutter: stable both-edges;
+    padding: 5px;
+    background: var(--comfy-input-bg);
+    border-radius: var(--image-feed-radius);
+    margin: 5px;
+    margin-top: 0px;
+}
+.pysssss-image-feed-list div, .pysssss-image-feed-list a {
+    display: flex;
+    flex-wrap: wrap;
+    width: var(--image-size);
+    height: var(--image-size);
+    align-content: center;
+    justify-content: center;
+}
+.pysssss-image-feed-list div {
+    background: rgba(0,0,0,0.15);
+    box-sizing: border-box;
+}
+.pysssss-image-feed-list div:hover{
+    filter: brightness(1.2);
+}
+.pysssss-image-feed-list img {
+    max-width: 100%;
+      max-height: 100%;
+}
+.pysssss-image-feed-list::-webkit-scrollbar {
+    background: var(--comfy-input-bg);
+    border-radius: var(--image-feed-radius);
+}
+.pysssss-image-feed-list::-webkit-scrollbar-thumb {
+    background:var(--comfy-menu-bg);
+    border: 5px solid transparent;
+    border-radius: var(--image-feed-radius);
+    background-clip: content-box;
+}
+.pysssss-image-feed-list::-webkit-scrollbar-thumb:hover {
+    background: var(--border-color);
+    background-clip: content-box;
+}
+.pysssss-image-feed-handle {
+    flex: 0;
+    background-color: #191919;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Disables dragging so it doesn't mess up the grab. */
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.pysssss-image-feed-handle--left, .pysssss-image-feed-handle--right {
+    cursor: col-resize;
+    min-width: 8px;
+    height: 100vh;
+}
+.pysssss-image-feed-handle--top, .pysssss-image-feed-handle--bottom {
+    cursor: row-resize;
+    min-height: 8px;
+    width: 100vw;
+}
+.pysssss-image-feed-handle:hover, .pysssss-image-feed-handle:active {
+    background-color: var(--border-color);
+}
+
+.pysssss-image-feed-table td {
+    text-align: right;
+}
+.pysssss-image-feed-table td.right {
+    text-align: left;
+}
+.pysssss-image-feed-table select {
+    color: var(--fg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    width: 100%;
+    background-color: var(--comfy-input-bg);
+}
+.pysssss-image-feed-table select:hover {
+    filter: brightness(1.2);
+}
+.pysssss-image-feed-table select:focus {
+    outline: none !important;
+    box-shadow: 0 0 3px var(--border-color);
+}

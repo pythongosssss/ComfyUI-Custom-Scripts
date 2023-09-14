@@ -110,25 +110,6 @@ $el("style", {
 		position:relative;
 		top:1px;
 	}
-	.pysssss-image-feed-menu section {
-		border-radius: var(--image-feed-radius);
-		background: rgba(0,0,0,0.6);
-		padding: 0 5px;
-		display: flex;
-		gap: 5px;
-		align-items: center;
-		position: relative;
-	}
-	.pysssss-image-feed-menu section span {
-		white-space: nowrap;
-	}
-	.pysssss-image-feed-menu section input {
-		flex: 1 1 100%;
-		background: rgba(0,0,0,0.6);
-		border-radius: var(--image-feed-radius);
-		overflow: hidden;
-		z-index: 100;
-	}
 
 	.sizing-menu {
 		position: relative;
@@ -251,6 +232,27 @@ $el("style", {
 	.pysssss-image-feed-handle:hover, .pysssss-image-feed-handle:active {
 		background-color: var(--border-color);
 	}
+
+	.pysssss-image-feed-table td {
+		text-align: right;
+	}
+	.pysssss-image-feed-table td.right {
+		text-align: left;
+	}
+	.pysssss-image-feed-table select {
+		color: var(--fg-color);
+		border: 1px solid var(--border-color);
+		border-radius: 5px;
+		width: 100%;
+		background-color: var(--comfy-input-bg);
+	}
+	.pysssss-image-feed-table select:hover {
+		filter: brightness(1.2);
+	}
+	.pysssss-image-feed-table select:focus {
+		outline: none !important;
+		box-shadow: 0 0 3px var(--border-color);
+	}
 	`,
 	parent: document.body,
 });
@@ -280,6 +282,14 @@ app.registerExtension({
 			localStorage.setItem("pysssss.ImageFeed." + n, v);
 		};
 
+		const getValString = (n, d) => {
+			const v = localStorage.getItem("pysssss.ImageFeed." + n);
+			if (v) {
+				return v;
+			}
+			return d;
+		}
+
 		const imageFeedRoot = $el("div.pysssss-image-feed-root", {
 			parent: document.body,
 		});
@@ -292,46 +302,7 @@ app.registerExtension({
 
 		imageFeedRoot.append(imageFeed, resizeHandle);
 
-		const feedLocation = app.ui.settings.addSetting({
-			id: "pysssss.ImageFeed.Location",
-			name: "🐍 Image Feed Location",
-			defaultValue: "bottom",
-			type: () => {
-				return $el("tr", [
-					$el("td", [
-						$el("label", {
-							textContent: "🐍 Image Feed Location:",
-						}),
-					]),
-					$el("td", [
-						$el(
-							"select",
-							{
-								style: {
-									fontSize: "14px",
-								},
-								oninput: (e) => {
-									feedLocation.value = e.target.value;
-									onFeedLocationChange(feedLocation.value);
-								},
-							},
-							["left", "top", "right", "bottom"].map((m) =>
-								$el("option", {
-									value: m,
-									textContent: m,
-									selected: feedLocation.value === m,
-								})
-							)
-						),
-					]),
-				]);
-			},
-			onChange(value) {
-				onFeedLocationChange(value);
-			},
-		});
-
-		function onFeedLocationChange(value) {
+		function updateFeedLocation(value) {
 			imageFeed.className = `pysssss-image-feed pysssss-image-feed--${value}`;
 			imageFeedRoot.className = `pysssss-image-feed-root pysssss-image-feed-root--${value}`;
 			resizeHandle.className = `pysssss-image-feed-handle pysssss-image-feed-handle--${value}`;
@@ -342,41 +313,7 @@ app.registerExtension({
 			}
 		}
 
-		const feedDirection = app.ui.settings.addSetting({
-			id: "pysssss.ImageFeed.Direction",
-			name: "🐍 Image Feed Direction",
-			defaultValue: "newest first",
-			type: () => {
-				return $el("tr", [
-					$el("td", [
-						$el("label", {
-							textContent: "🐍 Image Feed Direction:",
-						}),
-					]),
-					$el("td", [
-						$el(
-							"select",
-							{
-								style: {
-									fontSize: "14px",
-								},
-								oninput: (e) => {
-									feedDirection.value = e.target.value;
-									imageList.replaceChildren(...[...imageList.childNodes].reverse());
-								},
-							},
-							["newest first", "oldest first"].map((m) =>
-								$el("option", {
-									value: m,
-									textContent: m,
-									selected: feedDirection.value === m,
-								})
-							)
-						),
-					]),
-				]);
-			},
-		});
+		updateFeedLocation(getValString("Location", "bottom"));
 
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
 			textContent: "Clear",
@@ -405,12 +342,16 @@ app.registerExtension({
 			activeOnHover: true,
 		});
 		settingsPopup.setContent( (content) => {
-			content.append(
-				$el("section.size-control.feed-size-control", {}, [
-					$el("span", {
-						textContent: "Image Size",
-					}),
-					$el("input", {
+			const table = $el("table.pysssss-image-feed-table");
+
+			table.append(
+				$el("tr", [
+					$el("td", [
+						$el("label", {
+							textContent: "Image Size"
+						}),
+					]),
+					$el("input.image-feed-image-size", {
 						type: "range",
 						min: 32,
 						max: 512,
@@ -429,7 +370,59 @@ app.registerExtension({
 						},
 					}),
 				]),
-			)
+				$el("tr", [
+					$el("td", [
+						$el("label", {
+							textContent: "Location",
+						}),
+					]),
+					$el("td.right", [
+						$el(
+							"select",
+							{
+								oninput: (e) => {
+									saveVal("Location", e.target.value);
+									updateFeedLocation(getValString("Location", "bottom"));
+								},
+							},
+							["left", "top", "right", "bottom"].map((m) =>
+								$el("option", {
+									value: m,
+									textContent: m,
+									selected: getValString("Location", "bottom") === m,
+								})
+							)
+						),
+					]),
+				]),
+				$el("tr", [
+					$el("td", [
+						$el("label", {
+							textContent: "Sort by",
+						}),
+					]),
+					$el("td.right", [
+						$el(
+							"select",
+							{
+								oninput: (e) => {
+									saveVal("Direction", e.target.value);
+									imageList.replaceChildren(...[...imageList.childNodes].reverse());
+								},
+							},
+							["newest", "oldest"].map((m) =>
+								$el("option", {
+									value: m,
+									textContent: m,
+									selected: getValString("Direction", "newest") === m,
+								})
+							)
+						),
+					]),
+				]),
+			);
+
+			content.append(table);
 		});
 
 		imageFeed.append(
@@ -458,7 +451,7 @@ app.registerExtension({
 						src.type
 					}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
 
-					const method = feedDirection.value === "newest first" ? "prepend" : "append";
+					const method = getValString("Direction", "newest") === "newest" ? "prepend" : "append";
 					imageList[method](
 						$el("div", [
 							$el(
@@ -492,7 +485,7 @@ app.registerExtension({
 
 		resizeHandle.addEventListener('mousedown', (e) => {
 			isResizing = true;
-			isVertical = ["left", "right"].includes(feedLocation.value);
+			isVertical = ["left", "right"].includes(getValString("Location", "bottom"));
 			
 			if (isVertical) {
 				initialSize = e.clientX;
@@ -520,12 +513,13 @@ app.registerExtension({
 			}
 			
 			var newSize = 0;
+			const feedLocation = getValString("Location", "bottom");
 			if (isVertical) {
 				const deltaX = e.clientX - initialSize;
-				newSize = feedLocation.value == "left" ? imageFeedRootSize + deltaX : imageFeedRootSize - deltaX;
+				newSize = feedLocation == "left" ? imageFeedRootSize + deltaX : imageFeedRootSize - deltaX;
 			} else {
 				const deltaY = e.clientY - initialSize;
-				newSize = feedLocation.value == "top" ? imageFeedRootSize + deltaY : imageFeedRootSize - deltaY;
+				newSize = feedLocation == "top" ? imageFeedRootSize + deltaY : imageFeedRootSize - deltaY;
 			}
 
 			/* Change image size */
@@ -536,7 +530,7 @@ app.registerExtension({
 				saveVal("ImageSize", newImageSize);
 				imageFeedRoot.style.setProperty("--image-size", `${newImageSize}px`);
 				/* Update settings slider */
-				document.querySelector("section.size-control.feed-size-control input").value = newImageSize;
+				document.querySelector("input.image-feed-image-size").value = newImageSize;
 			}
 			
 			/* Snap to closest image-size multiple for a cleaner list */

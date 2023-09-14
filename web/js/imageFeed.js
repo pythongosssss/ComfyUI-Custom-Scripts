@@ -159,6 +159,7 @@ $el("style", {
 		min-height: 24px;
 	}
 	.pysssss-image-feed-list {
+		flex: 1;
 		align-content: flex-start;
 		overflow-y: auto;
 		display: grid;

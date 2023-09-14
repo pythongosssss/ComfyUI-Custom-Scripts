@@ -25,7 +25,6 @@ $el("style", {
 	.pysssss-image-feed-root--left, .pysssss-image-feed-root--right {
 		top: 0;
 		height: 100vh;
-		width: calc(var(--image-size) + 76px);
 	}
 	.pysssss-image-feed-root--left {
 		left: 0;
@@ -37,7 +36,6 @@ $el("style", {
 	.pysssss-image-feed-root--top, .pysssss-image-feed-root--bottom {
 		left: 0;
 		width: 100vw;
-		height: calc(var(--image-size) + 76px);
 	}
 	.pysssss-image-feed-root--top {
 		top: 0;
@@ -184,7 +182,6 @@ $el("style", {
 		overflow-y: auto;
 		display: grid;
 		gap: var(--image-gap-size);
-		grid-template-columns: repeat( auto-fit, minmax(var(--image-size, 128), 1fr) );
 		align-items: center;
       	justify-items: center;
 		transition: 100ms linear;
@@ -339,10 +336,8 @@ app.registerExtension({
 			imageFeedRoot.className = `pysssss-image-feed-root pysssss-image-feed-root--${value}`;
 			resizeHandle.className = `pysssss-image-feed-handle pysssss-image-feed-handle--${value}`;
 			if (["left", "right"].includes(value)) {
-				imageFeedRoot.style.width = "max(calc(var(--image-size) + 32px), 200px)";
 				imageFeedRoot.style.height = "unset";
 			} else {
-				imageFeedRoot.style.height = "max(calc(var(--image-size) + 32px), 200px)";
 				imageFeedRoot.style.width = "unset";
 			}
 		}
@@ -385,7 +380,10 @@ app.registerExtension({
 
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
 			textContent: "Clear",
-			onclick: () => imageList.replaceChildren(),
+			onclick: () => {
+				imageList.replaceChildren();
+				imageList.style.gridTemplateColumns = "unset";
+			},
 		});
 
 		const hideButton = $el("button.pysssss-image-feed-btn.hide-btn", {
@@ -480,6 +478,9 @@ app.registerExtension({
 						])
 					);
 				}
+				if (imageList.childNodes.length > 0) {
+					imageList.style.gridTemplateColumns = "repeat( auto-fit, minmax(var(--image-size, 128), 1fr) )";
+				}
 			}
 		});
 
@@ -538,22 +539,20 @@ app.registerExtension({
 				document.querySelector("section.size-control.feed-size-control input").value = newImageSize;
 			}
 			
-			const minSize = getVal("ImageSize", 128);
-			const maxSize = isVertical ?  window.innerWidth : window.innerHeight;
-			
 			/* Snap to closest image-size multiple for a cleaner list */
-			if (e.ctrlKey) { 
-				let steps = Math.round(newSize / minSize)
+			if (e.ctrlKey) {
+				const imageSize = getVal("ImageSize", 128);
+				let steps = Math.round(newSize / imageSize)
 				let gapSize = parseFloat(getComputedStyle(imageFeedRoot).getPropertyValue("--image-gap-size"));
-				newSize =  steps * minSize;
+				newSize = steps * imageSize;
 				newSize = newSize + paddingSize + (steps * (gapSize + 2));
 			}
-
-			if (newSize >= minSize && newSize <= maxSize) {
+			
+			if (newSize >= 0.0 && newSize <= isVertical ?  window.innerWidth : window.innerHeight) {
 				if (isVertical) {
-					imageFeedRoot.style.width = `max(calc(var(--image-size) + 76px), ${newSize}px, 200px)`;
+					imageFeedRoot.style.minWidth = `${newSize}px`;
 				} else {
-					imageFeedRoot.style.height = `max(calc(var(--image-size) + 76px), ${newSize}px, 200px)`;
+					imageFeedRoot.style.minHeight = `${newSize}px`;
 				}
 			}
 		}

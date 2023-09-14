@@ -17,7 +17,6 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    /* pointer-events: none; */
 }
 
 .pysssss-popup-header {
@@ -31,8 +30,7 @@
     left: 0px;
     top: 0px;
     clear: both;
-    background: #191919cc;
-    /* border: 2px solid var(--border-color); */
+    background: #191919fa;
     border-radius: var(--popup-radius);
     width: auto;
     height: auto;

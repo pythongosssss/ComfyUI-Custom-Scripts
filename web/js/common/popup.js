@@ -8,6 +8,7 @@ export class PopUp {
     constructor(element, options) {
         let name = options.name;
         this.activeOnHover = options.activeOnHover;
+        this.maxMouseDistance = options.maxMouseDistance ? options.maxMouseDistance : 50;
 
         this.root = $el(`div.pysssss-popup`, {
             parent: document.body,
@@ -29,10 +30,9 @@ export class PopUp {
         this.container.append(this.content);
 
 
-        this.onContainerLeaveBind = this.onContainerLeave.bind(this);
+        this.onRootMouseMoveBind = this.onRootMouseMove.bind(this);
         this.onRootClickBind = this.onRootClick.bind(this);
         this.onShowBind = this.show.bind(this);
-        // this.onHideBind = this.hide.bind(this);
 
         this.attach(element);
         this.hide();
@@ -46,7 +46,7 @@ export class PopUp {
     hide() {
         this.root.style.display = "none";
 
-        this.container.removeEventListener('mouseleave', this.onContainerLeaveBind);
+        this.root.removeEventListener('mousemove', this.onRootMouseMoveBind);
         this.root.removeEventListener('mousedown', this.onRootClickBind);
     }
 
@@ -55,7 +55,7 @@ export class PopUp {
 
         this.validatePosition();
 
-        this.container.addEventListener('mouseleave', this.onContainerLeaveBind);
+        this.root.addEventListener('mousemove', this.onRootMouseMoveBind);
         this.root.addEventListener('mousedown', this.onRootClickBind);
     }
 
@@ -79,8 +79,29 @@ export class PopUp {
         this.attachedElement = null;
     }
 
-    onContainerLeave(event) {
-        this.hide();
+    inAttachedElement(event, x, y) {
+        let rect = this.attachedElement.getBoundingClientRect();
+        return rect.left <= x && x <= rect.right &&
+               rect.top <= y && y <= rect.bottom;
+    }   
+
+    onRootMouseMove(event) {
+        let mouseX = event.x;
+        let mouseY = event.y;
+
+        if (this.inAttachedElement(event, mouseX, mouseY)) {
+            return;
+        }
+        
+        let rect = this.container.getBoundingClientRect();
+        
+        /* If certain distance away from popup */
+        const maxDistance = 50;
+        if (rect.top - mouseY > this.maxMouseDistance || mouseY - rect.bottom > this.maxMouseDistance ||
+            rect.left - mouseX > this.maxMouseDistance || mouseX - rect.right > this.maxMouseDistance
+        ) {
+            this.hide();
+        }
     }
 
     onRootClick(event) {
@@ -111,11 +132,11 @@ export class PopUp {
 
         /* Make sure popup is fully inside window */
         if (x + containerWidth > windowWidth) {
-            this.container.style.left = `${windowWidth - containerWidth * 2.0 + buttonWidth}px`;
+            this.container.style.left = `${rect.right - containerWidth - 10.0}px`;
         }
 
         if (y + containerHeight * 2.0 + (buttonHeight) > windowHeight) {
-            this.container.style.top = `${windowHeight - containerHeight * 2.0 + buttonHeight / 2.0 - 2.0}px`;
+            this.container.style.top = `${rect.top - containerHeight - 10.0}px`;
         }
     }
 }

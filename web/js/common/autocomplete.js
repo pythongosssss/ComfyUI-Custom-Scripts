@@ -462,7 +462,7 @@ export class TextAreaAutoComplete {
 	#update() {
 		let before = this.helper.getBeforeCursor();
 		if (before?.length) {
-			const m = before.match(/\b([\w-_:\\\/]+)$/);
+			const m = before.match(/([^\s|,|;|"]+)$/);
 			if (m) {
 				before = m[0];
 			} else {
@@ -499,8 +499,16 @@ export class TextAreaAutoComplete {
 
 			if (wordInfo.priority) {
 				parts.push(
-					$el("span.pysssss-autocomplete-priority", {
+					$el("span.pysssss-autocomplete-pill", {
 						textContent: wordInfo.priority,
+					})
+				);
+			}
+
+			if (wordInfo.value && wordInfo.text !== wordInfo.value) {
+				parts.push(
+					$el("span.pysssss-autocomplete-pill", {
+						textContent: wordInfo.value,
 					})
 				);
 			}
@@ -523,7 +531,10 @@ export class TextAreaAutoComplete {
 				{
 					onclick: () => {
 						this.el.focus();
-						this.helper.insertAtCursor(wordInfo.text + TextAreaAutoComplete.separator, -before.length);
+						this.helper.insertAtCursor(
+							(wordInfo.value ?? wordInfo.text) + TextAreaAutoComplete.separator,
+							-before.length
+						);
 						setTimeout(() => {
 							this.#update();
 						}, 150);

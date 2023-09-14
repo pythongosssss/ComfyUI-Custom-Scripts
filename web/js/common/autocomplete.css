@@ -25,7 +25,7 @@
 	text-decoration-color: dodgerblue;
 }
 
-.pysssss-autocomplete-priority {
+.pysssss-autocomplete-pill {
 	margin-left: auto;
 	font-size: 10px;
 	color: #fff;
@@ -33,7 +33,7 @@
 	position: relative;
 }
 
-.pysssss-autocomplete-priority::after {
+.pysssss-autocomplete-pill::after {
 	content: "";
 	display: block;
 	background: rgba(255, 255, 255, 0.25);
@@ -43,6 +43,10 @@
 	left: 10px;
 	top: 0;
 	border-radius: 5px;
+}
+
+.pysssss-autocomplete-pill + .pysssss-autocomplete-pill {
+	margin-left: 0;
 }
 
 .pysssss-autocomplete-item-info {

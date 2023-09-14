@@ -41,7 +41,7 @@ class MathExpression:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "expression": ("STRING", {"multiline": True, "dynamicPrompts": False}),
+                "expression": ("STRING", {"multiline": True, "dynamicPrompts": False, "pysssss.autocomplete": False}),
             },
             "optional": {
                 "a": ("INT,FLOAT,IMAGE,LATENT", ),

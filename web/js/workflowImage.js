@@ -561,7 +561,13 @@ app.registerExtension({
 						ctx.fillStyle = style.getPropertyValue("color");
 						ctx.font = style.getPropertyValue("font");
 
-						wrapText(ctx, this.inputEl.value, x, y + t.d * 12, w, t.d * 12);
+						const line = t.d * 12;
+						const split = this.inputEl.value.split("\n");
+						let start = y;
+						for (const l of split) {
+							start += line;
+							wrapText(ctx, l, x + 4, start, w, line);
+						}
 
 						ctx.restore();
 					}

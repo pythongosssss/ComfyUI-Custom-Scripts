@@ -1,5 +1,5 @@
 import { app } from "../../../scripts/app.js";
-import { api } from "../../../scripts/api.js"
+import { api } from "../../../scripts/api.js";
 import { $el } from "../../../scripts/ui.js";
 
 // Adds workflow management
@@ -84,42 +84,39 @@ class PysssssWorkflows {
 		this.loadMenu.style.display = this.workflows.length ? "flex" : "none";
 	}
 
-	constructor() {
-		function buildMenu(workflows) {
-			var menu = [];
-			var directories = new Map();
-			for (const workflow of workflows) {
-				var path = workflow.split("/");
-				var parent = menu;
-				var currentPath = "";
-				for (var i = 0; i < path.length - 1; i++) {
-					currentPath += "/" + path[i];
-					var newParent = directories.get(currentPath);
-					if (!newParent) {
-						newParent = {
-							title: path[i],
-							has_submenu: true,
-							submenu: {
-								options: [],
-							},
-						};
-						parent.push(newParent);
-						newParent = newParent.submenu.options;
-						directories.set(currentPath, newParent);
-					}
-					parent = newParent;
+	getMenuOptions(callback) {
+		const menu = [];
+		const directories = new Map();
+		for (const workflow of this.workflows || []) {
+			const path = workflow.split("/");
+			let parent = menu;
+			let currentPath = "";
+			for (let i = 0; i < path.length - 1; i++) {
+				currentPath += "/" + path[i];
+				let newParent = directories.get(currentPath);
+				if (!newParent) {
+					newParent = {
+						title: path[i],
+						has_submenu: true,
+						submenu: {
+							options: [],
+						},
+					};
+					parent.push(newParent);
+					newParent = newParent.submenu.options;
+					directories.set(currentPath, newParent);
 				}
-				parent.push({
-					title: path[path.length - 1],
-					callback: async () => {
-						const json = await getWorkflow(workflow);
-						app.loadGraphData(json);
-					},
-				});
+				parent = newParent;
 			}
-			return menu;
+			parent.push({
+				title: path[path.length - 1],
+				callback: () => callback(workflow),
+			});
 		}
+		return menu;
+	}
 
+	constructor() {
 		function addWorkflowMenu(type, getOptions) {
 			return $el("div.pysssss-workflow-arrow", {
 				parent: document.getElementById(`comfy-${type}-button`),
@@ -142,7 +139,12 @@ class PysssssWorkflows {
 			});
 		}
 
-		this.loadMenu = addWorkflowMenu("load", () => buildMenu(this.workflows || []));
+		this.loadMenu = addWorkflowMenu("load", () =>
+			this.getMenuOptions(async (workflow) => {
+				const json = await getWorkflow(workflow);
+				app.loadGraphData(json);
+			})
+		);
 		addWorkflowMenu("save", () => {
 			return [
 				{
@@ -209,6 +211,52 @@ class PysssssWorkflows {
 	}
 }
 
+const refreshComboInNodes = app.refreshComboInNodes;
+let workflows;
+
+async function sendToWorkflow(img, workflow) {
+	const graph = !workflow ? app.graph.serialize() : await getWorkflow(workflow);
+	const nodes = graph.nodes.filter((n) => n.type === "LoadImage");
+	let targetNode;
+	if (nodes.length === 0) {
+		alert("To send the image to another workflow, that workflow must have a LoadImage node.");
+		return;
+	} else if (nodes.length > 1) {
+		targetNode = nodes.find((n) => n.title?.toLowerCase().includes("input"));
+		if (!targetNode) {
+			targetNode = nodes[0];
+			alert(
+				"The target workflow has multiple LoadImage nodes, include 'input' in the name of the one you want to use. The first one will be used here."
+			);
+		}
+	} else {
+		targetNode = nodes[0];
+	}
+
+	const blob = await (await fetch(img.src)).blob();
+	const name =
+		(workflow || "sendtoworkflow").replace(/\//g, "_") +
+		"-" +
+		+new Date() +
+		new URLSearchParams(img.src.split("?")[1]).get("filename");
+	const body = new FormData();
+	body.append("image", new File([blob], name));
+
+	const resp = await api.fetchApi("/upload/image", {
+		method: "POST",
+		body,
+	});
+
+	if (resp.status === 200) {
+		await refreshComboInNodes.call(app);
+		targetNode.widgets_values[0] = name;
+		app.loadGraphData(graph);
+		app.graph.getNodeById(targetNode.id);
+	} else {
+		alert(resp.status + " - " + resp.statusText);
+	}
+}
+
 app.registerExtension({
 	name: "pysssss.Workflows",
 	init() {
@@ -218,11 +266,46 @@ app.registerExtension({
 		});
 	},
 	setup() {
-		const workflows = new PysssssWorkflows();
-		const refreshComboInNodes = app.refreshComboInNodes;
+		workflows = new PysssssWorkflows();
 		app.refreshComboInNodes = function () {
 			workflows.load();
 			refreshComboInNodes.apply(this, arguments);
+		};
+	},
+	async beforeRegisterNodeDef(nodeType, nodeData, app) {
+		const getExtraMenuOptions = nodeType.prototype.getExtraMenuOptions;
+		nodeType.prototype.getExtraMenuOptions = function (_, options) {
+			const r = getExtraMenuOptions?.apply?.(this, arguments);
+			let img;
+			if (this.imageIndex != null) {
+				// An image is selected so select that
+				img = this.imgs[this.imageIndex];
+			} else if (this.overIndex != null) {
+				// No image is selected but one is hovered
+				img = this.imgs[this.overIndex];
+			}
+
+			if (img) {
+				let pos = options.findIndex((o) => o.content === "Save Image");
+				if (pos === -1) {
+					pos = 0;
+				} else {
+					pos++;
+				}
+
+				options.splice(pos, 0, {
+					content: "Send to workflow",
+					has_submenu: true,
+					submenu: {
+						options: [
+							{ callback: () => sendToWorkflow(img), title: "[Current workflow]" },
+							...workflows.getMenuOptions(sendToWorkflow.bind(null, img)),
+						],
+					},
+				});
+			}
+
+			return r;
 		};
 	},
 });

@@ -232,10 +232,14 @@ app.registerExtension({
 		let imageFeedRootSize = 0;
 		let paddingSize = 0;
 		let isVertical = false;
+		let isOpposite = false;
 
 		resizeHandle.addEventListener('mousedown', (e) => {
 			isResizing = true;
-			isVertical = ["left", "right"].includes(getValString("Location", "bottom"));
+
+			const feedLocation = getValString("Location", "bottom");
+			isVertical = ["left", "right"].includes(feedLocation);
+			isOpposite = ["right", "bottom"].includes(feedLocation);
 			
 			if (isVertical) {
 				initialSize = e.clientX;
@@ -274,7 +278,10 @@ app.registerExtension({
 
 			/* Change image size */
 			if (e.shiftKey && !e.ctrlKey) {
-				let newImageSize = parseInt(getVal("ImageSize")) + (isVertical ? e.movementX : e.movementY);
+				const axis = isVertical ? "movementX" : "movementY";
+
+				let newImageSize = parseInt(getVal("ImageSize"));
+				newImageSize += isOpposite ? -e[axis] : e[axis];
 				newImageSize = Math.min(Math.max(32, newImageSize), 512);
 
 				saveVal("ImageSize", newImageSize);

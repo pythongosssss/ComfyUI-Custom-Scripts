@@ -373,8 +373,10 @@ export class TextAreaAutoComplete {
 			// We are visible
 			switch (e.key) {
 				case "Enter":
-					e.preventDefault();
-					this.#insertItem();
+					if (!e.ctrlKey) {
+						e.preventDefault();
+						this.#insertItem();
+					}
 					break;
 			}
 		}

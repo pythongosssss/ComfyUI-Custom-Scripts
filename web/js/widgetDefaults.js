@@ -57,23 +57,39 @@ app.registerExtension({
 			return items;
 		};
 
-		// app.graph.onNodeAdded = function (node) {
-		// 	const nodeDefaults = defaults[node.constructor.type];
-		// 	if (nodeDefaults) {
-		// 		for (const w of node.widgets || []) {
-		// 			let value = nodeDefaults[w.name];
-		// 			if (value != null) {
-		// 				debugger
-		// 				if (typeof w.value === "number") {
-		// 					value = +value;
-		// 				}
-		// 				w.value = value;
-		// 				debugger
-		// 				w.callback?.(w.value);
-		// 			}
-		// 		}
-		// 	}
-		// };
+		const onNodeAdded = app.graph.onNodeAdded;
+		app.graph.onNodeAdded = function (node) {
+			onNodeAdded?.apply?.(this, arguments);
+
+			// See if we have any defaults for this type of node
+			const nodeDefaults = defaults[node.constructor.type];
+			if (!nodeDefaults) return;
+
+			// Dont run if they are pre-configured nodes from load/pastes
+			const stack = new Error().stack;
+			if (stack.includes("pasteFromClipboard") || stack.includes("loadGraphData")) {
+				return;
+			}
+
+			for (const k in nodeDefaults) {
+				if (k.startsWith("property.")) {
+					const name = k.substring(9);
+					let v = nodeDefaults[k];
+					// Special handling for some built in values
+					if (name in node || ["color", "bgcolor", "title"].includes(name)) {
+						node[name] = v;
+					} else {
+						// Try using the correct type
+						if (!node.properties) node.properties = {};
+						if (typeof node.properties[name] === "number") v = +v;
+						else if (typeof node.properties[name] === "boolean") v = v === "true";
+						else if (v === "true") v = true;
+
+						node.properties[name] = v;
+					}
+				}
+			}
+		};
 
 		class WidgetDefaultsDialog extends ComfyDialog {
 			constructor() {
@@ -211,7 +227,7 @@ app.registerExtension({
 					$el("td", [
 						$el("label", {
 							for: id.replaceAll(".", "-"),
-							textContent: "🐍 Widget Defaults:",
+							textContent: "🐍 Widget & Property Defaults:",
 						}),
 					]),
 					$el("td", [

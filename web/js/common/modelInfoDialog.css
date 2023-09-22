@@ -12,11 +12,6 @@
 	text-align: center;
 	margin: 0 0 10px 0;
 }
-.pysssss-model-info main img {
-	max-height: 300px;
-	margin-left: 10px;
-	max-width: 50%;
-}
 .pysssss-model-info p {
 	margin: 5px 0;
 }
@@ -83,4 +78,19 @@
 
 .pysssss-model-metadata span {
 	color: dodgerblue;
+}
+
+.pysssss-preview {
+	max-width: 50%;
+	margin-left: 10px;
+	position: relative;
+}
+.pysssss-preview img {
+	max-height: 300px;
+}
+.pysssss-preview button {
+	position: absolute;
+	font-size: 12px;
+	bottom: 10px;
+	right: 10px;
 }

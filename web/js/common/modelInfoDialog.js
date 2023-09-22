@@ -38,10 +38,13 @@ export class ModelInfoDialog extends ComfyDialog {
 	}
 
 	async show(type, value) {
+		this.type = type;
+
 		const req = api.fetchApi("/pysssss/metadata/" + encodeURIComponent(`${type}/${value}`));
 		this.info = $el("div");
 		this.img = $el("img", { style: { display: "none" } });
-		this.main = $el("main", { style: { display: "flex" } }, [this.info, this.img]);
+		this.imgWrapper = $el("div.pysssss-preview", [this.img]);
+		this.main = $el("main", { style: { display: "flex" } }, [this.info, this.imgWrapper]);
 		this.content = $el("div.pysssss-model-content", [$el("h2", { textContent: this.name }), this.main]);
 
 		const loading = $el("div", { textContent: "ℹ️ Loading...", parent: this.content });
@@ -187,6 +190,46 @@ export class ModelInfoDialog extends ComfyDialog {
 				if (info.images?.length) {
 					this.img.src = info.images[0].url;
 					this.img.style.display = "";
+
+					this.imgSave = $el("button", {
+						textContent: "Use as preview",
+						parent: this.imgWrapper,
+						onclick: async () => {
+							// Convert the preview to a blob
+							const blob = await (await fetch(this.img.src)).blob();
+
+							// Store it in temp
+							const name = "temp_preview." + new URL(this.img.src).pathname.split(".")[1];
+							const body = new FormData();
+							body.append("image", new File([blob], name));
+							body.append("overwrite", "true");
+							body.append("type", "temp");
+
+							const resp = await api.fetchApi("/upload/image", {
+								method: "POST",
+								body,
+							});
+
+							if (resp.status !== 200) {
+								console.error(resp);
+								alert(`Error saving preview (${req.status}) ${req.statusText}`);
+								return;
+							}
+
+							// Use as preview
+							await api.fetchApi("/pysssss/save/" + encodeURIComponent(`${this.type}/${this.name}`), {
+								method: "POST",
+								body: JSON.stringify({
+									filename: name,
+									type: "temp",
+								}),
+								headers: {
+									"content-type": "application/json",
+								},
+							});
+							app.refreshComboInNodes();
+						},
+					});
 				}
 
 				return info;

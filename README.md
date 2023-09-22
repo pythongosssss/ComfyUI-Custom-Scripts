@@ -161,6 +161,18 @@ Allows you to control the rendering of the links between nodes between straight,
 
 
 # Changelog
+
+## 2023-09-13
+### New
+- ✨ Ability to "send" an image to a Load Image node in either the current or a different workflow
+### Minor
+- ✨ Add support for A1111 autocomplete CSV format
+- ✨ Allow setting custom node for middle click to add node
+
+## 2023-09-10
+### Minor
+- 🐛 Fix rendering new lines in workflow image exports
+
 ## 2023-09-08
 ### New
 - ✨ Add Load + Save Text file nodes, you can configure the allowed directories in the `user/text_file_dirs.json` file

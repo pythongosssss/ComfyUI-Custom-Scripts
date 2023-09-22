@@ -26,10 +26,14 @@ app.registerExtension({
 				for (const w in nodeDefaults) {
 					const widgetDef = inputs[w];
 					if (widgetDef) {
+						let v = nodeDefaults[w];
+						if (widgetDef[0] === "INT" || widgetDef[0] === "FLOAT") {
+							v = +v;
+						}
 						if (widgetDef[1]) {
-							widgetDef[1].default = nodeDefaults[w];
+							widgetDef[1].default = v;
 						} else {
-							widgetDef[1] = { default: nodeDefaults[w] };
+							widgetDef[1] = { default: v };
 						}
 					}
 				}

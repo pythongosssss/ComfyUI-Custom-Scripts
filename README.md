@@ -162,6 +162,13 @@ Allows you to control the rendering of the links between nodes between straight,
 
 # Changelog
 
+## 2023-09-22
+### Minor
+- ✨ Use Civitai image as preview
+- 🐛 CTRL+Enter on autocomplete will no longer accept the suggestions as it is the shortcut for queuing a prompt.
+- 🐛 Fix using numbers in widget defaults
+- ✨ Support setting node properties (e.g. title, colors) via widget defaults
+
 ## 2023-09-13
 ### New
 - ✨ Ability to "send" an image to a Load Image node in either the current or a different workflow

@@ -279,7 +279,7 @@ app.registerExtension({
 			defaultValue: comfyDefault,
 			type: "combo",
 			options: (value) =>
-				[comfyDefault, workflows.workflows].map((m) => ({
+				[comfyDefault, ...workflows.workflows].map((m) => ({
 					value: m,
 					text: m,
 					selected: m === value,

@@ -271,11 +271,15 @@ app.registerExtension({
 		Promise.all([addEmbeddings(), addCustomWords()]);
 
 		const STRING = ComfyWidgets.STRING;
+		const SKIP_WIDGETS = new Set(["ttN xyPlot.x_values", "ttN xyPlot.y_values"]);
 		ComfyWidgets.STRING = function (node, inputName, inputData) {
 			const r = STRING.apply(this, arguments);
 
 			if (inputData[1]?.multiline && inputData[1]?.["pysssss.autocomplete"] !== false) {
-				new TextAreaAutoComplete(r.widget.inputEl);
+				const id = `${node.comfyClass}.${inputName}`;
+				if (!SKIP_WIDGETS.has(id)) {
+					new TextAreaAutoComplete(r.widget.inputEl);
+				}
 			}
 
 			return r;

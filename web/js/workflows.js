@@ -265,11 +265,39 @@ app.registerExtension({
 			parent: document.head,
 		});
 	},
-	setup() {
+	async setup() {
 		workflows = new PysssssWorkflows();
 		app.refreshComboInNodes = function () {
 			workflows.load();
 			refreshComboInNodes.apply(this, arguments);
+		};
+
+		const comfyDefault = "[ComfyUI Default]";
+		const defaultWorkflow = app.ui.settings.addSetting({
+			id: "pysssss.Workflows.Default",
+			name: "🐍 Default Workflow",
+			defaultValue: comfyDefault,
+			type: "combo",
+			options: (value) =>
+				[comfyDefault, workflows.workflows].map((m) => ({
+					value: m,
+					text: m,
+					selected: m === value,
+				})),
+		});
+
+		document.getElementById("comfy-load-default-button").onclick = async function () {
+			if (
+				localStorage["Comfy.Settings.Comfy.ConfirmClear"] === "false" ||
+				confirm(`Load default workflow (${defaultWorkflow.value})?`)
+			) {
+				if (defaultWorkflow.value === comfyDefault) {
+					app.loadGraphData();
+				} else {
+					const json = await getWorkflow(defaultWorkflow.value);
+					app.loadGraphData(json);
+				}
+			}
 		};
 	},
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {

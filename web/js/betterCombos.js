@@ -162,8 +162,12 @@ app.registerExtension({
 					get() {
 						// HACK: litegraph supports rendering items with "content" in the menu, but not on the widget
 						// This detects when its being called by the widget drawing and just returns the text
-						if (res.widget && new Error().stack.includes("drawNodeWidgets")) {
-							return (value || type[0]).content;
+						// Also uses the content for the same image replacement value
+						if (res.widget) {
+							const stack = new Error().stack;
+							if (stack.includes("drawNodeWidgets") || stack.includes("saveImageExtraOutput")) {
+								return (value || type[0]).content;
+							}
 						}
 						return value;
 					},

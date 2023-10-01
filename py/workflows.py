@@ -3,9 +3,16 @@ from aiohttp import web
 import os
 import inspect
 import json
+import importlib
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+import pysssss
 
 root_directory = os.path.dirname(inspect.getfile(PromptServer))
 workflows_directory = os.path.join(root_directory, "pysssss-workflows")
+workflows_directory = pysssss.get_config_value(
+    "workflows.directory", workflows_directory)
+
 NODE_CLASS_MAPPINGS = {}
 NODE_DISPLAY_NAME_MAPPINGS = {}
 

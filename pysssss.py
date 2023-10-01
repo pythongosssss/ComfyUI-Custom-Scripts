@@ -263,7 +263,7 @@ def get_config_value(key, default=None, throw=False):
     split = key.split(".")
     obj = get_extension_config()
     for s in split:
-        if s in split:
+        if s in obj:
             obj = obj[s]
         else:
             if throw:

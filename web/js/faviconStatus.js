@@ -7,23 +7,36 @@ import { app } from "../../../scripts/app.js";
 app.registerExtension({
 	name: "pysssss.FaviconStatus",
 	setup() {
+		let link = document.querySelector("link[rel~='icon']");
+		if (!link) {
+			link = document.createElement("link");
+			link.rel = "icon";
+			document.head.appendChild(link);
+		}
+
+		let executing = false;
+		const update = () => (link.href = new URL(`assets/favicon${executing ? "-active" : ""}.ico`, import.meta.url));
+
+		api.addEventListener("execution_start", () => {
+			executing = true;
+			update();
+		});
+
+		api.addEventListener("executing", ({ detail }) => {
+			// null will be sent when it's finished
+			executing = !!detail;
+			update();
+		});
+
 		api.addEventListener("status", ({ detail }) => {
 			let title = "ComfyUI";
-			let favicon = "favicon";
 			if (detail && detail.exec_info.queue_remaining) {
-				favicon += "-active";
 				title = `(${detail.exec_info.queue_remaining}) ${title}`;
 			}
 			document.title = title;
-
-			let link = document.querySelector("link[rel~='icon']");
-			if (!link) {
-				link = document.createElement("link");
-				link.rel = "icon";
-				document.head.appendChild(link);
-			}
-
-			link.href = new URL(`assets/${favicon}.ico`, import.meta.url);
+			update();
+			executing = false;
 		});
+		update();
 	},
 });

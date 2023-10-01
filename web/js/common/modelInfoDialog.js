@@ -33,6 +33,10 @@ export class ModelInfoDialog extends ComfyDialog {
 		return this.metadata["pysssss.notes"];
 	}
 
+	set customNotes(v) {
+		this.metadata["pysssss.notes"] = v;
+	}
+
 	get hash() {
 		return this.metadata["pysssss.sha256"];
 	}
@@ -41,7 +45,7 @@ export class ModelInfoDialog extends ComfyDialog {
 		this.type = type;
 
 		const req = api.fetchApi("/pysssss/metadata/" + encodeURIComponent(`${type}/${value}`));
-		this.info = $el("div");
+		this.info = $el("div", { style: { flex: "auto" } });
 		this.img = $el("img", { style: { display: "none" } });
 		this.imgWrapper = $el("div.pysssss-preview", [this.img]);
 		this.main = $el("main", { style: { display: "flex" } }, [this.info, this.imgWrapper]);
@@ -81,7 +85,9 @@ export class ModelInfoDialog extends ComfyDialog {
 	}
 
 	getNoteInfo() {
-		if (this.customNotes) {
+		function parseNote() {
+			if (!this.customNotes) return [];
+
 			let notes = [];
 			// Extract links from notes
 			const r = new RegExp("(\\bhttps?:\\/\\/[^\\s]+)", "g");
@@ -119,14 +125,70 @@ export class ModelInfoDialog extends ComfyDialog {
 
 				end = fin;
 			} while (m);
-			return $el("span", notes);
-		} else {
-			let last = this.name.lastIndexOf(".");
-			if (last === -1) {
-				last = this.name.length;
-			}
-			return `Add custom notes in ${this.name.substring(0, last) + ".txt"}`;
+			return notes;
 		}
+
+		let textarea;
+		let notesContainer;
+		const editText = "✏️ Edit";
+		const edit = $el("a", {
+			textContent: editText,
+			href: "#",
+			style: {
+				float: "right",
+				color: "greenyellow",
+				textDecoration: "none",
+			},
+			onclick: async (e) => {
+				e.preventDefault();
+
+				if (textarea) {
+					this.customNotes = textarea.value;
+
+					const resp = await api.fetchApi(
+						"/pysssss/metadata/notes/" + encodeURIComponent(`${this.type}/${this.name}`),
+						{
+							method: "POST",
+							body: this.customNotes,
+						}
+					);
+
+					if (resp.status !== 200) {
+						console.error(resp);
+						alert(`Error saving notes (${req.status}) ${req.statusText}`);
+						return;
+					}
+
+					e.target.textContent = editText;
+					textarea.remove();
+					textarea = null;
+
+					notesContainer.replaceChildren(...parseNote.call(this));
+				} else {
+					e.target.textContent = "💾 Save";
+					textarea = $el("textarea", {
+						style: {
+							width: "100%",
+							minWidth: "200px",
+							minHeight: "50px",
+						},
+						textContent: this.customNotes,
+					});
+					e.target.after(textarea);
+					notesContainer.replaceChildren();
+					textarea.style.height = Math.min(textarea.scrollHeight, 300) + "px";
+				}
+			},
+		});
+
+		notesContainer = $el("div.pysssss-model-notes", parseNote.call(this));
+		return $el(
+			"div",
+			{
+				style: { display: "contents" },
+			},
+			[edit, notesContainer]
+		);
 	}
 
 	addInfo() {

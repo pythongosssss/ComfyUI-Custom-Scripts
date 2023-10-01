@@ -275,17 +275,43 @@ app.registerExtension({
 		ComfyWidgets.STRING = function (node, inputName, inputData) {
 			const r = STRING.apply(this, arguments);
 
-			if (inputData[1]?.multiline && inputData[1]?.["pysssss.autocomplete"] !== false) {
+			if (inputData[1]?.multiline) {
+				// Disabled on this input
+				const config = inputData[1]?.["pysssss.autocomplete"];
+				if (config === false) return r;
+
+				// In list of widgets to skip
 				const id = `${node.comfyClass}.${inputName}`;
-				if (!SKIP_WIDGETS.has(id)) {
-					new TextAreaAutoComplete(r.widget.inputEl);
+				if (SKIP_WIDGETS.has(id)) return r;
+
+				let words;
+				let separator;
+				if (typeof config === "object") {
+					separator = config.separator;
+					words = {};
+					if (config.words) {
+						// Custom wordlist, this will have been registered on setup
+						Object.assign(words, TextAreaAutoComplete.groups[node.comfyClass + "." + inputName] ?? {});
+					}
+
+					for (const item of config.groups ?? []) {
+						if (item === "*") {
+							// This widget wants all global words included
+							Object.assign(words, TextAreaAutoComplete.globalWords);
+						} else {
+							// This widget wants a specific group included
+							Object.assign(words, TextAreaAutoComplete.groups[item] ?? {});
+						}
+					}
 				}
+
+				new TextAreaAutoComplete(r.widget.inputEl, words, separator);
 			}
 
 			return r;
 		};
 
-		TextAreaAutoComplete.separator = localStorage.getItem(id + ".AutoSeparate") ?? ", ";
+		TextAreaAutoComplete.globalSeparator = localStorage.getItem(id + ".AutoSeparate") ?? ", ";
 		app.ui.settings.addSetting({
 			id,
 			name: "🐍 Text Autocomplete",
@@ -332,11 +358,11 @@ app.registerExtension({
 								$el("input", {
 									id: id.replaceAll(".", "-"),
 									type: "checkbox",
-									checked: !!TextAreaAutoComplete.separator,
+									checked: !!TextAreaAutoComplete.globalSeparator,
 									onchange: (event) => {
 										const checked = !!event.target.checked;
-										TextAreaAutoComplete.separator = checked ? ", " : "";
-										localStorage.setItem(id + ".AutoSeparate", TextAreaAutoComplete.separator);
+										TextAreaAutoComplete.globalSeparator = checked ? ", " : "";
+										localStorage.setItem(id + ".AutoSeparate", TextAreaAutoComplete.globalSeparator);
 									},
 								}),
 							]
@@ -357,5 +383,22 @@ app.registerExtension({
 				]);
 			},
 		});
+	},
+	beforeRegisterNodeDef(_, def) {
+		// Process each input to see if there is a custom word list for
+		// { input: { required: { something: ["STRING", { "pysssss.autocomplete": ["groupid", ["custom", "words"] ] }] } } }
+		const inputs = { ...def.input?.required, ...def.input?.optional };
+		for (const input in inputs) {
+			const config = inputs[input][1]?.["pysssss.autocomplete"];
+			if (!config) continue;
+			if (typeof config === "object" && config.words) {
+				const words = {};
+				for (const text of config.words || []) {
+					const obj = typeof text === "string" ? { text } : text;
+					words[obj.text] = obj;
+				}
+				TextAreaAutoComplete.updateWords(def.name + "." + input, words, false);
+			}
+		}
 	},
 });

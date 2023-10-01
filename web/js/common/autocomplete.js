@@ -284,14 +284,14 @@ class TextAreaCaretHelper {
 		return this.el.value.substring(this.el.selectionEnd);
 	}
 
-	insertAtCursor(value, offset) {
+	insertAtCursor(value, offset, finalOffset) {
 		if (this.el.selectionStart != null) {
 			const startPos = this.el.selectionStart;
 			const endPos = this.el.selectionEnd;
 
 			this.el.value =
 				this.el.value.substring(0, startPos + offset) + value + this.el.value.substring(endPos, this.el.value.length);
-			this.el.selectionEnd = this.el.selectionStart = startPos + value.length + offset;
+			this.el.selectionEnd = this.el.selectionStart = startPos + value.length + offset + finalOffset;
 		} else {
 			this.el.value += value;
 		}
@@ -300,25 +300,51 @@ class TextAreaCaretHelper {
 
 /*********************/
 
+/**
+ * @typedef {{
+ * 	text: string,
+ * 	priority?: number,
+ * 	info?: Function,
+ * 	hint?: string,
+ *  showValue?: boolean,
+ *  caretOffset?: number
+ * }} AutoCompleteEntry
+ */
 export class TextAreaAutoComplete {
-	static separator = "";
+	static globalSeparator = "";
 	static enabled = true;
 
+	/** @type {Record<string, Record<string, AutoCompleteEntry>>} */
 	static groups = {};
-
-	/** @type {Record<string, {text: string, priority?: number; info?: Function}>} */
-	static words = {};
+	/** @type {Set<string>} */
+	static globalGroups = new Set();
+	/** @type {Record<string, AutoCompleteEntry>} */
+	static globalWords = {};
 
 	/** @type {HTMLTextAreaElement} */
 	el;
 
+	/** @type {Record<string, AutoCompleteEntry>} */
+	overrideWords;
+	overrideSeparator = "";
+
+	get words() {
+		return this.overrideWords ?? TextAreaAutoComplete.globalWords;
+	}
+
+	get separator() {
+		return this.overrideSeparator ?? TextAreaAutoComplete.globalSeparator;
+	}
+
 	/**
 	 * @param {HTMLTextAreaElement} el
 	 */
-	constructor(el) {
+	constructor(el, words = null, separator = null) {
 		this.el = el;
 		this.helper = new TextAreaCaretHelper(el);
 		this.dropdown = $el("div.pysssss-autocomplete");
+		this.overrideWords = words;
+		this.overrideSeparator = separator;
 
 		this.#setup();
 	}
@@ -424,7 +450,7 @@ export class TextAreaAutoComplete {
 		const priorityMatches = [];
 		const prefixMatches = [];
 		const includesMatches = [];
-		for (const word of Object.keys(TextAreaAutoComplete.words)) {
+		for (const word of Object.keys(this.words)) {
 			const lowerWord = word.toLocaleLowerCase();
 			if (lowerWord === term) {
 				// Dont include exact matches
@@ -437,7 +463,7 @@ export class TextAreaAutoComplete {
 				continue;
 			}
 
-			const wordInfo = TextAreaAutoComplete.words[word];
+			const wordInfo = this.words[word];
 			if (wordInfo.priority) {
 				priorityMatches.push({ pos, wordInfo });
 			} else if (pos) {
@@ -499,6 +525,14 @@ export class TextAreaAutoComplete {
 				}),
 			];
 
+			if (wordInfo.hint) {
+				parts.push(
+					$el("span.pysssss-autocomplete-pill", {
+						textContent: wordInfo.hint,
+					})
+				);
+			}
+
 			if (wordInfo.priority) {
 				parts.push(
 					$el("span.pysssss-autocomplete-pill", {
@@ -507,7 +541,7 @@ export class TextAreaAutoComplete {
 				);
 			}
 
-			if (wordInfo.value && wordInfo.text !== wordInfo.value) {
+			if (wordInfo.value && wordInfo.text !== wordInfo.value && wordInfo.showValue !== false) {
 				parts.push(
 					$el("span.pysssss-autocomplete-pill", {
 						textContent: wordInfo.value,
@@ -534,8 +568,9 @@ export class TextAreaAutoComplete {
 					onclick: () => {
 						this.el.focus();
 						this.helper.insertAtCursor(
-							(wordInfo.value ?? wordInfo.text) + TextAreaAutoComplete.separator,
-							-before.length
+							(wordInfo.value ?? wordInfo.text) + this.separator,
+							-before.length,
+							wordInfo.caretOffset
 						);
 						setTimeout(() => {
 							this.#update();
@@ -575,15 +610,24 @@ export class TextAreaAutoComplete {
 		this.dropdown.remove();
 	}
 
-	static updateWords(id, words) {
+	static updateWords(id, words, addGlobal = true) {
 		const isUpdate = id in TextAreaAutoComplete.groups;
 		TextAreaAutoComplete.groups[id] = words;
+		if (addGlobal) {
+			TextAreaAutoComplete.globalGroups.add(id);
+		}
+
 		if (isUpdate) {
 			// Remerge all words
-			TextAreaAutoComplete.words = Object.assign({}, ...Object.values(TextAreaAutoComplete.groups));
-		} else {
+			TextAreaAutoComplete.globalWords = Object.assign(
+				{},
+				...Object.keys(TextAreaAutoComplete.groups)
+					.filter((k) => TextAreaAutoComplete.globalGroups.has(k))
+					.map((k) => TextAreaAutoComplete.groups[k])
+			);
+		} else if (addGlobal) {
 			// Just insert the new words
-			Object.assign(TextAreaAutoComplete.words, words);
+			Object.assign(TextAreaAutoComplete.globalWords, words);
 		}
 	}
 }

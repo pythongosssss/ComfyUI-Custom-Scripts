@@ -17,10 +17,12 @@ app.registerExtension({
 		let executing = false;
 		const update = () => (link.href = new URL(`assets/favicon${executing ? "-active" : ""}.ico`, import.meta.url));
 
-		api.addEventListener("execution_start", () => {
-			executing = true;
-			update();
-		});
+		for (const e of ["execution_start", "progress"]) {
+			api.addEventListener(e, () => {
+				executing = true;
+				update();
+			});
+		}
 
 		api.addEventListener("executing", ({ detail }) => {
 			// null will be sent when it's finished

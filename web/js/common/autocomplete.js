@@ -291,7 +291,7 @@ class TextAreaCaretHelper {
 
 			this.el.value =
 				this.el.value.substring(0, startPos + offset) + value + this.el.value.substring(endPos, this.el.value.length);
-			this.el.selectionEnd = this.el.selectionStart = startPos + value.length + offset + finalOffset;
+			this.el.selectionEnd = this.el.selectionStart = startPos + value.length + offset + (finalOffset ?? 0);
 		} else {
 			this.el.value += value;
 		}

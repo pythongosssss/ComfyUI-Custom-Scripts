@@ -70,11 +70,21 @@ def get_extension_config(reload=False):
         return config
 
     config_path = get_ext_dir("pysssss.json")
+    default_config_path = get_ext_dir("pysssss.default.json")
     if not os.path.exists(config_path):
-        log("Missing pysssss.json, this extension may not work correctly. Please reinstall the extension.",
-            type="ERROR", always=True, name="???")
-        print(f"Extension path: {get_ext_dir()}")
-        return {"name": "Unknown", "version": -1}
+        if os.path.exists(default_config_path):
+            shutil.copy(default_config_path, config_path)
+            if not os.path.exists(config_path):
+                log(f"Failed to create config at {config_path}", type="ERROR", always=True, name="???")
+                print(f"Extension path: {get_ext_dir()}")
+                return {"name": "Unknown", "version": -1}
+    
+        else:
+            log("Missing pysssss.default.json, this extension may not work correctly. Please reinstall the extension.",
+                type="ERROR", always=True, name="???")
+            print(f"Extension path: {get_ext_dir()}")
+            return {"name": "Unknown", "version": -1}
+
     with open(config_path, "r") as f:
         config = json.loads(f.read())
     return config

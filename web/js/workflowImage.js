@@ -386,7 +386,7 @@ class SvgWorkflowImage extends WorkflowImage {
 				return;
 			} else if (file && (file.type === "image/jpeg" || file.name?.endsWith(".jpg") || file.name?.endsWith(".jpeg"))) {
 				if (
-					await new Promise((r) => {
+					await new Promise((resolve) => {
 						try {
 							// This shouldnt go in here but it's easier than refactoring handleFile
 							const reader = new FileReader();

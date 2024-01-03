@@ -8,17 +8,18 @@ app.registerExtension({
 		if (nodeData.name === "ShowText|pysssss") {
 			function populate(text) {
 				if (this.widgets) {
-					const pos = this.widgets.findIndex((w) => w.name === "value");
-					if (pos !== -1) {
-						for (let i = pos; i < this.widgets.length; i++) {
-							this.widgets[i].onRemove?.();
-						}
-						this.widgets.length = pos;
+					for (let i = 1; i < this.widgets.length; i++) {
+						this.widgets[i].onRemove?.();
 					}
+					this.widgets.length = 1;
 				}
 
-				for (const list of text) {
-					const w = ComfyWidgets["STRING"](this, "value", ["STRING", { multiline: true }], app).widget;
+				const v = [...text];
+				if (!v[0]) {
+					v.shift();
+				}
+				for (const list of v) {
+					const w = ComfyWidgets["STRING"](this, "text", ["STRING", { multiline: true }], app).widget;
 					w.inputEl.readOnly = true;
 					w.inputEl.style.opacity = 0.6;
 					w.value = list;

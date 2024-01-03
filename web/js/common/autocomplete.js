@@ -314,6 +314,7 @@ class TextAreaCaretHelper {
 export class TextAreaAutoComplete {
 	static globalSeparator = "";
 	static enabled = true;
+	static replacer = undefined;
 
 	/** @type {Record<string, Record<string, AutoCompleteEntry>>} */
 	static groups = {};
@@ -565,7 +566,11 @@ export class TextAreaAutoComplete {
 				{
 					onclick: () => {
 						this.el.focus();
-						this.helper.insertAtCursor((wordInfo.value ?? wordInfo.text) + this.separator, -before.length, wordInfo.caretOffset);
+						let value = wordInfo.value ?? wordInfo.text;
+						if(TextAreaAutoComplete.replacer) {
+							value = TextAreaAutoComplete.replacer(value);
+						}
+						this.helper.insertAtCursor(value + this.separator, -before.length, wordInfo.caretOffset);
 						setTimeout(() => {
 							this.#update();
 						}, 150);

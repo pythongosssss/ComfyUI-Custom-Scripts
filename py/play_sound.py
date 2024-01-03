@@ -14,7 +14,8 @@ class PlaySound:
         return {"required": {
             "any": (any, {}),
             "mode": (["always", "on empty queue"], {}),
-            "volume": ("FLOAT", {"min": 0, "max": 1, "step": 0.1, "default": 0.5})
+            "volume": ("FLOAT", {"min": 0, "max": 1, "step": 0.1, "default": 0.5}),
+            "file": ("STRING", { "default": "notify.mp3" })
         }}
 
     FUNCTION = "nop"
@@ -28,7 +29,7 @@ class PlaySound:
     def IS_CHANGED(self, **kwargs):
         return float("NaN")
 
-    def nop(self, any, mode, volume):
+    def nop(self, any, mode, volume, file):
         return {"ui": {"a": []}, "result": (any,)}
 
 

@@ -2,14 +2,14 @@ import { app } from "../../../scripts/app.js";
 import { ComfyWidgets } from "../../../scripts/widgets.js";
 
 // Displays input text on a node
-
+debugger
 app.registerExtension({
 	name: "pysssss.ShowText",
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
 		if (nodeData.name === "ShowText|pysssss") {
 			function populate(text) {
 				if (this.widgets) {
-					const pos = this.widgets.findIndex((w) => w.name === "text");
+					const pos = this.widgets.findIndex((w) => w.name === "value");
 					if (pos !== -1) {
 						for (let i = pos; i < this.widgets.length; i++) {
 							this.widgets[i].onRemove?.();
@@ -19,7 +19,7 @@ app.registerExtension({
 				}
 
 				for (const list of text) {
-					const w = ComfyWidgets["STRING"](this, "text", ["STRING", { multiline: true }], app).widget;
+					const w = ComfyWidgets["STRING"](this, "value", ["STRING", { multiline: true }], app).widget;
 					w.inputEl.readOnly = true;
 					w.inputEl.style.opacity = 0.6;
 					w.value = list;

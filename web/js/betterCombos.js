@@ -27,10 +27,11 @@ app.registerExtension({
 					left: 0;
 					top: 0;
 					transform: translate(-100%, 0);
-					width: 256px;
-					height: 256px;
-					background-size: cover;
-					background-position: center;
+					width: 384px;
+					height: 384px;
+					background-size: contain;
+					background-position: top right;
+					background-repeat: no-repeat;
 					filter: brightness(65%);
 				}
 			`,

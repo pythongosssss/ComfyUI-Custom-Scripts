@@ -410,7 +410,7 @@ app.registerExtension({
 		api.addEventListener("executed", ({ detail }) => {
 			if (visible && detail?.output?.images) {
 				for (const src of detail.output.images) {
-					const href = `/view?filename=${encodeURIComponent(src.filename)}&type=${
+					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${
 						src.type
 					}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
 

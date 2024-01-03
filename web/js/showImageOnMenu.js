@@ -51,7 +51,7 @@ const ext = {
 			const images = detail?.output?.images;
 			if (!images) return;
 			const format = app.getPreviewFormatParam();
-			const src = `/view?filename=${encodeURIComponent(images[0].filename)}&type=${
+			const src = `./view?filename=${encodeURIComponent(images[0].filename)}&type=${
 				images[0].type
 			}&subfolder=${encodeURIComponent(images[0].subfolder)}&t=${+new Date()}${format}`;
 			show(src, detail.node);

@@ -312,7 +312,7 @@ app.registerExtension({
 		};
 
 		TextAreaAutoComplete.globalSeparator = localStorage.getItem(id + ".AutoSeparate") ?? ", ";
-		app.ui.settings.addSetting({
+		const enabledSetting = app.ui.settings.addSetting({
 			id,
 			name: "🐍 Text Autocomplete",
 			defaultValue: true,
@@ -383,6 +383,7 @@ app.registerExtension({
 				]);
 			},
 		});
+		TextAreaAutoComplete.enabled = enabledSetting.value;
 	},
 	beforeRegisterNodeDef(_, def) {
 		// Process each input to see if there is a custom word list for

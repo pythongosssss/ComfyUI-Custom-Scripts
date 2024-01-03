@@ -175,8 +175,9 @@ const CHAR_CODE_ZERO = "0".charCodeAt(0);
 const CHAR_CODE_NINE = "9".charCodeAt(0);
 
 class TextAreaCaretHelper {
-	constructor(el) {
+	constructor(el, getScale) {
 		this.el = el;
+		this.getScale = getScale;
 	}
 
 	#calculateElementOffset() {
@@ -253,11 +254,12 @@ class TextAreaCaretHelper {
 	}
 
 	getCursorOffset() {
+		const scale = this.getScale();
 		const elOffset = this.#calculateElementOffset();
 		const elScroll = this.#getElScroll();
 		const cursorPosition = this.#getCursorPosition();
 		const lineHeight = this.#getLineHeightPx();
-		const top = elOffset.top - elScroll.top + cursorPosition.top + lineHeight;
+		const top = elOffset.top - (elScroll.top * scale) + (cursorPosition.top + lineHeight) * scale;
 		const left = elOffset.left - elScroll.left + cursorPosition.left;
 		const clientTop = this.el.getBoundingClientRect().top;
 		if (this.el.dir !== "rtl") {
@@ -289,8 +291,7 @@ class TextAreaCaretHelper {
 			const startPos = this.el.selectionStart;
 			const endPos = this.el.selectionEnd;
 
-			this.el.value =
-				this.el.value.substring(0, startPos + offset) + value + this.el.value.substring(endPos, this.el.value.length);
+			this.el.value = this.el.value.substring(0, startPos + offset) + value + this.el.value.substring(endPos, this.el.value.length);
 			this.el.selectionEnd = this.el.selectionStart = startPos + value.length + offset + (finalOffset ?? 0);
 		} else {
 			this.el.value += value;
@@ -341,7 +342,7 @@ export class TextAreaAutoComplete {
 	 */
 	constructor(el, words = null, separator = null) {
 		this.el = el;
-		this.helper = new TextAreaCaretHelper(el);
+		this.helper = new TextAreaCaretHelper(el, () => app.canvas.ds.scale);
 		this.dropdown = $el("div.pysssss-autocomplete");
 		this.overrideWords = words;
 		this.overrideSeparator = separator;
@@ -481,10 +482,7 @@ export class TextAreaAutoComplete {
 		);
 
 		const top = priorityMatches.length * 0.2;
-		return priorityMatches
-			.slice(0, top)
-			.concat(prefixMatches, priorityMatches.slice(top), includesMatches)
-			.slice(0, 20);
+		return priorityMatches.slice(0, top).concat(prefixMatches, priorityMatches.slice(top), includesMatches).slice(0, 20);
 	}
 
 	#update() {
@@ -567,11 +565,7 @@ export class TextAreaAutoComplete {
 				{
 					onclick: () => {
 						this.el.focus();
-						this.helper.insertAtCursor(
-							(wordInfo.value ?? wordInfo.text) + this.separator,
-							-before.length,
-							wordInfo.caretOffset
-						);
+						this.helper.insertAtCursor((wordInfo.value ?? wordInfo.text) + this.separator, -before.length, wordInfo.caretOffset);
 						setTimeout(() => {
 							this.#update();
 						}, 150);

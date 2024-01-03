@@ -52,7 +52,7 @@ const ext = {
 			if (!images || !images.length) return;
 			const format = app.getPreviewFormatParam();
 			const src = [
-				`/view?filename=${encodeURIComponent(images[0].filename)}`,
+				`./view?filename=${encodeURIComponent(images[0].filename)}`,
 				`type=${images[0].type}`,
 				`subfolder=${encodeURIComponent(images[0].subfolder)}`,
 				`t=${+new Date()}${format}`,].join('&');

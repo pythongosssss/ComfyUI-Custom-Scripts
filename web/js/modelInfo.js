@@ -234,6 +234,8 @@ const infoHandler = {
 	CheckpointLoader: "checkpoints",
 	CheckpointLoaderSimple: "checkpoints",
 	"CheckpointLoader|pysssss": "checkpoints",
+	"Efficient Loader": "checkpoints",
+	"Eff. Loader SDXL": "checkpoints",
 };
 
 app.registerExtension({

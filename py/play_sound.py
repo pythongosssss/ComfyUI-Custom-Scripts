@@ -19,8 +19,9 @@ class PlaySound:
 
     FUNCTION = "nop"
     INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,)
     OUTPUT_NODE = True
-    RETURN_TYPES = ()
+    RETURN_TYPES = (any,)
 
     CATEGORY = "utils"
 
@@ -28,7 +29,7 @@ class PlaySound:
         return float("NaN")
 
     def nop(self, any, mode, volume):
-        return {"ui": {"a": []}, "result": ()}
+        return {"ui": {"a": []}, "result": (any,)}
 
 
 NODE_CLASS_MAPPINGS = {

@@ -2,7 +2,6 @@ import { app } from "../../../scripts/app.js";
 import { ComfyWidgets } from "../../../scripts/widgets.js";
 
 // Displays input text on a node
-debugger
 app.registerExtension({
 	name: "pysssss.ShowText",
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {

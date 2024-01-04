@@ -93,7 +93,7 @@ async function addCustomWords(text) {
 						// Word,[priority|alias]
 						num = +n[1];
 						if (isNaN(num)) {
-							text = n[1];
+							text = n[0] + "🔄️" + n[1];
 							value = n[0];
 						} else {
 							text = n[0];

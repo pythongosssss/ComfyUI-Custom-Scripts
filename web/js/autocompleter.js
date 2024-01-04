@@ -312,7 +312,7 @@ app.registerExtension({
 		};
 
 		TextAreaAutoComplete.globalSeparator = localStorage.getItem(id + ".AutoSeparate") ?? ", ";
-		app.ui.settings.addSetting({
+		const enabledSetting = app.ui.settings.addSetting({
 			id,
 			name: "🐍 Text Autocomplete",
 			defaultValue: true,
@@ -356,13 +356,32 @@ app.registerExtension({
 							},
 							[
 								$el("input", {
-									id: id.replaceAll(".", "-"),
 									type: "checkbox",
 									checked: !!TextAreaAutoComplete.globalSeparator,
 									onchange: (event) => {
 										const checked = !!event.target.checked;
 										TextAreaAutoComplete.globalSeparator = checked ? ", " : "";
 										localStorage.setItem(id + ".AutoSeparate", TextAreaAutoComplete.globalSeparator);
+									},
+								}),
+							]
+						),
+						$el(
+							"label",
+							{
+								textContent: "Replace _ with space ",
+								style: {
+									display: "block",
+								},
+							},
+							[
+								$el("input", {
+									type: "checkbox",
+									checked: !!TextAreaAutoComplete.replacer,
+									onchange: (event) => {
+										const checked = !!event.target.checked;
+										TextAreaAutoComplete.replacer = checked ? (v) => v.replaceAll("_", " ") : undefined;
+										localStorage.setItem(id + ".ReplaceUnderscore", checked);
 									},
 								}),
 							]
@@ -383,6 +402,9 @@ app.registerExtension({
 				]);
 			},
 		});
+		TextAreaAutoComplete.enabled = enabledSetting.value;
+		TextAreaAutoComplete.replacer = localStorage.getItem(id + ".ReplaceUnderscore") === "true" ? (v) => v.replaceAll("_", " ") : undefined;
+
 	},
 	beforeRegisterNodeDef(_, def) {
 		// Process each input to see if there is a custom word list for

@@ -154,7 +154,7 @@ app.registerExtension({
 							v = this.widgets_values[0];
 						}
 						let config = [link.type, {}];
-						if (input.widget) {
+						if (input.widget?.config) {
 							config = input.widget.config;
 						}
 						const { widget } = ComfyWidgets[widgetType](this, "value", config, app);

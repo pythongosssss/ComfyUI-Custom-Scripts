@@ -15,7 +15,18 @@ app.registerExtension({
 						return;
 					}
 				}
-				const url = new URL(`assets/notify.mp3`, import.meta.url);
+				let file = this.widgets[2].value;
+				if (!file) {
+					file = "notify.mp3";
+				}
+				if (!file.startsWith("http")) {
+					if (!file.includes("/")) {
+						file = "assets/" + file;
+					}
+					file = new URL(file, import.meta.url)
+				}
+				
+				const url = new URL(file);
 				const audio = new Audio(url);
 				audio.volume = this.widgets[1].value;
 				audio.play();

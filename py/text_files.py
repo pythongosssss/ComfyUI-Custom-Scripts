@@ -64,6 +64,8 @@ def get_file(root_dir, file):
 
     root_dir = get_dir_from_name(root_dir)
     root_dir = get_real_path(root_dir)
+    if not os.path.exists(root_dir):
+        os.mkdir(root_dir)
     full_path = os.path.join(root_dir, file)
 
     if not is_child_dir(root_dir, full_path):
@@ -78,10 +80,13 @@ class TextFileNode:
 
     @classmethod
     def VALIDATE_INPUTS(self, root_dir, file, **kwargs):
-        self.file = get_file(root_dir, file)
+        if file == "[none]" or not file or not file.strip():
+            return True
+        get_file(root_dir, file)
         return True
 
     def load_text(self, **kwargs):
+        self.file = get_file(kwargs["root_dir"], kwargs["file"])
         with open(self.file, "r") as f:
             return (f.read(), )
 
@@ -168,17 +173,18 @@ class SaveText(TextFileNode):
 
     FUNCTION = "write_text"
 
-    def write_text(self, root_dir, file, append, insert, text):
-        if append == "new only" and os.path.exists(self.file):
+    def write_text(self, **kwargs):
+        self.file = get_file(kwargs["root_dir"], kwargs["file"])
+        if kwargs["append"] == "new only" and os.path.exists(self.file):
             raise FileExistsError(
                 self.file + " already exists and 'new only' is selected.")
-        with open(self.file, "a+" if append == "append" else "w") as f:
+        with open(self.file, "a+" if kwargs["append"] == "append" else "w") as f:
             is_append = f.tell() != 0
-            if is_append and insert:
+            if is_append and kwargs["insert"]:
                 f.write("\n")
-            f.write(text)
+            f.write(kwargs["text"])
 
-        return super().load_text()
+        return super().load_text(**kwargs)
 
 
 NODE_CLASS_MAPPINGS = {

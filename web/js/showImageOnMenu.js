@@ -49,11 +49,13 @@ const ext = {
 		api.addEventListener("executed", ({ detail }) => {
 			if (!enabled) return;
 			const images = detail?.output?.images;
-			if (!images) return;
+			if (!images || !images.length) return;
 			const format = app.getPreviewFormatParam();
-			const src = `/view?filename=${encodeURIComponent(images[0].filename)}&type=${
-				images[0].type
-			}&subfolder=${encodeURIComponent(images[0].subfolder)}&t=${+new Date()}${format}`;
+			const src = [
+				`./view?filename=${encodeURIComponent(images[0].filename)}`,
+				`type=${images[0].type}`,
+				`subfolder=${encodeURIComponent(images[0].subfolder)}`,
+				`t=${+new Date()}${format}`,].join('&');
 			show(src, detail.node);
 		});
 

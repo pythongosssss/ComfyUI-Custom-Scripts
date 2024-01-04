@@ -81,6 +81,9 @@ async function saveWorkflow(name, workflow, overwrite) {
 class PysssssWorkflows {
 	async load() {
 		this.workflows = await getWorkflows();
+		if(this.workflows.length) {
+			this.workflows.sort();
+		}
 		this.loadMenu.style.display = this.workflows.length ? "flex" : "none";
 	}
 

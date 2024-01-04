@@ -95,7 +95,7 @@ class MathExpression:
         return expression
 
     def get_widget_value(self, extra_pnginfo, prompt, node_name, widget_name):
-        workflow = extra_pnginfo["workflow"]
+        workflow = extra_pnginfo["workflow"] if "workflow" in extra_pnginfo else { "nodes": [] }
         node_id = None
         for node in workflow["nodes"]:
             name = node["type"]

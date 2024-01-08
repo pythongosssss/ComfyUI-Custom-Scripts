@@ -31,7 +31,7 @@ async def save_notes(request):
     name = name[pos+1:]
 
     file_path = None
-    if type == "embeddings":
+    if type == "embeddings" or type == "loras":
         name = name.lower()
         files = folder_paths.get_filename_list(type)
         for f in files:
@@ -67,7 +67,7 @@ async def load_metadata(request):
     name = name[pos+1:]
 
     file_path = None
-    if type == "embeddings":
+    if type == "embeddings" or type == "loras":
         name = name.lower()
         files = folder_paths.get_filename_list(type)
         for f in files:

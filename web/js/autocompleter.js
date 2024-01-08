@@ -143,6 +143,23 @@ class EmbeddingInfoDialog extends ModelInfoDialog {
 	}
 }
 
+class LoraInfoDialog extends ModelInfoDialog {
+	async addInfo() {
+		super.addInfo();
+		const info = await this.addCivitaiInfo();
+		if (info) {
+			$el("div", {
+				parent: this.content,
+				innerHTML: info.description,
+				style: {
+					maxHeight: "250px",
+					overflow: "auto",
+				},
+			});
+		}
+	}
+}
+
 class CustomWordsDialog extends ComfyDialog {
 	async show() {
 		const text = await getCustomWords();
@@ -268,7 +285,25 @@ app.registerExtension({
 			TextAreaAutoComplete.updateWords("pysssss.embeddings", words);
 		}
 
-		Promise.all([addEmbeddings(), addCustomWords()]);
+		async function addLoras() {
+			const loras = await api
+				.fetchApi("/pysssss/loras", { cache: "no-store" })
+				.then(res => res.json());
+			const words = {};
+			words["lora:"] = { text: "lora:" };
+
+			for (const lora of loras) {
+				const v = `<lora:${lora}:1.0>`;
+				words[v] = {
+					text: v,
+					info: () => new LoraInfoDialog(lora).show("loras", lora),
+				};
+			}
+
+			TextAreaAutoComplete.updateWords("pysssss.loras", words);
+		}
+
+		Promise.all([addEmbeddings(), addLoras(), addCustomWords()]);
 
 		const STRING = ComfyWidgets.STRING;
 		const SKIP_WIDGETS = new Set(["ttN xyPlot.x_values", "ttN xyPlot.y_values"]);

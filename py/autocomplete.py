@@ -1,6 +1,7 @@
 from server import PromptServer
 from aiohttp import web
 import os
+import folder_paths
 
 dir = os.path.abspath(os.path.join(__file__, "../../user"))
 if not os.path.exists(dir):
@@ -20,3 +21,9 @@ async def update_autocomplete(request):
     with open(file, "w", encoding="utf-8") as f:
         f.write(await request.text())
     return web.Response(status=200)
+
+
+@PromptServer.instance.routes.get("/pysssss/loras")
+async def get_loras(request):
+    loras = folder_paths.get_filename_list("loras")
+    return web.json_response(list(map(lambda a: os.path.splitext(a)[0], loras)))

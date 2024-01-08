@@ -4,6 +4,7 @@ import { api } from "../../../../scripts/api.js";
 import { $el, ComfyDialog } from "../../../../scripts/ui.js";
 import { TextAreaAutoComplete } from "./common/autocomplete.js";
 import { ModelInfoDialog } from "./common/modelInfoDialog.js";
+import { LoraInfoDialog } from "./modelInfo.js";
 
 function parseCSV(csvText) {
 	const rows = [];
@@ -127,23 +128,6 @@ async function addCustomWords(text) {
 }
 
 class EmbeddingInfoDialog extends ModelInfoDialog {
-	async addInfo() {
-		super.addInfo();
-		const info = await this.addCivitaiInfo();
-		if (info) {
-			$el("div", {
-				parent: this.content,
-				innerHTML: info.description,
-				style: {
-					maxHeight: "250px",
-					overflow: "auto",
-				},
-			});
-		}
-	}
-}
-
-class LoraInfoDialog extends ModelInfoDialog {
 	async addInfo() {
 		super.addInfo();
 		const info = await this.addCivitaiInfo();

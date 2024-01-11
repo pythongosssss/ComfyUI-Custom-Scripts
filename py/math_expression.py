@@ -130,7 +130,7 @@ class MathExpression:
                 return target.shape[2]
             return target.shape[1]
 
-    def evaluate(self, expression, extra_pnginfo, prompt, a=None, b=None, c=None):
+    def evaluate(self, expression, prompt, extra_pnginfo={}, a=None, b=None, c=None):
         expression = expression.replace('\n', ' ').replace('\r', '')
         node = ast.parse(expression, mode='eval').body
 

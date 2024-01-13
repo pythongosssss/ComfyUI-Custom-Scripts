@@ -62,7 +62,7 @@ app.registerExtension({
 													if (!graphcanvas.selected_nodes || Object.keys(graphcanvas.selected_nodes).length <= 1){
 														fApplyColor(activeNode);
 													} else {
-														for (const i in graphcanvas.selected_nodes) {
+														for (let i in graphcanvas.selected_nodes) {
 															fApplyColor(graphcanvas.selected_nodes[i]);
 														}
 													}

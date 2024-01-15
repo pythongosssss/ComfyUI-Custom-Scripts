@@ -127,6 +127,13 @@ async function addCustomWords(text) {
 	}
 }
 
+function toggleLoras() {
+	[TextAreaAutoComplete.globalWords, TextAreaAutoComplete.globalWordsExclLoras] = [
+		TextAreaAutoComplete.globalWordsExclLoras,
+		TextAreaAutoComplete.globalWords,
+	];
+}
+
 class EmbeddingInfoDialog extends ModelInfoDialog {
 	async addInfo() {
 		super.addInfo();
@@ -287,7 +294,20 @@ app.registerExtension({
 			TextAreaAutoComplete.updateWords("pysssss.loras", words);
 		}
 
-		Promise.all([addEmbeddings(), addLoras(), addCustomWords()]);
+		// store global words with/without loras
+		Promise.all([addEmbeddings(), addCustomWords()])
+            .then(() => {
+                TextAreaAutoComplete.globalWordsExclLoras = Object.assign(
+                    {},
+                    TextAreaAutoComplete.globalWords
+                );
+            })
+            .then(addLoras)
+			.then(() => {
+                if (!TextAreaAutoComplete.lorasEnabled) {
+					toggleLoras(); // off by default
+				}
+            });
 
 		const STRING = ComfyWidgets.STRING;
 		const SKIP_WIDGETS = new Set(["ttN xyPlot.x_values", "ttN xyPlot.y_values"]);
@@ -361,6 +381,26 @@ app.registerExtension({
 										const checked = !!event.target.checked;
 										TextAreaAutoComplete.enabled = checked;
 										setter(checked);
+									},
+								}),
+							]
+						),
+						$el(
+							"label",
+							{
+								textContent: "Loras enabled ",
+								style: {
+									display: "block",
+								},
+							},
+							[
+								$el("input", {
+									type: "checkbox",
+									checked: !!TextAreaAutoComplete.lorasEnabled,
+									onchange: (event) => {
+										const checked = !!event.target.checked;
+										TextAreaAutoComplete.lorasEnabled = checked;
+										toggleLoras();
 									},
 								}),
 							]

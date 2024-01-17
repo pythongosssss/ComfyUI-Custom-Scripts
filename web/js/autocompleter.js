@@ -387,8 +387,9 @@ app.registerExtension({
 							]
 						),
 						$el(
-							"label",
+							"label.comfy-tooltip-indicator",
 							{
+								title: "This requires other ComfyUI that support using LoRAs in the prompt.",
 								textContent: "Loras enabled ",
 								style: {
 									display: "block",
@@ -402,6 +403,7 @@ app.registerExtension({
 										const checked = !!event.target.checked;
 										TextAreaAutoComplete.lorasEnabled = checked;
 										toggleLoras();
+										localStorage.setItem(id + ".ShowLoras", TextAreaAutoComplete.lorasEnabled);
 									},
 								}),
 							]
@@ -511,10 +513,12 @@ app.registerExtension({
 				]);
 			},
 		});
+
 		TextAreaAutoComplete.enabled = enabledSetting.value;
 		TextAreaAutoComplete.replacer = localStorage.getItem(id + ".ReplaceUnderscore") === "true" ? (v) => v.replaceAll("_", " ") : undefined;
 		TextAreaAutoComplete.insertOnTab = localStorage.getItem(id + ".InsertOnTab") !== "false";
 		TextAreaAutoComplete.insertOnEnter = localStorage.getItem(id + ".InsertOnEnter") !== "false";
+		TextAreaAutoComplete.lorasEnabled = localStorage.getItem(id + ".ShowLoras") === "true";
 	},
 	beforeRegisterNodeDef(_, def) {
 		// Process each input to see if there is a custom word list for

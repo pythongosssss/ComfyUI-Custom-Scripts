@@ -14,8 +14,9 @@ class WorkflowImage {
 			(p, n) => {
 				if (n.pos[0] < p[0]) p[0] = n.pos[0];
 				if (n.pos[1] < p[1]) p[1] = n.pos[1];
-				const r = n.pos[0] + n.size[0];
-				const b = n.pos[1] + n.size[1];
+				const bounds = n.getBounding();
+				const r = n.pos[0] + bounds[2];
+				const b = n.pos[1] + bounds[3];
 				if (r > p[2]) p[2] = r;
 				if (b > p[3]) p[3] = b;
 				return p;

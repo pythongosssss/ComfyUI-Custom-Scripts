@@ -25,6 +25,12 @@ function parseCSV(csvText) {
 		const char = csvText[i];
 		const nextChar = csvText[i + 1];
 
+		// Special handling for backslash escaped quotes
+		if (char === "\\" && nextChar === quote) {
+			currentField += quote;
+			i++;
+		}
+
 		if (!inQuotedField) {
 			if (char === quote) {
 				inQuotedField = true;

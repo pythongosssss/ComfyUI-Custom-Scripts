@@ -317,6 +317,7 @@ export class TextAreaAutoComplete {
 	static insertOnTab = true;
 	static insertOnEnter = true;
 	static replacer = undefined;
+	static lorasEnabled = false;
 
 	/** @type {Record<string, Record<string, AutoCompleteEntry>>} */
 	static groups = {};
@@ -324,6 +325,8 @@ export class TextAreaAutoComplete {
 	static globalGroups = new Set();
 	/** @type {Record<string, AutoCompleteEntry>} */
 	static globalWords = {};
+	/** @type {Record<string, AutoCompleteEntry>} */
+	static globalWordsExclLoras = {};
 
 	/** @type {HTMLTextAreaElement} */
 	el;

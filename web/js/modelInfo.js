@@ -4,7 +4,7 @@ import { ModelInfoDialog } from "./common/modelInfoDialog.js";
 
 const MAX_TAGS = 500;
 
-class LoraInfoDialog extends ModelInfoDialog {
+export class LoraInfoDialog extends ModelInfoDialog {
 	getTagFrequency() {
 		if (!this.metadata.ss_tag_frequency) return [];
 

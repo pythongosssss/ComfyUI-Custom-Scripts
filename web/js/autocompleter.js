@@ -4,6 +4,7 @@ import { api } from "../../../../scripts/api.js";
 import { $el, ComfyDialog } from "../../../../scripts/ui.js";
 import { TextAreaAutoComplete } from "./common/autocomplete.js";
 import { ModelInfoDialog } from "./common/modelInfoDialog.js";
+import { LoraInfoDialog } from "./modelInfo.js";
 
 function parseCSV(csvText) {
 	const rows = [];
@@ -125,6 +126,13 @@ async function addCustomWords(text) {
 			}, {})
 		);
 	}
+}
+
+function toggleLoras() {
+	[TextAreaAutoComplete.globalWords, TextAreaAutoComplete.globalWordsExclLoras] = [
+		TextAreaAutoComplete.globalWordsExclLoras,
+		TextAreaAutoComplete.globalWords,
+	];
 }
 
 class EmbeddingInfoDialog extends ModelInfoDialog {
@@ -269,7 +277,38 @@ app.registerExtension({
 			TextAreaAutoComplete.updateWords("pysssss.embeddings", words);
 		}
 
-		Promise.all([addEmbeddings(), addCustomWords()]);
+		async function addLoras() {
+			const loras = await api
+				.fetchApi("/pysssss/loras", { cache: "no-store" })
+				.then(res => res.json());
+			const words = {};
+			words["lora:"] = { text: "lora:" };
+
+			for (const lora of loras) {
+				const v = `<lora:${lora}:1.0>`;
+				words[v] = {
+					text: v,
+					info: () => new LoraInfoDialog(lora).show("loras", lora),
+				};
+			}
+
+			TextAreaAutoComplete.updateWords("pysssss.loras", words);
+		}
+
+		// store global words with/without loras
+		Promise.all([addEmbeddings(), addCustomWords()])
+            .then(() => {
+                TextAreaAutoComplete.globalWordsExclLoras = Object.assign(
+                    {},
+                    TextAreaAutoComplete.globalWords
+                );
+            })
+            .then(addLoras)
+			.then(() => {
+                if (!TextAreaAutoComplete.lorasEnabled) {
+					toggleLoras(); // off by default
+				}
+            });
 
 		const STRING = ComfyWidgets.STRING;
 		const SKIP_WIDGETS = new Set(["ttN xyPlot.x_values", "ttN xyPlot.y_values"]);
@@ -343,6 +382,26 @@ app.registerExtension({
 										const checked = !!event.target.checked;
 										TextAreaAutoComplete.enabled = checked;
 										setter(checked);
+									},
+								}),
+							]
+						),
+						$el(
+							"label",
+							{
+								textContent: "Loras enabled ",
+								style: {
+									display: "block",
+								},
+							},
+							[
+								$el("input", {
+									type: "checkbox",
+									checked: !!TextAreaAutoComplete.lorasEnabled,
+									onchange: (event) => {
+										const checked = !!event.target.checked;
+										TextAreaAutoComplete.lorasEnabled = checked;
+										toggleLoras();
 									},
 								}),
 							]

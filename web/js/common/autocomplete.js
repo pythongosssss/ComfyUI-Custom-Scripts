@@ -314,6 +314,8 @@ class TextAreaCaretHelper {
 export class TextAreaAutoComplete {
 	static globalSeparator = "";
 	static enabled = true;
+	static insertOnTab = true;
+	static insertOnEnter = true;
 	static replacer = undefined;
 
 	/** @type {Record<string, Record<string, AutoCompleteEntry>>} */
@@ -386,7 +388,9 @@ export class TextAreaAutoComplete {
 					break;
 				case "Tab":
 					e.preventDefault();
-					this.#insertItem();
+					if (TextAreaAutoComplete.insertOnTab) {
+						this.#insertItem();
+					}
 					break;
 			}
 		}
@@ -403,7 +407,9 @@ export class TextAreaAutoComplete {
 				case "Enter":
 					if (!e.ctrlKey) {
 						e.preventDefault();
-						this.#insertItem();
+						if (TextAreaAutoComplete.insertOnEnter) {
+							this.#insertItem();
+						}
 					}
 					break;
 			}
@@ -567,7 +573,7 @@ export class TextAreaAutoComplete {
 					onclick: () => {
 						this.el.focus();
 						let value = wordInfo.value ?? wordInfo.text;
-						if(TextAreaAutoComplete.replacer) {
+						if (TextAreaAutoComplete.replacer) {
 							value = TextAreaAutoComplete.replacer(value);
 						}
 						this.helper.insertAtCursor(value + this.separator, -before.length, wordInfo.caretOffset);

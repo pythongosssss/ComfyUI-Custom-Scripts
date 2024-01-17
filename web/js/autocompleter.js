@@ -104,7 +104,7 @@ async function addCustomWords(text) {
 						// a1111 csv format?
 						value = n[0];
 						priority = +n[2];
-						const aliases = n[3];
+						const aliases = n[3]?.trim();
 						if (aliases) {
 							const split = aliases.split(",");
 							for (const text of split) {
@@ -112,6 +112,7 @@ async function addCustomWords(text) {
 							}
 						}
 						text = value;
+						break;
 					default:
 						// Word,alias,priority
 						text = n[1];
@@ -386,6 +387,55 @@ app.registerExtension({
 								}),
 							]
 						),
+						$el(
+							"label",
+							{
+								textContent: "Insert suggestion on: ",
+								style: {
+									display: "block",
+								},
+							},
+							[
+								$el(
+									"label",
+									{
+										textContent: "Tab",
+										style: {
+											display: "block",
+											marginLeft: "20px",
+										},
+									},
+									$el("input", {
+										type: "checkbox",
+										checked: !!TextAreaAutoComplete.insertOnTab,
+										onchange: (event) => {
+											const checked = !!event.target.checked;
+											TextAreaAutoComplete.insertOnTab = checked;
+											localStorage.setItem(id + ".InsertOnTab", checked);
+										},
+									})
+								),
+								$el(
+									"label",
+									{
+										textContent: "Enter",
+										style: {
+											display: "block",
+											marginLeft: "20px",
+										},
+									},
+									$el("input", {
+										type: "checkbox",
+										checked: !!TextAreaAutoComplete.insertOnEnter,
+										onchange: (event) => {
+											const checked = !!event.target.checked;
+											TextAreaAutoComplete.insertOnEnter = checked;
+											localStorage.setItem(id + ".InsertOnEnter", checked);
+										},
+									})
+								),
+							]
+						),
 						$el("button", {
 							textContent: "Manage Custom Words",
 							onclick: () => {
@@ -404,7 +454,8 @@ app.registerExtension({
 		});
 		TextAreaAutoComplete.enabled = enabledSetting.value;
 		TextAreaAutoComplete.replacer = localStorage.getItem(id + ".ReplaceUnderscore") === "true" ? (v) => v.replaceAll("_", " ") : undefined;
-
+		TextAreaAutoComplete.insertOnTab = localStorage.getItem(id + ".InsertOnTab") !== "false";
+		TextAreaAutoComplete.insertOnEnter = localStorage.getItem(id + ".InsertOnEnter") !== "false";
 	},
 	beforeRegisterNodeDef(_, def) {
 		// Process each input to see if there is a custom word list for

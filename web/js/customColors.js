@@ -48,12 +48,25 @@ app.registerExtension({
 											});
 											picker.onchange = () => {
 												if (activeNode) {
-													if (activeNode.constructor === LiteGraph.LGraphGroup) {
-														activeNode.color = picker.value;
-													} else {
-														activeNode.color = colorShade(picker.value, 20);
-														activeNode.bgcolor = picker.value;
+													const fApplyColor = function(node){
+														if (picker.value) {
+															if (node.constructor === LiteGraph.LGraphGroup) {
+																node.color = picker.value;
+															} else {
+																node.color = colorShade(picker.value, 20);
+																node.bgcolor = picker.value;
+															}
+														}
 													}
+													const graphcanvas = LGraphCanvas.active_canvas;
+													if (!graphcanvas.selected_nodes || Object.keys(graphcanvas.selected_nodes).length <= 1){
+														fApplyColor(activeNode);
+													} else {
+														for (let i in graphcanvas.selected_nodes) {
+															fApplyColor(graphcanvas.selected_nodes[i]);
+														}
+													}
+
 													activeNode.setDirtyCanvas(true, true);
 												}
 											};

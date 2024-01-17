@@ -403,7 +403,7 @@ app.registerExtension({
 						$el(
 							"label.comfy-tooltip-indicator",
 							{
-								title: "This requires other ComfyUI that support using LoRAs in the prompt.",
+								title: "This requires other ComfyUI nodes/extensions that support using LoRAs in the prompt.",
 								textContent: "Loras enabled ",
 								style: {
 									display: "block",

@@ -112,7 +112,7 @@ async function addCustomWords(text) {
 						value = n[0];
 						priority = +n[2];
 						const aliases = n[3]?.trim();
-						if (aliases) {
+						if (aliases && aliases !== "null") { // Weird null in an example csv, maybe they are JSON.parsing the last column?
 							const split = aliases.split(",");
 							for (const text of split) {
 								p[text] = { text, priority, value };

@@ -51,6 +51,14 @@ function parseCSV(csvText) {
 				i++; // Skip the next quote
 			} else if (char === quote) {
 				inQuotedField = false;
+			} else if (char === "\r" || char === "\n" || i === csvText.length - 1) {
+				// Dont allow new lines in quoted text, assume its wrong
+				const parsed = parseCSV(currentField);
+				rows.pop();
+				rows.push(...parsed);
+				inQuotedField = false;
+				currentField = "";
+				rows.push([]);
 			} else {
 				currentField += char;
 			}

@@ -390,9 +390,9 @@ export class TextAreaAutoComplete {
 					}
 					break;
 				case "Tab":
-					e.preventDefault();
 					if (TextAreaAutoComplete.insertOnTab) {
 						this.#insertItem();
+						e.preventDefault();
 					}
 					break;
 			}
@@ -409,9 +409,9 @@ export class TextAreaAutoComplete {
 			switch (e.key) {
 				case "Enter":
 					if (!e.ctrlKey) {
-						e.preventDefault();
 						if (TextAreaAutoComplete.insertOnEnter) {
 							this.#insertItem();
+							e.preventDefault();
 						}
 					}
 					break;

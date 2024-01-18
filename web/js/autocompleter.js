@@ -480,15 +480,17 @@ app.registerExtension({
 											marginLeft: "20px",
 										},
 									},
-									$el("input", {
-										type: "checkbox",
-										checked: !!TextAreaAutoComplete.insertOnTab,
-										onchange: (event) => {
-											const checked = !!event.target.checked;
-											TextAreaAutoComplete.insertOnTab = checked;
-											localStorage.setItem(id + ".InsertOnTab", checked);
-										},
-									})
+									[
+										$el("input", {
+											type: "checkbox",
+											checked: !!TextAreaAutoComplete.insertOnTab,
+											onchange: (event) => {
+												const checked = !!event.target.checked;
+												TextAreaAutoComplete.insertOnTab = checked;
+												localStorage.setItem(id + ".InsertOnTab", checked);
+											},
+										}),
+									]
 								),
 								$el(
 									"label",
@@ -499,15 +501,17 @@ app.registerExtension({
 											marginLeft: "20px",
 										},
 									},
-									$el("input", {
-										type: "checkbox",
-										checked: !!TextAreaAutoComplete.insertOnEnter,
-										onchange: (event) => {
-											const checked = !!event.target.checked;
-											TextAreaAutoComplete.insertOnEnter = checked;
-											localStorage.setItem(id + ".InsertOnEnter", checked);
-										},
-									})
+									[
+										$el("input", {
+											type: "checkbox",
+											checked: !!TextAreaAutoComplete.insertOnEnter,
+											onchange: (event) => {
+												const checked = !!event.target.checked;
+												TextAreaAutoComplete.insertOnEnter = checked;
+												localStorage.setItem(id + ".InsertOnEnter", checked);
+											},
+										}),
+									]
 								),
 							]
 						),

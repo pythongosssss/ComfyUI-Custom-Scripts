@@ -409,6 +409,12 @@ app.registerExtension({
 
 		api.addEventListener("executed", ({ detail }) => {
 			if (visible && detail?.output?.images) {
+				if(detail.node?.includes?.(":")) {
+					// Ignore group nodes
+					const n = app.graph.getNodeById(detail.node.split(":")[0]);
+					if(n?.getInnerNodes) return;
+				}
+
 				for (const src of detail.output.images) {
 					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${
 						src.type

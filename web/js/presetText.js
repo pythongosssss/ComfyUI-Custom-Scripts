@@ -196,22 +196,29 @@ app.registerExtension({
 						return prompt;
 					},
 				];
-				if (widget.serializeValue) {
-					callbacks.push(widget.serializeValue);
-				}
+				let inheritedSerializeValue = widget.serializeValue || null;
 
 				let called = false;
 				const serializeValue = async (workflowNode, widgetIndex) => {
-					const widgetValue = widget.value;
-					if (called) return widgetValue;
+					const origWidgetValue = widget.value;
+					if (called) return origWidgetValue;
 					called = true;
 
-					for (const cb of callbacks) {
-						widget.value = await cb(workflowNode, widgetIndex);
+					let allCallbacks = [...callbacks];
+					if (inheritedSerializeValue) {
+						allCallbacks.push(inheritedSerializeValue)
+					}
+					let valueIsUndefined = false;
+
+					for (const cb of allCallbacks) {
+						let value = await cb(workflowNode, widgetIndex);
+						// Need to check the callback return value before it is set on widget.value as it coerces it to a string (even for undefined)
+						if (value === undefined) valueIsUndefined = true;
+						widget.value = value;
 					}
 
-					const prompt = widget.value;
-					widget.value = widgetValue;
+					const prompt = valueIsUndefined ? undefined : widget.value;
+					widget.value = origWidgetValue;
 
 					called = false;
 
@@ -223,7 +230,7 @@ app.registerExtension({
 						return serializeValue;
 					},
 					set(cb) {
-						callbacks.push(cb);
+						inheritedSerializeValue = cb;
 					},
 				});
 			}

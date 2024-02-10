@@ -285,6 +285,7 @@ app.registerExtension({
 				words[v] = {
 					text: v,
 					info: () => new EmbeddingInfoDialog(emb).show("embeddings", emb),
+					use_replacer: false,
 				};
 			}
 
@@ -303,6 +304,7 @@ app.registerExtension({
 				words[v] = {
 					text: v,
 					info: () => new LoraInfoDialog(lora).show("loras", lora),
+					use_replacer: false,
 				};
 			}
 

@@ -71,6 +71,13 @@ app.registerExtension({
 			}
 		});
 
+		function encodeRFC3986URIComponent(str) {
+			return encodeURIComponent(str).replace(
+				/[!'()*]/g,
+				(c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
+			);
+		}
+
 		// After an element is created for an item, add an image if it has one
 		contextMenuHook["addItem"].push(function (el, menu, [name, value, options]) {
 			if (el && isCustomItem(value) && value?.image && !value.submenu) {
@@ -78,7 +85,7 @@ app.registerExtension({
 				$el("div.pysssss-combo-image", {
 					parent: el,
 					style: {
-						backgroundImage: `url(/pysssss/view/${encodeURIComponent(value.image)})`,
+						backgroundImage: `url(/pysssss/view/${encodeRFC3986URIComponent(value.image)})`,
 					},
 				});
 			}

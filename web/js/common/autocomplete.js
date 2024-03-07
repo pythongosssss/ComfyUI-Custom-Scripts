@@ -4,16 +4,16 @@ import { addStylesheet } from "./utils.js";
 addStylesheet(import.meta.url);
 
 /*
-	https://github.com/component/textarea-caret-position
-	The MIT License (MIT)
+    https://github.com/component/textarea-caret-position
+    The MIT License (MIT)
 
-	Copyright (c) 2015 Jonathan Ong me@jongleberry.com
+    Copyright (c) 2015 Jonathan Ong me@jongleberry.com
 
-	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-	The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 const getCaretCoordinates = (function () {
 	// We'll copy the properties below into the mirror div.
@@ -157,19 +157,19 @@ const getCaretCoordinates = (function () {
 })();
 
 /*
-	Key functions from:
-	https://github.com/yuku/textcomplete
-	© Yuku Takahashi - This software is licensed under the MIT license.
+    Key functions from:
+    https://github.com/yuku/textcomplete
+    © Yuku Takahashi - This software is licensed under the MIT license.
 
-	The MIT License (MIT)
+    The MIT License (MIT)
 
-	Copyright (c) 2015 Jonathan Ong me@jongleberry.com
+    Copyright (c) 2015 Jonathan Ong me@jongleberry.com
 
-	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-	The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 const CHAR_CODE_ZERO = "0".charCodeAt(0);
 const CHAR_CODE_NINE = "9".charCodeAt(0);
@@ -291,46 +291,10 @@ class TextAreaCaretHelper {
 			const startPos = this.el.selectionStart;
 			const endPos = this.el.selectionEnd;
 
-			// Move selection to beginning of offset
-			this.el.selectionStart = this.el.selectionStart + offset;
-
-			// Using execCommand to support undo, but since it's officially 
-			// 'deprecated' we need a backup solution, but it won't support undo :(
-			let pasted = true;
-			try {
-				if (!document.execCommand("insertText", false, value)) {
-					pasted = false;
-				}
-			} catch (e) {
-				console.error("Error caught during execCommand:", e);
-				pasted = false;
-			}
-
-			if (!pasted) {
-				console.error(
-					"execCommand unsuccessful; not supported. Adding text manually, no undo support.");
-				textarea.setRangeText(modifiedText, this.el.selectionStart, this.el.selectionEnd, 'end');
-			}
-
+			this.el.value = this.el.value.substring(0, startPos + offset) + value + this.el.value.substring(endPos, this.el.value.length);
 			this.el.selectionEnd = this.el.selectionStart = startPos + value.length + offset + (finalOffset ?? 0);
 		} else {
-			// Using execCommand to support undo, but since it's officially 
-			// 'deprecated' we need a backup solution, but it won't support undo :(
-			let pasted = true;
-			try {
-				if (!document.execCommand("insertText", false, value)) {
-					pasted = false;
-				}
-			} catch (e) {
-				console.error("Error caught during execCommand:", e);
-				pasted = false;
-			}
-
-			if (!pasted) {
-				console.error(
-					"execCommand unsuccessful; not supported. Adding text manually, no undo support.");
-				this.el.value += value;
-			}
+			this.el.value += value;
 		}
 	}
 }

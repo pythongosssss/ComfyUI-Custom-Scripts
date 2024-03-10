@@ -467,13 +467,27 @@ app.registerExtension({
 								var imgContext = imgCanvas.getContext("2d");
 								imgContext.drawImage(img, 0, 0, img.width, img.height);
 
+								// and then hash the stripped image for memoization
 								var strippedImgB64 = imgCanvas.toDataURL("image/png");
-								if (seenImages[strippedImgB64]) {
-									// NOOP: image is a duplicate
-								} else {
+								var buf = new TextEncoder("utf-8").encode(strippedImgB64);
+								crypto.subtle.digest("SHA-1", buf).then((hash) => {
+									let hexes = [], view = new DataView(hash)
+									for (let i = 0; i < view.byteLength; i += 4) {
+										hexes.push(('00000000' + view.getUint32(i).toString(16)).slice(-8));
+									}
+									const hexHash = hexes.join('');
+									if (seenImages.has(hexHash)) {
+										// NOOP: image is a duplicate
+									} else {
+										// if we got to here, then the image is unique--so add to feed
+										seenImages.set(hexHash, true);
+										addImageToFeed(href);
+									}
+								}). catch((err) => {
+									// fall back to default behavior
+									console.error(err);
 									addImageToFeed(href);
-									seenImages[strippedImgB64] = true;
-								}
+								});
 							}
 							img.onerror = () => {
 								// fall back to default behavior

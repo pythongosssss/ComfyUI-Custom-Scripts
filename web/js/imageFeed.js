@@ -456,6 +456,30 @@ app.registerExtension({
 							// NOOP: image is a duplicate
 						} else {
 							seenImages.set(fingerprint, true);
+
+							// deduplicate by ignoring images with the same content
+							let img = $el("img", { src: href })
+							img.onload = () => {
+								// redraw the image onto a canvas to strip metadata
+								var imgCanvas = document.createElement("canvas");
+								imgCanvas.width = img.width;
+								imgCanvas.height = img.height;
+
+								var imgContext = imgCanvas.getContext("2d");
+								imgContext.drawImage(img, 0, 0, img.width, img.height);
+
+								var strippedImgB64 = imgCanvas.toDataURL("image/png");
+								if (seenImages[strippedImgB64]) {
+									// NOOP: image is a duplicate
+								} else {
+									addImageToFeed(href);
+									seenImages[strippedImgB64] = true;
+								}
+							}
+							img.onerror = () => {
+								// fall back to default behavior
+								addImageToFeed(href);
+							}
 						}
 					} else {
 						addImageToFeed(href);

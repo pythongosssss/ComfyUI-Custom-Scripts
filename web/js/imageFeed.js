@@ -208,6 +208,7 @@ app.registerExtension({
 	name: "pysssss.ImageFeed",
 	setup() {
 		let visible = true;
+		const seenImages = new Map();
 		const showButton = $el("button.comfy-settings-btn", {
 			textContent: "🖼️",
 			style: {
@@ -307,6 +308,13 @@ app.registerExtension({
 					]),
 				]);
 			},
+		});
+
+		const deduplicateFeed = app.ui.settings.addSetting({
+			id: "pysssss.ImageFeed.Deduplication",
+			name: "🐍 Image Feed Deduplication",
+			defaultValue: false,
+			type: "boolean"
 		});
 
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
@@ -416,6 +424,14 @@ app.registerExtension({
 				}
 
 				for (const src of detail.output.images) {
+					if (deduplicateFeed.value) {
+						// deduplicate the feed by ignoring images with the same filename/type/subfolder
+						const fingerprint = JSON.stringify({filename: src.filename, type: src.type, subfolder: src.subfolder});
+						if (seenImages.has(fingerprint))
+							continue;
+						seenImages.set(fingerprint, true);
+					}
+
 					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${
 						src.type
 					}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;

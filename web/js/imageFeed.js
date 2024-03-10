@@ -483,7 +483,7 @@ app.registerExtension({
 										seenImages.set(hexHash, true);
 										addImageToFeed(href);
 									}
-								}). catch((err) => {
+								}).catch((err) => {
 									// fall back to default behavior
 									console.error(err);
 									addImageToFeed(href);

@@ -341,6 +341,27 @@ app.registerExtension({
 			columnInput.value = v;
 		}
 
+		function addImageToFeed(href) {
+			const method = feedDirection.value === "newest first" ? "prepend" : "append";
+			imageList[method](
+				$el("div", [
+					$el(
+						"a",
+						{
+							target: "_blank",
+							href,
+							onclick: (e) => {
+								const imgs = [...imageList.querySelectorAll("img")].map((img) => img.getAttribute("src"));
+								lightbox.show(imgs, imgs.indexOf(href));
+								e.preventDefault();
+							},
+						},
+						[$el("img", { src: href })]
+					),
+				])
+			);
+		}
+
 		imageFeed.append(
 			$el("div.pysssss-image-feed-menu", [
 				$el("section.sizing-menu", {}, [
@@ -424,36 +445,21 @@ app.registerExtension({
 				}
 
 				for (const src of detail.output.images) {
-					if (deduplicateFeed.value) {
-						// deduplicate the feed by ignoring images with the same filename/type/subfolder
-						const fingerprint = JSON.stringify({filename: src.filename, type: src.type, subfolder: src.subfolder});
-						if (seenImages.has(fingerprint))
-							continue;
-						seenImages.set(fingerprint, true);
-					}
-
 					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${
 						src.type
 					}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
 
-					const method = feedDirection.value === "newest first" ? "prepend" : "append";
-					imageList[method](
-						$el("div", [
-							$el(
-								"a",
-								{
-									target: "_blank",
-									href,
-									onclick: (e) => {
-										const imgs = [...imageList.querySelectorAll("img")].map((img) => img.getAttribute("src"));
-										lightbox.show(imgs, imgs.indexOf(href));
-										e.preventDefault();
-									},
-								},
-								[$el("img", { src: href })]
-							),
-						])
-					);
+					if (deduplicateFeed.value) {
+						// deduplicate by ignoring images with the same filename/type/subfolder
+						const fingerprint = JSON.stringify({filename: src.filename, type: src.type, subfolder: src.subfolder});
+						if (seenImages.has(fingerprint)) {
+							// NOOP: image is a duplicate
+						} else {
+							seenImages.set(fingerprint, true);
+						}
+					} else {
+						addImageToFeed(href);
+					}
 				}
 			}
 		});

@@ -438,20 +438,19 @@ app.registerExtension({
 
 		api.addEventListener("executed", ({ detail }) => {
 			if (visible && detail?.output?.images) {
-				if(detail.node?.includes?.(":")) {
+				if (detail.node?.includes?.(":")) {
 					// Ignore group nodes
 					const n = app.graph.getNodeById(detail.node.split(":")[0]);
-					if(n?.getInnerNodes) return;
+					if (n?.getInnerNodes) return;
 				}
 
 				for (const src of detail.output.images) {
-					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${
-						src.type
-					}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
+					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type
+						}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
 
 					if (deduplicateFeed.value) {
 						// deduplicate by ignoring images with the same filename/type/subfolder
-						const fingerprint = JSON.stringify({filename: src.filename, type: src.type, subfolder: src.subfolder});
+						const fingerprint = JSON.stringify({ filename: src.filename, type: src.type, subfolder: src.subfolder });
 						if (seenImages.has(fingerprint)) {
 							// NOOP: image is a duplicate
 						} else {

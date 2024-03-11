@@ -313,6 +313,11 @@ app.registerExtension({
 		const deduplicateFeed = app.ui.settings.addSetting({
 			id: "pysssss.ImageFeed.Deduplication",
 			name: "🐍 Image Feed Deduplication",
+			tooltip: `Ensures unique images in the image feed but at the cost of CPU-bound performance impact \
+(from hundreds of milliseconds to seconds per image, depending on byte size).
+
+For workflows that produce duplicate images, turning this setting on may yield overall client-side performance improvements \
+by reducing the number of images in the feed.`,
 			defaultValue: false,
 			type: "boolean"
 		});

@@ -450,6 +450,7 @@ app.registerExtension({
 
 					if (deduplicateFeed.value) {
 						// deduplicate by ignoring images with the same filename/type/subfolder
+						const startTime = performance.now();
 						const fingerprint = JSON.stringify({ filename: src.filename, type: src.type, subfolder: src.subfolder });
 						if (seenImages.has(fingerprint)) {
 							// NOOP: image is a duplicate
@@ -458,6 +459,10 @@ app.registerExtension({
 
 							// deduplicate by ignoring images with the same content
 							let img = $el("img", { src: href })
+							img.onerror = () => {
+								// fall back to default behavior
+								addImageToFeed(href);
+							}
 							img.onload = () => {
 								// redraw the image onto a canvas to strip metadata
 								var imgCanvas = document.createElement("canvas");
@@ -469,29 +474,21 @@ app.registerExtension({
 
 								// and then hash the stripped image for memoization
 								var strippedImgB64 = imgCanvas.toDataURL("image/png");
-								var buf = new TextEncoder("utf-8").encode(strippedImgB64);
-								crypto.subtle.digest("SHA-1", buf).then((hash) => {
-									let hexes = [], view = new DataView(hash)
-									for (let i = 0; i < view.byteLength; i += 4) {
-										hexes.push(('00000000' + view.getUint32(i).toString(16)).slice(-8));
-									}
-									const hexHash = hexes.join('');
-									if (seenImages.has(hexHash)) {
-										// NOOP: image is a duplicate
-									} else {
-										// if we got to here, then the image is unique--so add to feed
-										seenImages.set(hexHash, true);
-										addImageToFeed(href);
-									}
-								}).catch((err) => {
-									// fall back to default behavior
-									console.error(err);
+								var simpleHash = Array.from(strippedImgB64).reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
+								if (seenImages.has(simpleHash)) {
+									// NOOP: image is a duplicate
+								} else {
+									// if we got to here, then the image is unique--so add to feed
+									seenImages.set(simpleHash, true);
 									addImageToFeed(href);
-								});
-							}
-							img.onerror = () => {
-								// fall back to default behavior
-								addImageToFeed(href);
+								}
+
+								// calculate the size of the image based on the stripped base64 data: ((4 * n / 3) + 3) & ~3 bytes, for n b64 chars
+								// source: https://stackoverflow.com/a/32140193
+								const imgSizeBytes = ((4 * strippedImgB64.length / 3) + 3) & ~3;
+								const imgSizeMB = (imgSizeBytes / 1048576).toFixed(2);
+								const endTime = performance.now();
+								console.log("%c[🐍 pysssss]", "color: limegreen", `Image deduplication (${imgSizeMB} MB) took ${endTime - startTime}ms: ${fingerprint}`);
 							}
 						}
 					} else {

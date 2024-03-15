@@ -208,6 +208,7 @@ app.registerExtension({
 	name: "pysssss.ImageFeed",
 	setup() {
 		let visible = true;
+		const seenImages = new Map();
 		const showButton = $el("button.comfy-settings-btn", {
 			textContent: "🖼️",
 			style: {
@@ -309,6 +310,18 @@ app.registerExtension({
 			},
 		});
 
+		const deduplicateFeed = app.ui.settings.addSetting({
+			id: "pysssss.ImageFeed.Deduplication",
+			name: "🐍 Image Feed Deduplication",
+			tooltip: `Ensures unique images in the image feed but at the cost of CPU-bound performance impact \
+(from hundreds of milliseconds to seconds per image, depending on byte size).
+
+For workflows that produce duplicate images, turning this setting on may yield overall client-side performance improvements \
+by reducing the number of images in the feed.`,
+			defaultValue: false,
+			type: "boolean"
+		});
+
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
 			textContent: "Clear",
 			onclick: () => imageList.replaceChildren(),
@@ -331,6 +344,27 @@ app.registerExtension({
 			saveVal("ImageSize", v);
 			columnInput.max = Math.max(10, v, columnInput.max);
 			columnInput.value = v;
+		}
+
+		function addImageToFeed(href) {
+			const method = feedDirection.value === "newest first" ? "prepend" : "append";
+			imageList[method](
+				$el("div", [
+					$el(
+						"a",
+						{
+							target: "_blank",
+							href,
+							onclick: (e) => {
+								const imgs = [...imageList.querySelectorAll("img")].map((img) => img.getAttribute("src"));
+								lightbox.show(imgs, imgs.indexOf(href));
+								e.preventDefault();
+							},
+						},
+						[$el("img", { src: href })]
+					),
+				])
+			);
 		}
 
 		imageFeed.append(
@@ -409,35 +443,62 @@ app.registerExtension({
 
 		api.addEventListener("executed", ({ detail }) => {
 			if (visible && detail?.output?.images) {
-				if(detail.node?.includes?.(":")) {
+				if (detail.node?.includes?.(":")) {
 					// Ignore group nodes
 					const n = app.graph.getNodeById(detail.node.split(":")[0]);
-					if(n?.getInnerNodes) return;
+					if (n?.getInnerNodes) return;
 				}
 
 				for (const src of detail.output.images) {
-					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${
-						src.type
-					}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
+					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type
+						}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
 
-					const method = feedDirection.value === "newest first" ? "prepend" : "append";
-					imageList[method](
-						$el("div", [
-							$el(
-								"a",
-								{
-									target: "_blank",
-									href,
-									onclick: (e) => {
-										const imgs = [...imageList.querySelectorAll("img")].map((img) => img.getAttribute("src"));
-										lightbox.show(imgs, imgs.indexOf(href));
-										e.preventDefault();
-									},
-								},
-								[$el("img", { src: href })]
-							),
-						])
-					);
+					if (deduplicateFeed.value) {
+						// deduplicate by ignoring images with the same filename/type/subfolder
+						const startTime = performance.now();
+						const fingerprint = JSON.stringify({ filename: src.filename, type: src.type, subfolder: src.subfolder });
+						if (seenImages.has(fingerprint)) {
+							// NOOP: image is a duplicate
+						} else {
+							seenImages.set(fingerprint, true);
+
+							// deduplicate by ignoring images with the same content
+							let img = $el("img", { src: href })
+							img.onerror = () => {
+								// fall back to default behavior
+								addImageToFeed(href);
+							}
+							img.onload = () => {
+								// redraw the image onto a canvas to strip metadata
+								var imgCanvas = document.createElement("canvas");
+								imgCanvas.width = img.width;
+								imgCanvas.height = img.height;
+
+								var imgContext = imgCanvas.getContext("2d");
+								imgContext.drawImage(img, 0, 0, img.width, img.height);
+
+								// and then hash the stripped image for memoization
+								var strippedImgB64 = imgCanvas.toDataURL("image/png");
+								var simpleHash = Array.from(strippedImgB64).reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
+								if (seenImages.has(simpleHash)) {
+									// NOOP: image is a duplicate
+								} else {
+									// if we got to here, then the image is unique--so add to feed
+									seenImages.set(simpleHash, true);
+									addImageToFeed(href);
+								}
+
+								// calculate the size of the image based on the stripped base64 data: ((4 * n / 3) + 3) & ~3 bytes, for n b64 chars
+								// source: https://stackoverflow.com/a/32140193
+								const imgSizeBytes = ((4 * strippedImgB64.length / 3) + 3) & ~3;
+								const imgSizeMB = (imgSizeBytes / 1048576).toFixed(2);
+								const endTime = performance.now();
+								console.log("%c[🐍 pysssss]", "color: limegreen", `Image deduplication (${imgSizeMB} MB) took ${endTime - startTime}ms: ${fingerprint}`);
+							}
+						}
+					} else {
+						addImageToFeed(href);
+					}
 				}
 			}
 		});

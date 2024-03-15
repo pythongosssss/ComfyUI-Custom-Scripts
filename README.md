@@ -64,9 +64,19 @@ Adds a custom color picker to nodes & groups
 Adds a favicon and title to the window, favicon changes color while generating and the window title includes the number of prompts in the queue
 
 ## Image Feed
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/caea0d48-85b9-4ca9-9771-5c795db35fbc)
-Adds a panel showing images that have been generated in the current session, you can control the direction that images are added and the position of the panel via the ComfyUI settings screen and the size of the panel and the images via the sliders at the top of the panel.  
-![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/ca093d38-41a3-4647-9223-5bd0b9ee4f1e)
+![image](https://github.com/birdddev/ComfyUI-Custom-Scripts/assets/47731506/b9f96e8b-c891-459d-b5c4-b43432caf880)
+Adds a panel showing images that have been generated in the current session, you can sort the images that are added by newest or oldest and change the position of the panel via the panel's settings.
+
+
+![image](https://github.com/birdddev/ComfyUI-Custom-Scripts/assets/47731506/1e4dbc2b-7484-43ee-9778-f4dcaddee913)
+
+
+Holding Shift while adjusting the panel size also adjusts the size of the images.
+While holding Ctrl, the panel will snap to the closest amount of "columns" the image size allows.
+
+
+https://github.com/birdddev/ComfyUI-Custom-Scripts/assets/47731506/78707e01-2053-438c-905d-ce6a1578b53b
+
 
 ## KSampler (Advanced) denoise helper
 Provides a simple method to set custom denoise on the advanced sampler  

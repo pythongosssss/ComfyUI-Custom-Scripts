@@ -2,207 +2,10 @@ import { api } from "../../../scripts/api.js";
 import { app } from "../../../scripts/app.js";
 import { $el } from "../../../scripts/ui.js";
 import { lightbox } from "./common/lightbox.js";
+import { PopUp } from "./common/popup.js";
+import { addStylesheet } from "./common/utils.js";
 
-$el("style", {
-	textContent: `
-	.pysssss-image-feed {
-		position: absolute;
-		background: var(--comfy-menu-bg);
-		color: var(--fg-color);
-		z-index: 99;
-		font-family: sans-serif;
-		font-size: 12px;
-		display: flex;
-		flex-direction: column;
-	}
-	.pysssss-image-feed--top, .pysssss-image-feed--bottom {
-		width: 100vw;
-		min-height: 30px;
-		max-height: calc(var(--max-size, 20) * 1vh);
-	}
-	.pysssss-image-feed--top {
-		top: 0;
-	}
-	.pysssss-image-feed--bottom {
-		bottom: 0;
-		flex-direction: column-reverse;
-		padding-top: 5px;
-	}
-	.pysssss-image-feed--left, .pysssss-image-feed--right {
-		top: 0;
-		height: 100vh;
-		min-width: 200px;
-		max-width: calc(var(--max-size, 10) * 1vw);
-	}
-	.pysssss-image-feed--left {
-		left: 0;
-	}
-	.pysssss-image-feed--right {
-		right: 0;
-	}
-
-	.pysssss-image-feed--left .pysssss-image-feed-menu, .pysssss-image-feed--right .pysssss-image-feed-menu {
-		flex-direction: column;
-	}
-
-	.pysssss-image-feed-menu {
-		position: relative;
-		flex: 0 1 min-content;
-		display: flex;
-		gap: 5px;
-		padding: 5px;
-		justify-content: space-between;
-	}
-	.pysssss-image-feed-btn-group {
-		align-items: stretch;
-		display: flex;
-		gap: .5rem;
-		flex: 0 1 fit-content;
-		justify-content: flex-end;
-	}
-	.pysssss-image-feed-btn {
-		background-color:var(--comfy-input-bg);
-		border-radius:5px;
-		border:2px solid var(--border-color);
-		color: var(--fg-color);
-		cursor:pointer;
-		display:inline-block;
-		flex: 0 1 fit-content;
-		text-decoration:none;
-	}
-	.pysssss-image-feed-btn.sizing-btn:checked {
-		filter: invert();
-	}
-	.pysssss-image-feed-btn.clear-btn {
-		padding: 5px 20px;
-	}
-	.pysssss-image-feed-btn.hide-btn {
-		padding: 5px;
-		aspect-ratio: 1 / 1;
-	}
-	.pysssss-image-feed-btn:hover {
-		filter: brightness(1.2);
-	}
-	.pysssss-image-feed-btn:active {
-		position:relative;
-		top:1px;
-	}
-	
-	.pysssss-image-feed-menu section {
-		border-radius: 5px;
-		background: rgba(0,0,0,0.6);
-		padding: 0 5px;
-		display: flex;
-		gap: 5px;
-		align-items: center;
-		position: relative;
-	}
-	.pysssss-image-feed-menu section span {
-		white-space: nowrap;
-	}
-	.pysssss-image-feed-menu section input {
-		flex: 1 1 100%;
-		background: rgba(0,0,0,0.6);
-		border-radius: 5px;
-		overflow: hidden;
-		z-index: 100;
-	}
-
-	.sizing-menu {
-		position: relative;
-	}
-
-	.size-controls-flyout {
-		position: absolute;
-		transform: scaleX(0%);
-		transition: 200ms ease-out;
-		transition-delay: 500ms;
-		z-index: 101;
-		width: 300px;
-	}
-
-	.sizing-menu:hover .size-controls-flyout {
-		transform: scale(1, 1);
-		transition: 200ms linear;
-		transition-delay: 0;
-	}
-	.pysssss-image-feed--bottom .size-controls-flyout  {
-		transform: scale(1,0);
-		transform-origin: bottom;
-		bottom: 0;
-		left: 0;
-	}
-	.pysssss-image-feed--top .size-controls-flyout  {
-		transform: scale(1,0);
-		transform-origin: top;
-		top: 0;
-		left: 0;
-	}
-	.pysssss-image-feed--left .size-controls-flyout  {
-		transform: scale(0, 1);
-		transform-origin: left;
-		top: 0;
-		left: 0;
-	}
-	.pysssss-image-feed--right .size-controls-flyout  {
-		transform: scale(0, 1);
-		transform-origin: right;
-		top: 0;
-		right: 0;
-	}
-	
-	.pysssss-image-feed-menu > * {
-		min-height: 24px;
-	}
-	.pysssss-image-feed-list {
-		flex: 1 1 auto;
-		overflow-y: auto;
-		display: grid;
-		align-items: center;
-		justify-content: center;
-		gap: 4px;
-		grid-auto-rows: min-content;
-		grid-template-columns: repeat(var(--img-sz, 3), 1fr);
-		transition: 100ms linear;
-		scrollbar-gutter: stable both-edges;
-		padding: 5px;
-		background: var(--comfy-input-bg);
-		border-radius: 5px;
-		margin: 5px;
-		margin-top: 0px;
-	}
-	.pysssss-image-feed-list:empty {
-		display: none;
-	}
-	.pysssss-image-feed-list div {
-		height: 100%;
-		text-align: center;
-	}
-	.pysssss-image-feed-list::-webkit-scrollbar {
-		background: var(--comfy-input-bg);
-		border-radius: 5px;
-	}
-	.pysssss-image-feed-list::-webkit-scrollbar-thumb {
-		background:var(--comfy-menu-bg);
-		border: 5px solid transparent;
-		border-radius: 8px;
-		background-clip: content-box;
-	}
-	.pysssss-image-feed-list::-webkit-scrollbar-thumb:hover {
-		background: var(--border-color);
-		background-clip: content-box;
-	}
-	.pysssss-image-feed-list img {
-		object-fit: var(--img-fit, contain);
-		max-width: 100%;
-		max-height: calc(var(--max-size) * 1vh);
-		border-radius: 4px;
-	}
-	.pysssss-image-feed-list img:hover {
-		filter: brightness(1.2);
-	}`,
-	parent: document.body,
-});
+addStylesheet(import.meta.url);
 
 app.registerExtension({
 	name: "pysssss.ImageFeed",
@@ -229,174 +32,158 @@ app.registerExtension({
 			localStorage.setItem("pysssss.ImageFeed." + n, v);
 		};
 
-		const imageFeed = $el("div.pysssss-image-feed", {
+		const getValString = (n, d) => {
+			const v = localStorage.getItem("pysssss.ImageFeed." + n);
+			if (v) {
+				return v;
+			}
+			return d;
+		}
+
+		const imageFeedRoot = $el("div.pysssss-image-feed-root", {
 			parent: document.body,
 		});
+
+		const imageFeed = $el("div.pysssss-image-feed");
+
 		const imageList = $el("div.pysssss-image-feed-list");
 
-		const feedLocation = app.ui.settings.addSetting({
-			id: "pysssss.ImageFeed.Location",
-			name: "🐍 Image Feed Location",
-			defaultValue: "bottom",
-			type: () => {
-				return $el("tr", [
-					$el("td", [
-						$el("label", {
-							textContent: "🐍 Image Feed Location:",
-						}),
-					]),
-					$el("td", [
-						$el(
-							"select",
-							{
-								style: {
-									fontSize: "14px",
-								},
-								oninput: (e) => {
-									feedLocation.value = e.target.value;
-									imageFeed.className = `pysssss-image-feed pysssss-image-feed--${feedLocation.value}`;
-								},
-							},
-							["left", "top", "right", "bottom"].map((m) =>
-								$el("option", {
-									value: m,
-									textContent: m,
-									selected: feedLocation.value === m,
-								})
-							)
-						),
-					]),
-				]);
-			},
-			onChange(value) {
-				imageFeed.className = `pysssss-image-feed pysssss-image-feed--${value}`;
-			},
-		});
+		const resizeHandle = $el("div.pysssss-image-feed-handle");
 
-		const feedDirection = app.ui.settings.addSetting({
-			id: "pysssss.ImageFeed.Direction",
-			name: "🐍 Image Feed Direction",
-			defaultValue: "newest first",
-			type: () => {
-				return $el("tr", [
-					$el("td", [
-						$el("label", {
-							textContent: "🐍 Image Feed Direction:",
-						}),
-					]),
-					$el("td", [
-						$el(
-							"select",
-							{
-								style: {
-									fontSize: "14px",
-								},
-								oninput: (e) => {
-									feedDirection.value = e.target.value;
-									imageList.replaceChildren(...[...imageList.childNodes].reverse());
-								},
-							},
-							["newest first", "oldest first"].map((m) =>
-								$el("option", {
-									value: m,
-									textContent: m,
-									selected: feedDirection.value === m,
-								})
-							)
-						),
-					]),
-				]);
-			},
-		});
+		imageFeedRoot.append(imageFeed, resizeHandle);
+
+		function updateFeedLocation(value) {
+			imageFeed.className = `pysssss-image-feed pysssss-image-feed--${value}`;
+			imageFeedRoot.className = `pysssss-image-feed-root pysssss-image-feed-root--${value}`;
+			resizeHandle.className = `pysssss-image-feed-handle pysssss-image-feed-handle--${value}`;
+			if (["left", "right"].includes(value)) {
+				imageFeedRoot.style.height = "unset";
+			} else {
+				imageFeedRoot.style.width = "unset";
+			}
+		}
+
+		updateFeedLocation(getValString("Location", "bottom"));
 
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
 			textContent: "Clear",
-			onclick: () => imageList.replaceChildren(),
+			onclick: () => {
+				imageList.replaceChildren();
+				imageList.style.gridTemplateColumns = "unset";
+			},
 		});
 
 		const hideButton = $el("button.pysssss-image-feed-btn.hide-btn", {
 			textContent: "❌",
 			onclick: () => {
-				imageFeed.style.display = "none";
+				imageFeedRoot.style.display = "none";
 				showButton.style.display = "unset";
 				saveVal("Visible", 0);
 				visible = false;
 			},
 		});
 
-		let columnInput;
-		function updateColumnCount(v) {
-			columnInput.parentElement.title = `Controls the number of columns in the feed (${v} columns).\nClick label to set custom value.`;
-			imageFeed.style.setProperty("--img-sz", v);
-			saveVal("ImageSize", v);
-			columnInput.max = Math.max(10, v, columnInput.max);
-			columnInput.value = v;
-		}
+		const settingsButton = $el("button.pysssss-image-feed-btn.settings-btn", {}, [
+			$el("label.size-control-handle", { textContent: "⚙️" })
+		]);
 
-		imageFeed.append(
-			$el("div.pysssss-image-feed-menu", [
-				$el("section.sizing-menu", {}, [
-					$el("label.size-control-handle", { textContent: "↹ Resize Feed" }),
-					$el("div.size-controls-flyout", {}, [
-						$el("section.size-control.feed-size-control", {}, [
-							$el("span", {
-								textContent: "Feed Size...",
-							}),
-							$el("input", {
-								type: "range",
-								min: 10,
-								max: 80,
+		const settingsPopup = new PopUp(settingsButton, {
+			name: "Feed Settings",
+			activeOnHover: true,
+		});
+		settingsPopup.setContent( (content) => {
+			const table = $el("table.pysssss-image-feed-table");
+
+			table.append(
+				$el("tr", [
+					$el("td", [
+						$el("label", {
+							textContent: "Image Size"
+						}),
+					]),
+					$el("input.image-feed-image-size", {
+						type: "range",
+						min: 32,
+						max: 512,
+						step: 12,
+						oninput: (e) => {
+							e.target.parentElement.title = `Controls the maximum size of the images in the feed panel (${e.target.value}px/512px)`;
+							imageFeedRoot.style.setProperty("--image-size", `${e.target.value}px` );
+							saveVal("ImageSize", e.target.value);
+							e.target.textContent = `${e.target.value}px/512px`;
+						},
+						$: (el) => {
+							requestAnimationFrame(() => {
+								el.value = getVal("ImageSize", 128);
+								el.oninput({ target: el });
+							});
+						},
+					}),
+				]),
+				$el("tr", [
+					$el("td", [
+						$el("label", {
+							textContent: "Location",
+						}),
+					]),
+					$el("td.right", [
+						$el(
+							"select",
+							{
 								oninput: (e) => {
-									e.target.parentElement.title = `Controls the maximum size of the image feed panel (${e.target.value}vh)`;
-									imageFeed.style.setProperty("--max-size", e.target.value);
-									saveVal("FeedSize", e.target.value);
+									saveVal("Location", e.target.value);
+									updateFeedLocation(getValString("Location", "bottom"));
 								},
-								$: (el) => {
-									requestAnimationFrame(() => {
-										el.value = getVal("FeedSize", 25);
-										el.oninput({ target: el });
-									});
-								},
-							}),
-						]),
-						$el("section.size-control.image-size-control", {}, [
-							$el("a", {
-								textContent: "Column count...",
-								style: {
-									cursor: "pointer",
-									textDecoration: "underline",
-								},
-								onclick: () => {
-									const v = +prompt("Enter custom column count", 20);
-									if (!isNaN(v)) {
-										updateColumnCount(v);
-									}
-								},
-							}),
-							$el("input", {
-								type: "range",
-								min: 1,
-								max: 10,
-								step: 1,
-								oninput: (e) => {
-									updateColumnCount(e.target.value);
-								},
-								$: (el) => {
-									columnInput = el;
-									requestAnimationFrame(() => {
-										updateColumnCount(getVal("ImageSize", 4));
-									});
-								},
-							}),
-						]),
+							},
+							["left", "top", "right", "bottom"].map((m) =>
+								$el("option", {
+									value: m,
+									textContent: m,
+									selected: getValString("Location", "bottom") === m,
+								})
+							)
+						),
 					]),
 				]),
+				$el("tr", [
+					$el("td", [
+						$el("label", {
+							textContent: "Sort by",
+						}),
+					]),
+					$el("td.right", [
+						$el(
+							"select",
+							{
+								oninput: (e) => {
+									saveVal("Direction", e.target.value);
+									imageList.replaceChildren(...[...imageList.childNodes].reverse());
+								},
+							},
+							["newest", "oldest"].map((m) =>
+								$el("option", {
+									value: m,
+									textContent: m,
+									selected: getValString("Direction", "newest") === m,
+								})
+							)
+						),
+					]),
+				]),
+			);
+
+			content.append(table);
+		});
+
+		imageFeed.append(
+			$el("div.pysssss-image-feed-header", [
+				settingsButton,
 				$el("div.pysssss-image-feed-btn-group", {}, [clearButton, hideButton]),
 			]),
 			imageList
 		);
 		showButton.onclick = () => {
-			imageFeed.style.display = "block";
+			imageFeedRoot.style.display = "flex";
 			showButton.style.display = "none";
 			saveVal("Visible", 1);
 			visible = true;
@@ -420,13 +207,14 @@ app.registerExtension({
 						src.type
 					}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
 
-					const method = feedDirection.value === "newest first" ? "prepend" : "append";
+					const method = getValString("Direction", "newest") === "newest" ? "prepend" : "append";
 					imageList[method](
 						$el("div", [
 							$el(
 								"a",
 								{
 									target: "_blank",
+									draggable: false,
 									href,
 									onclick: (e) => {
 										const imgs = [...imageList.querySelectorAll("img")].map((img) => img.getAttribute("src"));
@@ -439,7 +227,104 @@ app.registerExtension({
 						])
 					);
 				}
+				if (imageList.childNodes.length > 0) {
+					imageList.style.gridTemplateColumns = "repeat( auto-fit, minmax(var(--image-size, 128), 1fr) )";
+				}
 			}
 		});
+
+		let isResizing = false;
+		let initialSize = 0;
+		let imageFeedRootSize = 0;
+		let paddingSize = 0;
+		let isVertical = false;
+		let isOpposite = false;
+
+		resizeHandle.addEventListener('mousedown', (e) => {
+			isResizing = true;
+
+			const feedLocation = getValString("Location", "bottom");
+			isVertical = ["left", "right"].includes(feedLocation);
+			isOpposite = ["right", "bottom"].includes(feedLocation);
+			
+			if (isVertical) {
+				initialSize = e.clientX;
+				imageFeedRootSize = parseFloat(getComputedStyle(imageFeedRoot).width);
+				paddingSize = (imageFeedRootSize - parseFloat(getComputedStyle(imageFeed).width)) * 8;
+			} else {
+				initialSize = e.clientY;
+				imageFeedRootSize = parseFloat(getComputedStyle(imageFeedRoot).height);
+				paddingSize = (imageFeedRootSize - parseFloat(getComputedStyle(imageFeed).height)) * 16;
+			}
+
+			[...imageList.querySelectorAll("img")].map((img) => {
+				img.setAttribute("draggable", false);
+			});
+
+			document.documentElement.style.cursor = isVertical ? "col-resize" : "row-resize";
+
+			document.addEventListener('mousemove', resizeContainer);
+			document.addEventListener('mouseup', stopResize);
+		});
+
+		function resizeContainer(e) {
+			if (!isResizing) {
+				return;
+			}
+			
+			var newSize = 0;
+			const feedLocation = getValString("Location", "bottom");
+			if (isVertical) {
+				const deltaX = e.clientX - initialSize;
+				newSize = feedLocation == "left" ? imageFeedRootSize + deltaX : imageFeedRootSize - deltaX;
+			} else {
+				const deltaY = e.clientY - initialSize;
+				newSize = feedLocation == "top" ? imageFeedRootSize + deltaY : imageFeedRootSize - deltaY;
+			}
+
+			/* Change image size */
+			if (e.shiftKey && !e.ctrlKey) {
+				const axis = isVertical ? "movementX" : "movementY";
+
+				let newImageSize = parseInt(getVal("ImageSize"));
+				newImageSize += isOpposite ? -e[axis] : e[axis];
+				newImageSize = Math.min(Math.max(32, newImageSize), 512);
+
+				saveVal("ImageSize", newImageSize);
+				imageFeedRoot.style.setProperty("--image-size", `${newImageSize}px`);
+				/* Update settings slider */
+				document.querySelector("input.image-feed-image-size").value = newImageSize;
+			}
+			
+			/* Snap to closest image-size multiple for a cleaner list */
+			if (e.ctrlKey) {
+				const imageSize = getVal("ImageSize", 128);
+				let steps = Math.round(newSize / imageSize)
+				let gapSize = parseFloat(getComputedStyle(imageFeedRoot).getPropertyValue("--image-gap-size"));
+				newSize = steps * imageSize;
+				newSize = newSize + paddingSize + (steps * (gapSize + 2));
+			}
+			
+			/* Make sure panel size is always within window */
+			if (newSize >= 0.0 && newSize <= isVertical ?  window.innerWidth : window.innerHeight) {
+				if (isVertical) {
+					imageFeedRoot.style.minWidth = `${newSize}px`;
+				} else {
+					imageFeedRoot.style.minHeight = `${newSize}px`;
+				}
+			}
+		}
+
+		function stopResize() {
+			isResizing = false;
+			document.removeEventListener('mousemove', resizeContainer);
+			document.removeEventListener('mouseup', stopResize);
+
+			document.documentElement.style.cursor = "default";
+
+			[...imageList.querySelectorAll("img")].map((img) => {
+				img.setAttribute("draggable", true);
+			});
+		}
 	},
 });

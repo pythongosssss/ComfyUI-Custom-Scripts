@@ -293,9 +293,14 @@ app.registerExtension({
 		}
 
 		async function addLoras() {
-			const loras = await api
-				.fetchApi("/pysssss/loras", { cache: "no-store" })
-				.then(res => res.json());
+			let loras;
+			try {
+				loras = LiteGraph.registered_node_types["LoraLoader"]?.nodeData.input.required.lora_name[0];
+			} catch (error) {
+				loras = await api
+					.fetchApi("/pysssss/loras", { cache: "no-store" })
+					.then(res => res.json());
+			}
 			const words = {};
 			words["lora:"] = { text: "lora:" };
 

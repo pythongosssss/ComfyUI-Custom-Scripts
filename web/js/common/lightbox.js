@@ -107,6 +107,16 @@ export class Lightbox {
 		this.img.src = img;
 		this.img.style.opacity = 1;
 	}
+
+	async updateWithNewImage(img, feedDirection) {
+		// No-op if lightbox is not open
+		if (this.el.style.display === "none" || this.el.style.opacity === "0") return;
+
+		// Ensure currently shown image does not change
+		const [method, shift] = feedDirection === "newest first" ? ["unshift", 1] : ["push", 0];
+		this.images[method](img);
+		await this.update(shift);
+	}
 }
 
 export const lightbox = new Lightbox();

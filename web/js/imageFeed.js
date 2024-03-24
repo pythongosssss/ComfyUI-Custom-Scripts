@@ -438,6 +438,8 @@ app.registerExtension({
 							),
 						])
 					);
+					// If lightbox is open, update it with new image
+					lightbox.updateWithNewImage(href, feedDirection.value);
 				}
 			}
 		});

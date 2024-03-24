@@ -466,6 +466,29 @@ app.registerExtension({
 								),
 							]
 						),
+						$el(
+							"label",
+							{
+								textContent: "Max suggestions: ",
+								style: {
+									display: "block",
+								},
+							},
+							[
+								$el("input", {
+									type: "number",
+									value: +TextAreaAutoComplete.suggestionCount,
+									style: {
+										width: "80px"
+									},
+									onchange: (event) => {
+										const value = +event.target.value;
+										TextAreaAutoComplete.suggestionCount = value;;
+										localStorage.setItem(id + ".SuggestionCount", TextAreaAutoComplete.suggestionCount);
+									},
+								}),
+							]
+						),
 						$el("button", {
 							textContent: "Manage Custom Words",
 							onclick: () => {
@@ -488,6 +511,7 @@ app.registerExtension({
 		TextAreaAutoComplete.insertOnTab = localStorage.getItem(id + ".InsertOnTab") !== "false";
 		TextAreaAutoComplete.insertOnEnter = localStorage.getItem(id + ".InsertOnEnter") !== "false";
 		TextAreaAutoComplete.lorasEnabled = localStorage.getItem(id + ".ShowLoras") === "true";
+		TextAreaAutoComplete.suggestionCount = +localStorage.getItem(id + ".SuggestionCount");
 	},
 	setup() {
 		async function addEmbeddings() {

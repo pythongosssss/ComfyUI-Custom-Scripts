@@ -5,6 +5,7 @@
 	font-family: sans-serif;
 	box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.4);
 	z-index: 9999;
+	overflow: auto;
 }
 
 .pysssss-autocomplete-item {

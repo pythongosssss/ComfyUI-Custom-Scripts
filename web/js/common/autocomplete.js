@@ -355,6 +355,7 @@ export class TextAreaAutoComplete {
 	static insertOnEnter = true;
 	static replacer = undefined;
 	static lorasEnabled = false;
+	static suggestionCount = 20;
 
 	/** @type {Record<string, Record<string, AutoCompleteEntry>>} */
 	static groups = {};
@@ -529,7 +530,7 @@ export class TextAreaAutoComplete {
 		);
 
 		const top = priorityMatches.length * 0.2;
-		return priorityMatches.slice(0, top).concat(prefixMatches, priorityMatches.slice(top), includesMatches).slice(0, 20);
+		return priorityMatches.slice(0, top).concat(prefixMatches, priorityMatches.slice(top), includesMatches).slice(0, TextAreaAutoComplete.suggestionCount);
 	}
 
 	#update() {
@@ -649,6 +650,7 @@ export class TextAreaAutoComplete {
 		const position = this.helper.getCursorOffset();
 		this.dropdown.style.left = (position.left ?? 0) + "px";
 		this.dropdown.style.top = (position.top ?? 0) + "px";
+		this.dropdown.style.maxHeight = (window.innerHeight - position.top) + "px";
 	}
 
 	#hide() {

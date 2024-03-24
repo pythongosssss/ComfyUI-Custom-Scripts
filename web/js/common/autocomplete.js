@@ -291,10 +291,46 @@ class TextAreaCaretHelper {
 			const startPos = this.el.selectionStart;
 			const endPos = this.el.selectionEnd;
 
-			this.el.value = this.el.value.substring(0, startPos + offset) + value + this.el.value.substring(endPos, this.el.value.length);
+			// Move selection to beginning of offset
+			this.el.selectionStart = this.el.selectionStart + offset;
+
+			// Using execCommand to support undo, but since it's officially 
+			// 'deprecated' we need a backup solution, but it won't support undo :(
+			let pasted = true;
+			try {
+				if (!document.execCommand("insertText", false, value)) {
+					pasted = false;
+				}
+			} catch (e) {
+				console.error("Error caught during execCommand:", e);
+				pasted = false;
+			}
+
+			if (!pasted) {
+				console.error(
+					"execCommand unsuccessful; not supported. Adding text manually, no undo support.");
+				textarea.setRangeText(modifiedText, this.el.selectionStart, this.el.selectionEnd, 'end');
+			}
+
 			this.el.selectionEnd = this.el.selectionStart = startPos + value.length + offset + (finalOffset ?? 0);
 		} else {
-			this.el.value += value;
+			// Using execCommand to support undo, but since it's officially 
+			// 'deprecated' we need a backup solution, but it won't support undo :(
+			let pasted = true;
+			try {
+				if (!document.execCommand("insertText", false, value)) {
+					pasted = false;
+				}
+			} catch (e) {
+				console.error("Error caught during execCommand:", e);
+				pasted = false;
+			}
+
+			if (!pasted) {
+				console.error(
+					"execCommand unsuccessful; not supported. Adding text manually, no undo support.");
+				this.el.value += value;
+			}
 		}
 	}
 }

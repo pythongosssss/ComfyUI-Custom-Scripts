@@ -28,8 +28,6 @@ app.registerExtension({
 		const activeUrl = await testUrl(true);
 		const idleUrl = await testUrl(false);
 
-		console.log(activeUrl, idleUrl);
-
 		let executing = false;
 		const update = () => (link.href = executing ? activeUrl : idleUrl);
 

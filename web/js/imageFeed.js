@@ -478,7 +478,7 @@ app.registerExtension({
 					lightbox.updateWithNewImage(href, feedDirection.value);
 					setTimeout(() => {
 						window.dispatchEvent(new Event("resize"));
-					}, 0);
+					}, 1);
 				}
 			}
 		});

@@ -238,6 +238,7 @@ class TextAreaCaretHelper {
 			fontSize: computedStyle.fontSize,
 			fontFamily: computedStyle.fontFamily,
 			padding: "0",
+			position: "absolute",
 		});
 		body.appendChild(tempNode);
 

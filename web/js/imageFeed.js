@@ -15,6 +15,9 @@ $el("style", {
 		display: flex;
 		flex-direction: column;
 	}
+	div > .pysssss-image-feed {
+		position: static;
+	}
 	.pysssss-image-feed--top, .pysssss-image-feed--bottom {
 		width: 100vw;
 		min-height: 30px;
@@ -206,7 +209,7 @@ $el("style", {
 
 app.registerExtension({
 	name: "pysssss.ImageFeed",
-	setup() {
+	async setup() {
 		let visible = true;
 		const showButton = $el("button.comfy-settings-btn", {
 			textContent: "🖼️",
@@ -216,6 +219,17 @@ app.registerExtension({
 				display: "none",
 			},
 		});
+		let showMenuButton;
+		if (!app.menu.element.style.display && app.menu?.settingsGroup) {
+			showMenuButton = new (await import("../../../scripts/ui/components/button.js")).ComfyButton({
+				icon: "image-multiple",
+				action: () => showButton.click(),
+				tooltip: "Show Image Feed 🐍",
+				content: "Show Image Feed 🐍",
+			});
+			showMenuButton.enabled = false;
+			app.menu.settingsGroup.append(showMenuButton);
+		}
 
 		const getVal = (n, d) => {
 			const v = localStorage.getItem("pysssss.ImageFeed." + n);
@@ -229,10 +243,18 @@ app.registerExtension({
 			localStorage.setItem("pysssss.ImageFeed." + n, v);
 		};
 
-		const imageFeed = $el("div.pysssss-image-feed", {
-			parent: document.body,
-		});
+		const imageFeed = $el("div.pysssss-image-feed");
 		const imageList = $el("div.pysssss-image-feed-list");
+
+		function updateMenuParent(location) {
+			if (showMenuButton) {
+				document.querySelector(".comfyui-body-" + location).append(imageFeed);
+			} else {
+				if (!imageFeed.parent) {
+					document.body.append(imageFeed);
+				}
+			}
+		}
 
 		const feedLocation = app.ui.settings.addSetting({
 			id: "pysssss.ImageFeed.Location",
@@ -255,6 +277,8 @@ app.registerExtension({
 								oninput: (e) => {
 									feedLocation.value = e.target.value;
 									imageFeed.className = `pysssss-image-feed pysssss-image-feed--${feedLocation.value}`;
+									updateMenuParent(feedLocation.value);
+									window.dispatchEvent(new Event("resize"));
 								},
 							},
 							["left", "top", "right", "bottom"].map((m) =>
@@ -270,6 +294,7 @@ app.registerExtension({
 			},
 			onChange(value) {
 				imageFeed.className = `pysssss-image-feed pysssss-image-feed--${value}`;
+				updateMenuParent(value);
 			},
 		});
 
@@ -311,7 +336,10 @@ app.registerExtension({
 
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
 			textContent: "Clear",
-			onclick: () => imageList.replaceChildren(),
+			onclick: () => {
+				imageList.replaceChildren();
+				window.dispatchEvent(new Event("resize"));
+			},
 		});
 
 		const hideButton = $el("button.pysssss-image-feed-btn.hide-btn", {
@@ -319,8 +347,10 @@ app.registerExtension({
 			onclick: () => {
 				imageFeed.style.display = "none";
 				showButton.style.display = "unset";
+				if (showMenuButton) showMenuButton.enabled = true;
 				saveVal("Visible", 0);
 				visible = false;
+				window.dispatchEvent(new Event("resize"));
 			},
 		});
 
@@ -331,6 +361,7 @@ app.registerExtension({
 			saveVal("ImageSize", v);
 			columnInput.max = Math.max(10, v, columnInput.max);
 			columnInput.value = v;
+			window.dispatchEvent(new Event("resize"));
 		}
 
 		imageFeed.append(
@@ -350,6 +381,7 @@ app.registerExtension({
 									e.target.parentElement.title = `Controls the maximum size of the image feed panel (${e.target.value}vh)`;
 									imageFeed.style.setProperty("--max-size", e.target.value);
 									saveVal("FeedSize", e.target.value);
+									window.dispatchEvent(new Event("resize"));
 								},
 								$: (el) => {
 									requestAnimationFrame(() => {
@@ -398,10 +430,14 @@ app.registerExtension({
 		showButton.onclick = () => {
 			imageFeed.style.display = "block";
 			showButton.style.display = "none";
+			if (showMenuButton) showMenuButton.enabled = false;
+
 			saveVal("Visible", 1);
 			visible = true;
+			window.dispatchEvent(new Event("resize"));
 		};
 		document.querySelector(".comfy-settings-btn").after(showButton);
+		window.dispatchEvent(new Event("resize"));
 
 		if (!+getVal("Visible", 1)) {
 			hideButton.onclick();
@@ -409,16 +445,16 @@ app.registerExtension({
 
 		api.addEventListener("executed", ({ detail }) => {
 			if (visible && detail?.output?.images) {
-				if(detail.node?.includes?.(":")) {
+				if (detail.node?.includes?.(":")) {
 					// Ignore group nodes
 					const n = app.graph.getNodeById(detail.node.split(":")[0]);
-					if(n?.getInnerNodes) return;
+					if (n?.getInnerNodes) return;
 				}
 
 				for (const src of detail.output.images) {
-					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${
-						src.type
-					}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
+					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type}&subfolder=${encodeURIComponent(
+						src.subfolder
+					)}&t=${+new Date()}`;
 
 					const method = feedDirection.value === "newest first" ? "prepend" : "append";
 					imageList[method](
@@ -440,6 +476,9 @@ app.registerExtension({
 					);
 					// If lightbox is open, update it with new image
 					lightbox.updateWithNewImage(href, feedDirection.value);
+					setTimeout(() => {
+						window.dispatchEvent(new Event("resize"));
+					}, 0);
 				}
 			}
 		});

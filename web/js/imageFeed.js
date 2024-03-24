@@ -220,7 +220,7 @@ app.registerExtension({
 			},
 		});
 		let showMenuButton;
-		if (!app.menu?.element.style.display && app.menu.settingsGroup) {
+		if (!app.menu?.element.style.display && app.menu?.settingsGroup) {
 			showMenuButton = new (await import("../../../scripts/ui/components/button.js")).ComfyButton({
 				icon: "image-multiple",
 				action: () => showButton.click(),

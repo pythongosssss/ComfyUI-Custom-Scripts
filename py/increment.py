@@ -8,7 +8,7 @@ class AnyType(str):
 any = AnyType("*")
 
 class IncrementNode:
-    curr_value=None
+    curr_value={}
     @classmethod
     def IS_CHANGED():
         return float('nan')  
@@ -16,20 +16,19 @@ class IncrementNode:
             
     @classmethod
     def INPUT_TYPES(cls):  
-        return {"required":{}}
+        return {"required":{"link_id":("INT",{})}
+        }
 
     RETURN_TYPES = ("INT",)
     RETURN_NAMES = ("INT",)
     CATEGORY = "utils"
-    FUNCTION = "get_value"
-    
-    def __init__(self):
-        if IncrementNode.curr_value is None:
-            IncrementNode.curr_value=0  
-    
-    def get_value(self):
-        cur_value=IncrementNode.curr_value
-        IncrementNode.curr_value+=1   
+    FUNCTION = "get_value"    
+   
+    def get_value(self, link_id):
+        if link_id not in IncrementNode.curr_value:
+            IncrementNode.curr_value[link_id]=0 
+        cur_value=IncrementNode.curr_value[link_id]
+        IncrementNode.curr_value[link_id]+=1   
         return (cur_value, )
 
 
@@ -41,15 +40,18 @@ class Halt:
     
     @classmethod
     def INPUT_TYPES(cls):  
-        return {"required":{"source": (any, {})}}
+        return {"required":{"source": (any, {})},"optional":{"link_id":("INT",{})}}
 
     RETURN_TYPES = ()
     RETURN_NAMES = ()
     CATEGORY = "utils"
     FUNCTION = "get_value"    
     OUTPUT_NODE = True
-    def get_value(self,source):
-        IncrementNode.curr_value=0   
+    def get_value(self,source,link_id=None):
+        if link_id is None:
+            IncrementNode.curr_value={}
+        elif link_id in IncrementNode.curr_value:
+            del IncrementNode.curr_value[link_id]   
         return ()
 
         

@@ -61,5 +61,5 @@ NODE_CLASS_MAPPINGS = {
 # A dictionary that contains the friendly/humanly readable titles for the nodes
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Increment|pysssss": "Increment 🐍",
-    "Halt": "Halt 🐍"
+    "Halt|pysssss": "Halt 🐍"
 }

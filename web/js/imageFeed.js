@@ -281,10 +281,11 @@ app.registerExtension({
 		}
 
 		const prefix = "pysssss.ImageFeed.";
+		const comfyPrefix = "Comfy.Settings." + prefix;
 
 		//Legacy getter and setter - for accessing the settings from the menu setting system.
 		const getVal = (n, d) => {
-			const v = localStorage.getItem(prefix + n);
+			const v = localStorage.getItem(comfyPrefix + n);
 			if (v && !isNaN(+v)) {
 				return v;
 			}
@@ -294,6 +295,7 @@ app.registerExtension({
 		const saveVal = (n, v) => {
 			localStorage.setItem(prefix + n, v);
 		};
+
 
 		const getJSONVal = (n, d) => {
 			const v = localStorage.getItem(prefix + n);
@@ -323,7 +325,7 @@ app.registerExtension({
 		const eligibleNodes = ['SaveImage', 'PreviewImage', 'KSampler', 'KSampler (Efficient)', 'KSampler Adv. (Efficient)', 'KSampler SDXL (Eff.)'];
 
 		let sortOrder = getJSONVal("SortOrder", "ID");
-		let	selectedNodeIds = getJSONVal("NodeFilter", []);
+		let selectedNodeIds = getJSONVal("NodeFilter", []);
 		let imageNodes;
 
 		let filterToggleButton;
@@ -769,7 +771,7 @@ app.registerExtension({
 			if (!visible || !detail?.output?.images) {
 				return;
 			}
-			const newestToOldest = getVal("Comfy.Settings.pysssss.ImageFeed.NewestFirst", "true") === "true";
+			const newestToOldest = getVal("NewestFirst", "true") === "true";
 			const newBatchIdentifier = detail.prompt_id;
 			const filterEnabled = getJSONVal("FilterEnabled", false);
 
@@ -888,8 +890,8 @@ app.registerExtension({
 		}
 
 		function checkAndRemoveExtraImageBatches() {
-			const newestToOldest = getVal("Comfy.Settings.pysssss.ImageFeed.NewestFirst", "true") === "true";
-			const maxImageBatches = getVal("Comfy.Settings.pysssss.ImageFeed.MaxFeedLength", 25);
+			const newestToOldest = getVal("NewestFirst", "true") === "true";
+			const maxImageBatches = getVal("MaxFeedLength", 25);
 
 			let allBatches = imageFeed.querySelector('.pysssss-image-feed-list').querySelectorAll('.image-batch-container');
 

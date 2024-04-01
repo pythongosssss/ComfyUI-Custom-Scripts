@@ -854,7 +854,7 @@ app.registerExtension({
 			// Construct the base and full URL with cache-busting
 			const baseUrl = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type}&subfolder=${encodeURIComponent(src.subfolder)}`;
 			const timestampedUrl = `${baseUrl}&t=${+new Date()}`;
-			const newestToOldest = getVal("Comfy.Settings.pysssss.ImageFeed.NewestFirst", "true") === "true";
+			const newestToOldest = getVal("NewestFirst", "true") === "true";
 
 			const imageElement = document.createElement('div');
 			imageElement.className = 'image-container';

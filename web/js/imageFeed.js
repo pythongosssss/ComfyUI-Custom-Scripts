@@ -104,9 +104,9 @@ $el("style", {
 
 		.image-feed-vertical-bar {
 			height: 100%;
-			width: var(--separator-width);
-			background-color: var(--separator-color);
-			display: inline-block; 
+			width: 4px;
+			background-color: yellow;
+			display: inline-block
 			z-index: 502; /*For some reason some text controls have a zindex of 100??? */
 		}
 
@@ -811,7 +811,6 @@ app.registerExtension({
 				if (currentBatchIdentifier) {
 					const yellowBar = document.createElement('div');
 					yellowBar.className = "image-feed-vertical-bar";
-					yellowBar.style.cssText = "width: 4px; background-color: yellow; display: inline-block;";
 					if (newestToOldest) {
 						imageList.prepend(yellowBar);
 					} else {

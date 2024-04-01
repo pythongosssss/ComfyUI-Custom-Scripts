@@ -284,14 +284,16 @@ app.registerExtension({
 		const prefix = "pysssss.ImageFeed.";
 		const comfyPrefix = "Comfy.Settings." + prefix;
 
-		//Legacy getter and setter - for accessing the settings from the menu setting system.
+		//Legacy getter and setter - only used for accessing the settings from the menu setting system.
 		const getVal = (n, d) => {
+			console.log("Fetching value for ", comfyPrefix + n);
 			const v = localStorage.getItem(comfyPrefix + n);
-			if (v && !isNaN(+v)) {
-				return v;
+
+			if (v === null) {
+				return d; // Return the default value if the item doesn't exist in localStorage
 			}
-			return d;
-		};
+			return v;
+		}
 
 		const saveVal = (n, v) => {
 			localStorage.setItem(prefix + n, v);
@@ -343,9 +345,9 @@ app.registerExtension({
 			textContent: "Clear",
 			onclick: () => {
 
-				currentBatchIdentifier = null;		     //Forget the last batch, we're starting over.
-				currentBatchContainer.replaceChildren(); //Clear the current batch container
-				imageList.replaceChildren();			 //Clear the contents of the imageList.
+				currentBatchIdentifier = null;	 
+				currentBatchContainer.replaceChildren();  
+				imageList.replaceChildren();		 
 				window.dispatchEvent(new Event("resize"));
 			},
 		});
@@ -542,7 +544,7 @@ app.registerExtension({
 				});
 
 				const label = createElement('label', {
-					htmlFor: checkbox.id, // Changed 'htmlFor' to 'forHtml' to ensure compatibility
+					htmlFor: checkbox.id, 
 					textContent: node.title ? `${node.title} (ID: ${node.id})` : `Node ID: ${node.id}`
 				});
 
@@ -637,7 +639,6 @@ app.registerExtension({
 			const modal = loadModal();
 			const overlay = loadOverlay();
 
-			//Check for new nodes and sort before we show off.
 			if (!isVisible) {
 				// Save the current state when hiding the overlay
 				//There's never been a better time.
@@ -665,7 +666,7 @@ app.registerExtension({
 				onChange: (newOrder) => {
 					//Technically we don't need to do anything.
 					//We query and handle this later on.
-					const displayValue = newOrder ? "newest first" : "oldest first";
+					//const displayValue = newOrder ? "newest first" : "oldest first";
 				},
 				tooltip: "Change the order in which images are displayed.",
 			});

@@ -288,7 +288,8 @@ app.registerExtension({
 			if (v === null) {
 				return d;
 			}
-			return v;
+			return v.replace(/^"|"$/g, ''); //Whoever wrote the string handling code in the API - Do you have any idea how long I spent debugging this?
+											//Stupid problems get stupid solutions.
 		};
 
 		const saveVal = (n, v) => {
@@ -642,11 +643,11 @@ app.registerExtension({
 			const feedDirectionSetting = app.ui.settings.addSetting({
 				id: "pysssss.ImageFeed.NewestFirst",
 				name: "🐍 Image Feed Direction",
-				defaultValue: "true",
+				defaultValue: "newest",
 				type: "combo",
 				options: () => [
-					{ text: "newest first", value: "true" },
-					{ text: "oldest first", value: "false" }
+					{ text: "newest first", value: "newest" },
+					{ text: "oldest first", value: "oldest" }
 				],
 				onChange: (newOrder) => {
 					//Technically we don't need to do anything.
@@ -754,7 +755,7 @@ app.registerExtension({
 			//If the filter has no nodes selected but enabled is true, set enabled to false.
 			//The design is very human. 
 			if (filterEnabled && (!selectedNodeIds || selectedNodeIds.length === 0)) {
-				saveJSONVal('pysssss.ImageFeed.FilterEnabled', false);
+				saveJSONVal('FilterEnabled', false);
 				return;
 			}
 		});
@@ -763,9 +764,10 @@ app.registerExtension({
 			if (!visible || !detail?.output?.images) {
 				return;
 			}
-			const newestToOldest = getVal("NewestFirst", "true") === "true";
+
+			const newestToOldest = getVal("NewestFirst", "newest") == "newest";
+			const filterEnabled = getJSONVal("FilterEnabled", true) === true;
 			const newBatchIdentifier = detail.prompt_id;
-			const filterEnabled = getJSONVal("FilterEnabled", getVal("NewestFirst", "true"));
 
 			if (detail.node?.includes?.(":")) {
 				// Ignore group nodes
@@ -835,7 +837,7 @@ app.registerExtension({
 			// Construct the base and full URL with cache-busting
 			const baseUrl = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type}&subfolder=${encodeURIComponent(src.subfolder)}`;
 			const timestampedUrl = `${baseUrl}&t=${+new Date()}`;
-			const newestToOldest = getVal("NewestFirst", "true") === "true";
+			const newestToOldest = getVal("NewestFirst", "newest") === "newest";
 
 			const imageElement = document.createElement('div');
 			imageElement.className = 'image-container';
@@ -864,6 +866,7 @@ app.registerExtension({
 			imageElement.appendChild(anchor);
 
 			if (newestToOldest) {
+
 				batchContainer.prepend(imageElement);
 			} else {
 				batchContainer.appendChild(imageElement);
@@ -871,7 +874,7 @@ app.registerExtension({
 		}
 
 		function checkAndRemoveExtraImageBatches() {
-			const newestToOldest = getVal("NewestFirst", "true") === "true";
+			const newestToOldest = getVal("NewestFirst","newest") === "newest";
 			const maxImageBatches = getVal("MaxFeedLength", 25);
 
 			if (!imageList) {

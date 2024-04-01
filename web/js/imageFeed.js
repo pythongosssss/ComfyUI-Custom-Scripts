@@ -85,7 +85,7 @@ $el("style", {
 			overflow: hidden;
 			max-height: inherit;
 			height: inherit;
-			z-index: 501; /*For some reason some text controls have a zindex of 100??? */
+			z-index: 501; /* For some reason some text controls have a zindex of 100??? */
 		}
 
 		.image-container a {
@@ -95,12 +95,10 @@ $el("style", {
 		}		
 
 		.image-container img {
-			max-height: 100%; 
-			max-width: 100%; 
-			object-fit: contain; 
-			max-height: inherit;
+			max-height: inherit; 
 			height: inherit;
 			width: auto;
+			object-fit: contain; 
 		}
 
 		.image-feed-vertical-bar {
@@ -231,7 +229,6 @@ $el("style", {
 			background-color: #000;
 		}
 
-
 		.custom-node-item {
 			display: flex;
 			align-items: center;
@@ -240,7 +237,7 @@ $el("style", {
 			padding: 10px;
 			border-radius: 5px;
 			background-color: #000;
-			border: 1px solid yellow !important;
+			border: 1px solid yellow;  
 		}
 
 		.custom-label {
@@ -284,31 +281,31 @@ app.registerExtension({
 		const prefix = "pysssss.ImageFeed.";
 		const comfyPrefix = "Comfy.Settings." + prefix;
 
-		//Legacy getter and setter - only used for accessing the settings from the menu setting system.
+		//Legacy getter and setter - for accessing the settings from the menu setting system.
 		const getVal = (n, d) => {
-			console.log("Fetching value for ", comfyPrefix + n);
 			const v = localStorage.getItem(comfyPrefix + n);
 
 			if (v === null) {
-				return d; // Return the default value if the item doesn't exist in localStorage
+				return d;
 			}
 			return v;
-		}
+		};
 
 		const saveVal = (n, v) => {
-			localStorage.setItem(prefix + n, v);
+			const valueToSave = (typeof v === "boolean") ? v.toString() : v;
+			localStorage.setItem(prefix + n, valueToSave);
 		};
 
 
 		const getJSONVal = (n, d) => {
 			const v = localStorage.getItem(prefix + n);
 			if (v === null) {
-				return d; // Return the default value if the item doesn't exist in localStorage
+				return d; 
 			}
 			try {
 				return JSON.parse(v);
 			} catch (error) {
-				return d; // Return the default value if parsing fails
+				return d; 
 			}
 		};
 
@@ -337,17 +334,13 @@ app.registerExtension({
 		let currentBatchIdentifier;
 		let currentBatchContainer;
 
-		let resizeControl;
-		let buttonGroup;
-
-
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
 			textContent: "Clear",
 			onclick: () => {
 
-				currentBatchIdentifier = null;	 
-				currentBatchContainer.replaceChildren();  
-				imageList.replaceChildren();		 
+				currentBatchIdentifier = null;		      
+				currentBatchContainer.replaceChildren(); //Clear the current batch container
+				imageList.replaceChildren();			 //Clear the contents of the imageList.
 				window.dispatchEvent(new Event("resize"));
 			},
 		});
@@ -377,8 +370,6 @@ app.registerExtension({
 
 
 		function updateControlPositions(feedLocation) {
-			const imageFeed = document.querySelector('.pysssss-image-feed');
-
 			if (!imageFeed) {
 				console.error('Image feed element not found.');
 				return;
@@ -522,8 +513,6 @@ app.registerExtension({
 
 			const filterEnabled = getJSONVal("FilterEnabled", false);
 
-			console.log("Redrawing node list.");
-
 			updateImageNodes();
 			sortImageNodes();
 
@@ -536,7 +525,7 @@ app.registerExtension({
 					type: 'checkbox',
 					id: `node-${node.id}`,
 					checked: selectedNodeIds.includes(node.id),
-					disabled: !filterEnabled // Disable or enable based on filter state
+					disabled: !filterEnabled 
 				});
 
 				checkbox.addEventListener('change', () => {
@@ -574,7 +563,7 @@ app.registerExtension({
 				customNodeItem.appendChild(customLabel);
 				listContainer.appendChild(customNodeItem);
 			} else {
-				// If the custom node item already exists, just update its disabled state
+				//If the custom node item already exists, just update its disabled state
 				const customCheckbox = customNodeItem.querySelector('input[type="checkbox"]');
 				if (customCheckbox) {
 					customCheckbox.disabled = !filterEnabled;
@@ -638,9 +627,9 @@ app.registerExtension({
 		function setNodeSelectorVisibility(isVisible) {
 			const modal = loadModal();
 			const overlay = loadOverlay();
-
+						
 			if (!isVisible) {
-				// Save the current state when hiding the overlay
+				//Save the current state when hiding the overlay
 				//There's never been a better time.
 				saveJSONVal("NodeFilter", selectedNodeIds);
 				redrawImageNodeList(imageNodes, loadModal());
@@ -650,10 +639,6 @@ app.registerExtension({
 			return;
 		}
 		function onDomReady() {
-
-			//When the DOM is ready, build our UI elements.
-			//Setup the main image feed UI menu.
-			//Setup two event listeners that do the bulk of the work.
 			const feedDirectionSetting = app.ui.settings.addSetting({
 				id: "pysssss.ImageFeed.NewestFirst",
 				name: "🐍 Image Feed Direction",
@@ -666,7 +651,6 @@ app.registerExtension({
 				onChange: (newOrder) => {
 					//Technically we don't need to do anything.
 					//We query and handle this later on.
-					//const displayValue = newOrder ? "newest first" : "oldest first";
 				},
 				tooltip: "Change the order in which images are displayed.",
 			});
@@ -722,17 +706,16 @@ app.registerExtension({
 				tooltip: "Choose the location of the image feed.",
 			});
 
-			//Add the image list to the DOM.
 			imageFeed.append(imageList);
 
-			//Setup on screen interface.
+			//This is just the on screen interface.
 			buttonPanel.append(nodeFilterButton);
 			buttonPanel.append(clearButton);
 			imageFeed.append(buttonPanel);
 			imageFeed.append(closeButton);
 
-			resizeControl = document.querySelector('.pysssss-image-feed-resize');
-			buttonGroup = document.querySelector('.pysssss-image-feed-btn-group');
+			const resizeControl = document.querySelector('.pysssss-image-feed-resize');
+			const buttonGroup = document.querySelector('.pysssss-image-feed-btn-group');
 
 			if (showButton) {
 				showButton.onclick = () => {
@@ -782,7 +765,7 @@ app.registerExtension({
 			}
 			const newestToOldest = getVal("NewestFirst", "true") === "true";
 			const newBatchIdentifier = detail.prompt_id;
-			const filterEnabled = getJSONVal("FilterEnabled", false);
+			const filterEnabled = getJSONVal("FilterEnabled", getVal("NewestFirst", "true"));
 
 			if (detail.node?.includes?.(":")) {
 				// Ignore group nodes
@@ -790,21 +773,10 @@ app.registerExtension({
 				if (n?.getInnerNodes) return;
 			}
 
-			if (!imageFeed) {
-				console.error('Image feed container not found!');
+			if (!imageFeed && !imageList) {
+				console.error('Image feed or imageList container not found!');
 				return;
 			} else {
-				// Initialize a new image list if it doesn't exist
-				if (!imageList) {
-					imageList = imageFeed.querySelector('.pysssss-image-feed-list');
-
-					if (!imageList) {
-						imageList = document.createElement('div');
-						imageList.className = 'pysssss-image-feed-list';
-						imageFeed.appendChild(imageList);
-					}
-				}
-
 				// Start a new batch container immediately
 				if (!currentBatchContainer) {
 					currentBatchContainer = document.createElement('div');
@@ -863,7 +835,7 @@ app.registerExtension({
 			// Construct the base and full URL with cache-busting
 			const baseUrl = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type}&subfolder=${encodeURIComponent(src.subfolder)}`;
 			const timestampedUrl = `${baseUrl}&t=${+new Date()}`;
-			const newestToOldest = getVal("Comfy.Settings.pysssss.ImageFeed.NewestFirst", "true") === "true";
+			const newestToOldest = getVal("NewestFirst", "true") === "true";
 
 			const imageElement = document.createElement('div');
 			imageElement.className = 'image-container';
@@ -902,18 +874,23 @@ app.registerExtension({
 			const newestToOldest = getVal("NewestFirst", "true") === "true";
 			const maxImageBatches = getVal("MaxFeedLength", 25);
 
-			let allBatches = imageFeed.querySelector('.pysssss-image-feed-list').querySelectorAll('.image-batch-container');
+			if (!imageList) {
+				console.log("Image list not found.");
+				return;
+			}
+
+			let allBatches = imageList.querySelectorAll('.image-batch-container');
 
 			while (allBatches.length > maxImageBatches) {
 				const elementToRemove = newestToOldest ? allBatches[allBatches.length - 1] : allBatches[0];
 				const yellowBarToRemove = newestToOldest ? elementToRemove.previousElementSibling : elementToRemove.nextElementSibling;
 
 				if (yellowBarToRemove && yellowBarToRemove.className === "image-feed-vertical-bar") {
-					imageFeed.querySelector('.pysssss-image-feed-list').removeChild(yellowBarToRemove);
+					imageList.removeChild(yellowBarToRemove);
 				}
-				imageFeed.querySelector('.pysssss-image-feed-list').removeChild(elementToRemove);
+				imageList.removeChild(elementToRemove);
 
-				allBatches = imageFeed.querySelector('.pysssss-image-feed-list').querySelectorAll('.image-batch-container');
+				allBatches = imageList.querySelectorAll('.image-batch-container');
 			}
 		}
 	},

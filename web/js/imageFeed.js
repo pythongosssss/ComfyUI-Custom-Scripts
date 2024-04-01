@@ -760,8 +760,7 @@ app.registerExtension({
 			//If the filter has no nodes selected but enabled is true, set enabled to false.
 			//The design is very human. 
 			if (filterEnabled && (!selectedNodeIds || selectedNodeIds.length === 0)) {
-				filterEnabled = false;
-				saveJSONVal('pysssss.ImageFeed.FilterEnabled', filterEnabled);
+				saveJSONVal('pysssss.ImageFeed.FilterEnabled', false);
 				return;
 			}
 		});

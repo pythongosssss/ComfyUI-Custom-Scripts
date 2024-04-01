@@ -1,10 +1,11 @@
+
 import { api } from "../../../scripts/api.js";
 import { app } from "../../../scripts/app.js";
 import { $el } from "../../../scripts/ui.js";
 import { lightbox } from "./common/lightbox.js";
 
 $el("style", {
-    textContent: `
+	textContent: `
 		:root {
 			--background-color-main: rgb(36, 39, 48);
 			--separator-color: yellow;
@@ -250,7 +251,7 @@ $el("style", {
 		.custom-label.disabled {
 			color: #555;
 		}`,
-    parent: document.body,
+	parent: document.body,
 });
 
 app.registerExtension({
@@ -260,7 +261,7 @@ app.registerExtension({
 
 		const showButton = $el("button.comfy-settings-btn", {
 			textContent: "🖼️",
-			id: "uniqueShowButton",  
+			id: "uniqueShowButton",
 			style: {
 				right: "16px",
 				cursor: "pointer",
@@ -428,7 +429,7 @@ app.registerExtension({
 			imageNodes = filteredNodes;
 			return;
 		}
- 
+
 		function updateSelectedNodeIds(nodeId, isChecked) {
 			if (isChecked) {
 				if (!selectedNodeIds.includes(nodeId)) {
@@ -471,10 +472,10 @@ app.registerExtension({
 		function toggleFilter() {
 			let filterEnabled = getJSONVal("FilterEnabled", false);
 
-			filterEnabled = !filterEnabled; 
+			filterEnabled = !filterEnabled;
 			filterToggleButton.textContent = filterEnabled ? 'Disable Filter' : 'Enable Filter';
 			sortToggleButton.disabled = !filterEnabled;
-			saveJSONVal("FilterEnabled", filterEnabled); 
+			saveJSONVal("FilterEnabled", filterEnabled);
 			redrawImageNodeList();
 
 		}
@@ -550,26 +551,33 @@ app.registerExtension({
 				list.appendChild(listItem);
 			});
 
-			// Additional code for 'Other Custom Nodes' checkbox
-			const customNodeItem = document.createElement('li');
-			customNodeItem.classList.add("custom-node-item"); // Use classList for adding classes
-			const customCheckbox = document.createElement('input');
-			customCheckbox.type = 'checkbox';
-			customCheckbox.id = 'custom-node-checkbox';
-			customCheckbox.checked = selectedNodeIds.includes(-1);
-			customCheckbox.disabled = !filterEnabled;
-			customCheckbox.addEventListener('change', function () {
-				updateSelectedNodeIds(-1, this.checked);
-			});
+			let customNodeItem = listContainer.querySelector('.custom-node-item');
+			if (!customNodeItem) {
+				customNodeItem = document.createElement('li');
+				customNodeItem.classList.add("custom-node-item");
 
-			const customLabel = document.createElement('label');
-			customLabel.setAttribute('for', customCheckbox.id); // Use setAttribute for HTML attributes
-			customLabel.textContent = "Custom Nodes Not Shown";
-			customLabel.classList.add("custom-label"); // Use classList for adding classes
+				const customCheckbox = document.createElement('input');
+				customCheckbox.type = 'checkbox';
+				customCheckbox.id = 'custom-node-checkbox';
+				customCheckbox.addEventListener('change', function () {
+					updateSelectedNodeIds(-1, this.checked);
+				});
 
-			customNodeItem.appendChild(customCheckbox);
-			customNodeItem.appendChild(customLabel);
-			listContainer.appendChild(customNodeItem); // Append to the container, not directly to the modal
+				const customLabel = document.createElement('label');
+				customLabel.setAttribute('for', customCheckbox.id);
+				customLabel.textContent = "Custom Nodes Not Shown";
+				customLabel.classList.add("custom-label");
+
+				customNodeItem.appendChild(customCheckbox);
+				customNodeItem.appendChild(customLabel);
+				listContainer.appendChild(customNodeItem);
+			} else {
+				// If the custom node item already exists, just update its disabled state
+				const customCheckbox = customNodeItem.querySelector('input[type="checkbox"]');
+				if (customCheckbox) {
+					customCheckbox.disabled = !filterEnabled;
+				}
+			}
 		}
 
 		function createImageNodeList() {
@@ -648,8 +656,8 @@ app.registerExtension({
 			const feedDirectionSetting = app.ui.settings.addSetting({
 				id: "pysssss.ImageFeed.NewestFirst",
 				name: "🐍 Image Feed Direction",
-				defaultValue: "true",  
-				type: "combo", 
+				defaultValue: "true",
+				type: "combo",
 				options: () => [
 					{ text: "newest first", value: "true" },
 					{ text: "oldest first", value: "false" }
@@ -665,17 +673,17 @@ app.registerExtension({
 			const feedLengthSetting = app.ui.settings.addSetting({
 				id: "pysssss.ImageFeed.MaxFeedLength",
 				name: "🐍 Max Batches In Feed",
-				defaultValue: 25, 
-				type: "number", 
+				defaultValue: 25,
+				type: "number",
 				onChange: (newValue) => {
 					// Technically we don't need to do anything.
 					// We'll removal elements during the executed event.
 				},
 				tooltip: "Maximum number of image batches to retain before the oldest start dropping from image feed.",
 				attrs: {
-					min: '25', 
-					max: '200', 
-					step: '25', 
+					min: '25',
+					max: '200',
+					step: '25',
 				},
 			});
 
@@ -733,7 +741,7 @@ app.registerExtension({
 					imageFeed.style.display = "block";
 					showButton.style.display = "none";
 
-					const showMenuButton = document.querySelector('.show-menu-button');  
+					const showMenuButton = document.querySelector('.show-menu-button');
 					if (showMenuButton) showMenuButton.disabled = true;
 
 					window.dispatchEvent(new Event("resize"));
@@ -854,7 +862,7 @@ app.registerExtension({
 			// Construct the base and full URL with cache-busting
 			const baseUrl = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type}&subfolder=${encodeURIComponent(src.subfolder)}`;
 			const timestampedUrl = `${baseUrl}&t=${+new Date()}`;
-			const newestToOldest = getVal("NewestFirst", "true") === "true";
+			const newestToOldest = getVal("Comfy.Settings.pysssss.ImageFeed.NewestFirst", "true") === "true";
 
 			const imageElement = document.createElement('div');
 			imageElement.className = 'image-container';
@@ -864,7 +872,7 @@ app.registerExtension({
 			anchor.onclick = (e) => {
 				e.preventDefault();
 				const absoluteUrl = new URL(timestampedUrl, window.location.origin).href;
-				const imgs = getAllImages(); 
+				const imgs = getAllImages();
 				// Normalize and compare without the `t` parameter for matching
 				const normalizedUrls = imgs.map(url => url.split('&t=')[0]);
 				const baseUrlAbsolute = new URL(baseUrl, window.location.origin).href;

@@ -428,7 +428,7 @@ app.registerExtension({
 			imageList
 		);
 		showButton.onclick = () => {
-			imageFeed.style.display = "block";
+			imageFeed.style.display = "flex";
 			showButton.style.display = "none";
 			if (showMenuButton) showMenuButton.enabled = false;
 

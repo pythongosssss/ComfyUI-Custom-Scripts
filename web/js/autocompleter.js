@@ -511,7 +511,7 @@ app.registerExtension({
 		TextAreaAutoComplete.insertOnTab = localStorage.getItem(id + ".InsertOnTab") !== "false";
 		TextAreaAutoComplete.insertOnEnter = localStorage.getItem(id + ".InsertOnEnter") !== "false";
 		TextAreaAutoComplete.lorasEnabled = localStorage.getItem(id + ".ShowLoras") === "true";
-		TextAreaAutoComplete.suggestionCount = +localStorage.getItem(id + ".SuggestionCount");
+		TextAreaAutoComplete.suggestionCount = +localStorage.getItem(id + ".SuggestionCount") || 20;
 	},
 	setup() {
 		async function addEmbeddings() {

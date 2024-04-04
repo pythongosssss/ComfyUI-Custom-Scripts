@@ -492,7 +492,7 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			imageList
 		);
 		showButton.onclick = () => {
-			imageFeed.style.display = "block";
+			imageFeed.style.display = "flex";
 			showButton.style.display = "none";
 			if (showMenuButton) showMenuButton.enabled = false;
 

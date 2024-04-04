@@ -339,12 +339,21 @@ app.registerExtension({
 			id: "pysssss.ImageFeed.Deduplication",
 			name: "🐍 Image Feed Deduplication",
 			tooltip: `Ensures unique images in the image feed but at the cost of CPU-bound performance impact \
-(from hundreds of milliseconds to seconds per image, depending on byte size).
+(from hundreds of milliseconds to seconds per image, depending on byte size). For workflows that produce duplicate images, turning this setting on may yield overall client-side performance improvements \
+by reducing the number of images in the feed.
 
-For workflows that produce duplicate images, turning this setting on may yield overall client-side performance improvements \
-by reducing the number of images in the feed.`,
-			defaultValue: false,
-			type: "boolean"
+Recommended: "enabled (max performance)" uness images are erroneously deduplicated.`,
+			defaultValue: 0,
+			type: "combo",
+			options: (value) => {
+				let dedupeOptions = {"disabled": 0, "enabled (slow)": 1, "enabled (performance)": 0.5, "enabled (max performance)": 0.25};
+				return Object.entries(dedupeOptions).map(([k, v]) => ({
+						value: v,
+						text: k,
+						selected: k === value,
+					})
+				)
+			},
 		});
 
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
@@ -501,58 +510,73 @@ by reducing the number of images in the feed.`,
 		api.addEventListener("executed", ({ detail }) => {
 			if (visible && detail?.output?.images) {
 				if (detail.node?.includes?.(":")) {
-				if (detail.node?.includes?.(":")) {
 					// Ignore group nodes
 					const n = app.graph.getNodeById(detail.node.split(":")[0]);
-					if (n?.getInnerNodes) return;
 					if (n?.getInnerNodes) return;
 				}
 
 				for (const src of detail.output.images) {
-					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type
-						}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
+					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type}&
+					subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
 
-					if (deduplicateFeed.value) {
+					// deduplicateFeed.value is essentially the scaling factor used for image hashing
+					// but when deduplication is disabled, this value is "0"
+					if (deduplicateFeed.value > 0) {
 						// deduplicate by ignoring images with the same filename/type/subfolder
-						const startTime = performance.now();
+						let startTime = performance.now();
 						const fingerprint = JSON.stringify({ filename: src.filename, type: src.type, subfolder: src.subfolder });
 						if (seenImages.has(fingerprint)) {
 							// NOOP: image is a duplicate
 						} else {
 							seenImages.set(fingerprint, true);
-
-							// deduplicate by ignoring images with the same content
 							let img = $el("img", { src: href })
 							img.onerror = () => {
 								// fall back to default behavior
 								addImageToFeed(href);
 							}
 							img.onload = () => {
-								// redraw the image onto a canvas to strip metadata
-								var imgCanvas = document.createElement("canvas");
-								imgCanvas.width = img.width;
-								imgCanvas.height = img.height;
+								console.log(`... (${img.width}x${img.height}) fetching image took ${performance.now() - start} milliseconds`);
 
-								var imgContext = imgCanvas.getContext("2d");
-								imgContext.drawImage(img, 0, 0, img.width, img.height);
+								// redraw the image onto a canvas to strip metadata (resize if performance mode)
+								let start = performance.now();
+								let imgCanvas = document.createElement("canvas");
+								let imgScalar = deduplicateFeed.value;
+								imgCanvas.width = imgScalar * img.width;
+								imgCanvas.height = imgScalar * img.height;
 
-								// and then hash the stripped image for memoization
-								var strippedImgB64 = imgCanvas.toDataURL("image/png");
-								var simpleHash = Array.from(strippedImgB64).reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
-								if (seenImages.has(simpleHash)) {
+								let imgContext = imgCanvas.getContext("2d");
+								imgContext.drawImage(img, 0, 0, imgCanvas.width, imgCanvas.height);
+								console.log(`... (${imgCanvas.width}x${imgCanvas.height}) drawing took ${performance.now() - start} milliseconds`);
+
+								start = performance.now();
+								const data = imgContext.getImageData(0, 0, imgCanvas.width, imgCanvas.height);
+								console.log(`... (${imgCanvas.width}x${imgCanvas.height}) getting data took ${performance.now() - start} milliseconds`);
+
+								// calculate fast hash of the image data
+								start = performance.now();
+								let hash = 0;
+								for (const b of data.data) {
+									hash = ((hash << 5) - hash) + b;
+								}
+								console.log(`... (${imgCanvas.width}x${imgCanvas.height}) fast hashing took ${performance.now() - start} milliseconds: ${hash}`);
+
+								// calculate slow hash
+								start = performance.now();
+								let strippedImgB64 = imgCanvas.toDataURL("image/png");
+								let slowHash = Array.from(strippedImgB64).reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
+								console.log(`... (${imgCanvas.width}x${imgCanvas.height}) slow hashing took ${performance.now() - start} milliseconds: ${slowHash}`);
+
+								// don't include time to add image to feed
+								console.log("%c[🐍 pysssss]", "color: limegreen", `Image deduplication (${imgCanvas.width}x${imgCanvas.height}) took ${performance.now() - startTime}ms: ${fingerprint}`);
+
+								// add image to feed if we've never seen the hash before
+								if (seenImages.has(hash)) {
 									// NOOP: image is a duplicate
 								} else {
 									// if we got to here, then the image is unique--so add to feed
-									seenImages.set(simpleHash, true);
+									seenImages.set(hash, true);
 									addImageToFeed(href);
 								}
-
-								// calculate the size of the image based on the stripped base64 data: ((4 * n / 3) + 3) & ~3 bytes, for n b64 chars
-								// source: https://stackoverflow.com/a/32140193
-								const imgSizeBytes = ((4 * strippedImgB64.length / 3) + 3) & ~3;
-								const imgSizeMB = (imgSizeBytes / 1048576).toFixed(2);
-								const endTime = performance.now();
-								console.log("%c[🐍 pysssss]", "color: limegreen", `Image deduplication (${imgSizeMB} MB) took ${endTime - startTime}ms: ${fingerprint}`);
 							}
 						}
 					} else {

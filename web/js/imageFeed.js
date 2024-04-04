@@ -535,10 +535,7 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 								addImageToFeed(href);
 							}
 							img.onload = () => {
-								console.log(`... (${img.width}x${img.height}) fetching image took ${performance.now() - start} milliseconds`);
-
 								// redraw the image onto a canvas to strip metadata (resize if performance mode)
-								let start = performance.now();
 								let imgCanvas = document.createElement("canvas");
 								let imgScalar = deduplicateFeed.value;
 								imgCanvas.width = imgScalar * img.width;
@@ -546,11 +543,7 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 
 								let imgContext = imgCanvas.getContext("2d");
 								imgContext.drawImage(img, 0, 0, imgCanvas.width, imgCanvas.height);
-								console.log(`... (${imgCanvas.width}x${imgCanvas.height}) drawing took ${performance.now() - start} milliseconds`);
-
-								start = performance.now();
 								const data = imgContext.getImageData(0, 0, imgCanvas.width, imgCanvas.height);
-								console.log(`... (${imgCanvas.width}x${imgCanvas.height}) getting data took ${performance.now() - start} milliseconds`);
 
 								// calculate fast hash of the image data
 								start = performance.now();
@@ -558,13 +551,6 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 								for (const b of data.data) {
 									hash = ((hash << 5) - hash) + b;
 								}
-								console.log(`... (${imgCanvas.width}x${imgCanvas.height}) fast hashing took ${performance.now() - start} milliseconds: ${hash}`);
-
-								// calculate slow hash
-								start = performance.now();
-								let strippedImgB64 = imgCanvas.toDataURL("image/png");
-								let slowHash = Array.from(strippedImgB64).reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
-								console.log(`... (${imgCanvas.width}x${imgCanvas.height}) slow hashing took ${performance.now() - start} milliseconds: ${slowHash}`);
 
 								// don't include time to add image to feed
 								console.log("%c[🐍 pysssss]", "color: limegreen", `Image deduplication (${imgCanvas.width}x${imgCanvas.height}) took ${performance.now() - startTime}ms: ${fingerprint}`);

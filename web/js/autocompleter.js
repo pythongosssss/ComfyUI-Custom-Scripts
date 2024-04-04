@@ -1,7 +1,7 @@
 import { app } from "../../../scripts/app.js";
 import { ComfyWidgets } from "../../../scripts/widgets.js";
-import { api } from "../../../../scripts/api.js";
-import { $el, ComfyDialog } from "../../../../scripts/ui.js";
+import { api } from "../../../scripts/api.js";
+import { $el, ComfyDialog } from "../../../scripts/ui.js";
 import { TextAreaAutoComplete } from "./common/autocomplete.js";
 import { ModelInfoDialog } from "./common/modelInfoDialog.js";
 import { LoraInfoDialog } from "./modelInfo.js";
@@ -275,57 +275,6 @@ const id = "pysssss.AutoCompleter";
 app.registerExtension({
 	name: id,
 	init() {
-		async function addEmbeddings() {
-			const embeddings = await api.getEmbeddings();
-			const words = {};
-			words["embedding:"] = { text: "embedding:" };
-
-			for (const emb of embeddings) {
-				const v = `embedding:${emb}`;
-				words[v] = {
-					text: v,
-					info: () => new EmbeddingInfoDialog(emb).show("embeddings", emb),
-					use_replacer: false,
-				};
-			}
-
-			TextAreaAutoComplete.updateWords("pysssss.embeddings", words);
-		}
-
-		async function addLoras() {
-			const loras = await api
-				.fetchApi("/pysssss/loras", { cache: "no-store" })
-				.then(res => res.json());
-			const words = {};
-			words["lora:"] = { text: "lora:" };
-
-			for (const lora of loras) {
-				const v = `<lora:${lora}:1.0>`;
-				words[v] = {
-					text: v,
-					info: () => new LoraInfoDialog(lora).show("loras", lora),
-					use_replacer: false,
-				};
-			}
-
-			TextAreaAutoComplete.updateWords("pysssss.loras", words);
-		}
-
-		// store global words with/without loras
-		Promise.all([addEmbeddings(), addCustomWords()])
-            .then(() => {
-                TextAreaAutoComplete.globalWordsExclLoras = Object.assign(
-                    {},
-                    TextAreaAutoComplete.globalWords
-                );
-            })
-            .then(addLoras)
-			.then(() => {
-                if (!TextAreaAutoComplete.lorasEnabled) {
-					toggleLoras(); // off by default
-				}
-            });
-
 		const STRING = ComfyWidgets.STRING;
 		const SKIP_WIDGETS = new Set(["ttN xyPlot.x_values", "ttN xyPlot.y_values"]);
 		ComfyWidgets.STRING = function (node, inputName, inputData) {
@@ -517,6 +466,29 @@ app.registerExtension({
 								),
 							]
 						),
+						$el(
+							"label",
+							{
+								textContent: "Max suggestions: ",
+								style: {
+									display: "block",
+								},
+							},
+							[
+								$el("input", {
+									type: "number",
+									value: +TextAreaAutoComplete.suggestionCount,
+									style: {
+										width: "80px"
+									},
+									onchange: (event) => {
+										const value = +event.target.value;
+										TextAreaAutoComplete.suggestionCount = value;;
+										localStorage.setItem(id + ".SuggestionCount", TextAreaAutoComplete.suggestionCount);
+									},
+								}),
+							]
+						),
 						$el("button", {
 							textContent: "Manage Custom Words",
 							onclick: () => {
@@ -539,6 +511,62 @@ app.registerExtension({
 		TextAreaAutoComplete.insertOnTab = localStorage.getItem(id + ".InsertOnTab") !== "false";
 		TextAreaAutoComplete.insertOnEnter = localStorage.getItem(id + ".InsertOnEnter") !== "false";
 		TextAreaAutoComplete.lorasEnabled = localStorage.getItem(id + ".ShowLoras") === "true";
+		TextAreaAutoComplete.suggestionCount = +localStorage.getItem(id + ".SuggestionCount");
+	},
+	setup() {
+		async function addEmbeddings() {
+			const embeddings = await api.getEmbeddings();
+			const words = {};
+			words["embedding:"] = { text: "embedding:" };
+
+			for (const emb of embeddings) {
+				const v = `embedding:${emb}`;
+				words[v] = {
+					text: v,
+					info: () => new EmbeddingInfoDialog(emb).show("embeddings", emb),
+					use_replacer: false,
+				};
+			}
+
+			TextAreaAutoComplete.updateWords("pysssss.embeddings", words);
+		}
+
+		async function addLoras() {
+			let loras;
+			try {
+				loras = LiteGraph.registered_node_types["LoraLoader"]?.nodeData.input.required.lora_name[0];
+			} catch (error) {}
+
+			if (!loras?.length) {
+				loras = await api.fetchApi("/pysssss/loras", { cache: "no-store" }).then((res) => res.json());
+			}
+
+			const words = {};
+			words["lora:"] = { text: "lora:" };
+
+			for (const lora of loras) {
+				const v = `<lora:${lora}:1.0>`;
+				words[v] = {
+					text: v,
+					info: () => new LoraInfoDialog(lora).show("loras", lora),
+					use_replacer: false,
+				};
+			}
+
+			TextAreaAutoComplete.updateWords("pysssss.loras", words);
+		}
+
+		// store global words with/without loras
+		Promise.all([addEmbeddings(), addCustomWords()])
+			.then(() => {
+				TextAreaAutoComplete.globalWordsExclLoras = Object.assign({}, TextAreaAutoComplete.globalWords);
+			})
+			.then(addLoras)
+			.then(() => {
+				if (!TextAreaAutoComplete.lorasEnabled) {
+					toggleLoras(); // off by default
+				}
+			});
 	},
 	beforeRegisterNodeDef(_, def) {
 		// Process each input to see if there is a custom word list for

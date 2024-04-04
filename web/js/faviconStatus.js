@@ -6,7 +6,7 @@ import { app } from "../../../scripts/app.js";
 
 app.registerExtension({
 	name: "pysssss.FaviconStatus",
-	setup() {
+	async setup() {
 		let link = document.querySelector("link[rel~='icon']");
 		if (!link) {
 			link = document.createElement("link");
@@ -14,8 +14,22 @@ app.registerExtension({
 			document.head.appendChild(link);
 		}
 
+		const getUrl = (active, user) => new URL(`assets/favicon${active ? "-active" : ""}${user ? ".user" : ""}.ico`, import.meta.url);
+		const testUrl = async (active) => {
+			const url = getUrl(active, true);
+			const r = await fetch(url, {
+				method: "HEAD",
+			});
+			if (r.status === 200) {
+				return url;
+			}
+			return getUrl(active, false);
+		};
+		const activeUrl = await testUrl(true);
+		const idleUrl = await testUrl(false);
+
 		let executing = false;
-		const update = () => (link.href = new URL(`assets/favicon${executing ? "-active" : ""}.ico`, import.meta.url));
+		const update = () => (link.href = executing ? activeUrl : idleUrl);
 
 		for (const e of ["execution_start", "progress"]) {
 			api.addEventListener(e, () => {

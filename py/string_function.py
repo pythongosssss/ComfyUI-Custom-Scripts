@@ -7,11 +7,11 @@ class StringFunction:
             "required": {
                 "action": (["append", "replace"], {}),
                 "tidy_tags": (["yes", "no"], {}),
-                "text_a": ("STRING", {"multiline": True}),
-                "text_b": ("STRING", {"multiline": True}),
+                "text_a": ("STRING", {"multiline": True, "dynamicPrompts": False}),
+                "text_b": ("STRING", {"multiline": True, "dynamicPrompts": False}),
             },
             "optional": {
-                "text_c": ("STRING", {"multiline": True})
+                "text_c": ("STRING", {"multiline": True, "dynamicPrompts": False})
             }
         }
 

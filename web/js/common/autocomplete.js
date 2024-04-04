@@ -238,6 +238,7 @@ class TextAreaCaretHelper {
 			fontSize: computedStyle.fontSize,
 			fontFamily: computedStyle.fontFamily,
 			padding: "0",
+			position: "absolute",
 		});
 		body.appendChild(tempNode);
 
@@ -291,10 +292,46 @@ class TextAreaCaretHelper {
 			const startPos = this.el.selectionStart;
 			const endPos = this.el.selectionEnd;
 
-			this.el.value = this.el.value.substring(0, startPos + offset) + value + this.el.value.substring(endPos, this.el.value.length);
+			// Move selection to beginning of offset
+			this.el.selectionStart = this.el.selectionStart + offset;
+
+			// Using execCommand to support undo, but since it's officially 
+			// 'deprecated' we need a backup solution, but it won't support undo :(
+			let pasted = true;
+			try {
+				if (!document.execCommand("insertText", false, value)) {
+					pasted = false;
+				}
+			} catch (e) {
+				console.error("Error caught during execCommand:", e);
+				pasted = false;
+			}
+
+			if (!pasted) {
+				console.error(
+					"execCommand unsuccessful; not supported. Adding text manually, no undo support.");
+				textarea.setRangeText(modifiedText, this.el.selectionStart, this.el.selectionEnd, 'end');
+			}
+
 			this.el.selectionEnd = this.el.selectionStart = startPos + value.length + offset + (finalOffset ?? 0);
 		} else {
-			this.el.value += value;
+			// Using execCommand to support undo, but since it's officially 
+			// 'deprecated' we need a backup solution, but it won't support undo :(
+			let pasted = true;
+			try {
+				if (!document.execCommand("insertText", false, value)) {
+					pasted = false;
+				}
+			} catch (e) {
+				console.error("Error caught during execCommand:", e);
+				pasted = false;
+			}
+
+			if (!pasted) {
+				console.error(
+					"execCommand unsuccessful; not supported. Adding text manually, no undo support.");
+				this.el.value += value;
+			}
 		}
 	}
 }
@@ -318,6 +355,7 @@ export class TextAreaAutoComplete {
 	static insertOnEnter = true;
 	static replacer = undefined;
 	static lorasEnabled = false;
+	static suggestionCount = 20;
 
 	/** @type {Record<string, Record<string, AutoCompleteEntry>>} */
 	static groups = {};
@@ -492,7 +530,7 @@ export class TextAreaAutoComplete {
 		);
 
 		const top = priorityMatches.length * 0.2;
-		return priorityMatches.slice(0, top).concat(prefixMatches, priorityMatches.slice(top), includesMatches).slice(0, 20);
+		return priorityMatches.slice(0, top).concat(prefixMatches, priorityMatches.slice(top), includesMatches).slice(0, TextAreaAutoComplete.suggestionCount);
 	}
 
 	#update() {
@@ -612,6 +650,7 @@ export class TextAreaAutoComplete {
 		const position = this.helper.getCursorOffset();
 		this.dropdown.style.left = (position.left ?? 0) + "px";
 		this.dropdown.style.top = (position.top ?? 0) + "px";
+		this.dropdown.style.maxHeight = (window.innerHeight - position.top) + "px";
 	}
 
 	#hide() {

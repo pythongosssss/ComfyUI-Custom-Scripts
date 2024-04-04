@@ -523,7 +523,6 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 					// but when deduplication is disabled, this value is "0"
 					if (deduplicateFeed.value > 0) {
 						// deduplicate by ignoring images with the same filename/type/subfolder
-						let startTime = performance.now();
 						const fingerprint = JSON.stringify({ filename: src.filename, type: src.type, subfolder: src.subfolder });
 						if (seenImages.has(fingerprint)) {
 							// NOOP: image is a duplicate
@@ -546,14 +545,10 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 								const data = imgContext.getImageData(0, 0, imgCanvas.width, imgCanvas.height);
 
 								// calculate fast hash of the image data
-								start = performance.now();
 								let hash = 0;
 								for (const b of data.data) {
 									hash = ((hash << 5) - hash) + b;
 								}
-
-								// don't include time to add image to feed
-								console.log("%c[🐍 pysssss]", "color: limegreen", `Image deduplication (${imgCanvas.width}x${imgCanvas.height}) took ${performance.now() - startTime}ms: ${fingerprint}`);
 
 								// add image to feed if we've never seen the hash before
 								if (seenImages.has(hash)) {

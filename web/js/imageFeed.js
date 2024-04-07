@@ -211,6 +211,7 @@ app.registerExtension({
 	name: "pysssss.ImageFeed",
 	async setup() {
 		let visible = true;
+		const seenImages = new Map();
 		const showButton = $el("button.comfy-settings-btn", {
 			textContent: "🖼️",
 			style: {
@@ -334,6 +335,27 @@ app.registerExtension({
 			},
 		});
 
+		const deduplicateFeed = app.ui.settings.addSetting({
+			id: "pysssss.ImageFeed.Deduplication",
+			name: "🐍 Image Feed Deduplication",
+			tooltip: `Ensures unique images in the image feed but at the cost of CPU-bound performance impact \
+(from hundreds of milliseconds to seconds per image, depending on byte size). For workflows that produce duplicate images, turning this setting on may yield overall client-side performance improvements \
+by reducing the number of images in the feed.
+
+Recommended: "enabled (max performance)" uness images are erroneously deduplicated.`,
+			defaultValue: 0,
+			type: "combo",
+			options: (value) => {
+				let dedupeOptions = {"disabled": 0, "enabled (slow)": 1, "enabled (performance)": 0.5, "enabled (max performance)": 0.25};
+				return Object.entries(dedupeOptions).map(([k, v]) => ({
+						value: v,
+						text: k,
+						selected: k === value,
+					})
+				)
+			},
+		});
+
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
 			textContent: "Clear",
 			onclick: () => {
@@ -362,6 +384,27 @@ app.registerExtension({
 			columnInput.max = Math.max(10, v, columnInput.max);
 			columnInput.value = v;
 			window.dispatchEvent(new Event("resize"));
+		}
+
+		function addImageToFeed(href) {
+			const method = feedDirection.value === "newest first" ? "prepend" : "append";
+			imageList[method](
+				$el("div", [
+					$el(
+						"a",
+						{
+							target: "_blank",
+							href,
+							onclick: (e) => {
+								const imgs = [...imageList.querySelectorAll("img")].map((img) => img.getAttribute("src"));
+								lightbox.show(imgs, imgs.indexOf(href));
+								e.preventDefault();
+							},
+						},
+						[$el("img", { src: href })]
+					),
+				])
+			);
 		}
 
 		imageFeed.append(
@@ -452,33 +495,53 @@ app.registerExtension({
 				}
 
 				for (const src of detail.output.images) {
-					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type}&subfolder=${encodeURIComponent(
-						src.subfolder
-					)}&t=${+new Date()}`;
+					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type}&
+					subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
 
-					const method = feedDirection.value === "newest first" ? "prepend" : "append";
-					imageList[method](
-						$el("div", [
-							$el(
-								"a",
-								{
-									target: "_blank",
-									href,
-									onclick: (e) => {
-										const imgs = [...imageList.querySelectorAll("img")].map((img) => img.getAttribute("src"));
-										lightbox.show(imgs, imgs.indexOf(href));
-										e.preventDefault();
-									},
-								},
-								[$el("img", { src: href })]
-							),
-						])
-					);
-					// If lightbox is open, update it with new image
-					lightbox.updateWithNewImage(href, feedDirection.value);
-					setTimeout(() => {
-						window.dispatchEvent(new Event("resize"));
-					}, 1);
+					// deduplicateFeed.value is essentially the scaling factor used for image hashing
+					// but when deduplication is disabled, this value is "0"
+					if (deduplicateFeed.value > 0) {
+						// deduplicate by ignoring images with the same filename/type/subfolder
+						const fingerprint = JSON.stringify({ filename: src.filename, type: src.type, subfolder: src.subfolder });
+						if (seenImages.has(fingerprint)) {
+							// NOOP: image is a duplicate
+						} else {
+							seenImages.set(fingerprint, true);
+							let img = $el("img", { src: href })
+							img.onerror = () => {
+								// fall back to default behavior
+								addImageToFeed(href);
+							}
+							img.onload = () => {
+								// redraw the image onto a canvas to strip metadata (resize if performance mode)
+								let imgCanvas = document.createElement("canvas");
+								let imgScalar = deduplicateFeed.value;
+								imgCanvas.width = imgScalar * img.width;
+								imgCanvas.height = imgScalar * img.height;
+
+								let imgContext = imgCanvas.getContext("2d");
+								imgContext.drawImage(img, 0, 0, imgCanvas.width, imgCanvas.height);
+								const data = imgContext.getImageData(0, 0, imgCanvas.width, imgCanvas.height);
+
+								// calculate fast hash of the image data
+								let hash = 0;
+								for (const b of data.data) {
+									hash = ((hash << 5) - hash) + b;
+								}
+
+								// add image to feed if we've never seen the hash before
+								if (seenImages.has(hash)) {
+									// NOOP: image is a duplicate
+								} else {
+									// if we got to here, then the image is unique--so add to feed
+									seenImages.set(hash, true);
+									addImageToFeed(href);
+								}
+							}
+						}
+					} else {
+						addImageToFeed(href);
+					}
 				}
 			}
 		});

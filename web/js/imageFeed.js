@@ -407,27 +407,6 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			);
 		}
 
-		function addImageToFeed(href) {
-			const method = feedDirection.value === "newest first" ? "prepend" : "append";
-			imageList[method](
-				$el("div", [
-					$el(
-						"a",
-						{
-							target: "_blank",
-							href,
-							onclick: (e) => {
-								const imgs = [...imageList.querySelectorAll("img")].map((img) => img.getAttribute("src"));
-								lightbox.show(imgs, imgs.indexOf(href));
-								e.preventDefault();
-							},
-						},
-						[$el("img", { src: href })]
-					),
-				])
-			);
-		}
-
 		imageFeed.append(
 			$el("div.pysssss-image-feed-menu", [
 				$el("section.sizing-menu", {}, [

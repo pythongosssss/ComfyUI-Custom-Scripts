@@ -100,7 +100,7 @@ const ext = {
 			const mouseY = this.graph_mouse[1];
 			let shiftX = 0;
 			let shiftY = 0;
-			if (snapToGrid && !dndState.ctrlDown && dndState.group) {
+			if (snapToGrid && dndState.group) {
 				// discretize the canvas position to the nearest snappable coordinate,
 				// but account for the diff between mouse and group positions
 				const g = dndState.group;
@@ -119,9 +119,12 @@ const ext = {
 				g.pos[1] = y;
 
 				// translate all nodes in group, translate them by dx, dy
-				for (const node of g._nodes) {
-					node.pos[0] -= dx;
-					node.pos[1] -= dy;
+				// but don't do this when ctrl is pressed
+				if (!dndState.ctrlDown) {
+					for (const node of g._nodes) {
+						node.pos[0] -= dx;
+						node.pos[1] -= dy;
+					}
 				}
 
 				// ensure the group bounds are snapped to the grid (e.g., when resizing the group)

@@ -102,34 +102,40 @@ const ext = {
 				// discretize the canvas position to the nearest snappable coordinate,
 				// but account for the diff between mouse and group positions
 				const g = dndState.group;
-				shiftX = LiteGraph.CANVAS_GRID_SIZE * Math.round((mouseX - g.pos[0]) / LiteGraph.CANVAS_GRID_SIZE);
-				shiftY = LiteGraph.CANVAS_GRID_SIZE * Math.round((mouseY - g.pos[1]) / LiteGraph.CANVAS_GRID_SIZE);
 
-				let x = LiteGraph.CANVAS_GRID_SIZE * Math.round((mouseX) / LiteGraph.CANVAS_GRID_SIZE);
-				let y = LiteGraph.CANVAS_GRID_SIZE * Math.round((mouseY) / LiteGraph.CANVAS_GRID_SIZE);
-				x -= shiftX;
-				y -= shiftY;
+				if (this.selected_group_resizing) {
+					// snap after redrawing the group during a resize, to avoid flickering title bar
+					// TODO: show preview box like we do for nodes
+					const r = origDrawGroups.apply(this, arguments);
+					// ensure the group bounds are snapped to the grid (e.g., when resizing the group)
+					g.size[0] = LiteGraph.CANVAS_GRID_SIZE * Math.round(g.size[0] / LiteGraph.CANVAS_GRID_SIZE);
+					g.size[1] = LiteGraph.CANVAS_GRID_SIZE * Math.round(g.size[1] / LiteGraph.CANVAS_GRID_SIZE);
+					return r;
+				} else {
+					// unlike resizing, we snap the group and its nodes before redrawing, to avoid flickering
+					shiftX = LiteGraph.CANVAS_GRID_SIZE * Math.round((mouseX - g.pos[0]) / LiteGraph.CANVAS_GRID_SIZE);
+					shiftY = LiteGraph.CANVAS_GRID_SIZE * Math.round((mouseY - g.pos[1]) / LiteGraph.CANVAS_GRID_SIZE);
 
-				// update group position (`move()` does not yield smooth translation across canvas)
-				const dx = g.pos[0] - x;
-				const dy = g.pos[1] - y;
-				g.pos[0] = x;
-				g.pos[1] = y;
-
-				// translate all nodes in group, translate them by dx, dy
-				// but don't do this when ctrl is pressed
-				if (!dndState.ctrlDown) {
-					for (const node of g._nodes) {
-						node.pos[0] -= dx;
-						node.pos[1] -= dy;
-					}
+					let x = LiteGraph.CANVAS_GRID_SIZE * Math.round((mouseX) / LiteGraph.CANVAS_GRID_SIZE);
+					let y = LiteGraph.CANVAS_GRID_SIZE * Math.round((mouseY) / LiteGraph.CANVAS_GRID_SIZE);
+					x -= shiftX;
+					y -= shiftY;
+	
+					// update group position (`move()` does not yield smooth translation across canvas)
+					const dx = g.pos[0] - x;
+					const dy = g.pos[1] - y;
+					g.pos[0] = x;
+					g.pos[1] = y;
+	
+					// translate all nodes in group, translate them by dx, dy
+					// but don't do this when ctrl is pressed
+					if (!dndState.ctrlDown) {
+						for (const node of g._nodes) {
+							node.pos[0] -= dx;
+							node.pos[1] -= dy;
+						}
+					}				
 				}
-
-				// ensure the group bounds are snapped to the grid (e.g., when resizing the group)
-				// caveat: this may resize the group to snap the bounds to the grid, even if the group is not being resized but only being moved
-				g.size[0] = LiteGraph.CANVAS_GRID_SIZE * Math.round(g.size[0] / LiteGraph.CANVAS_GRID_SIZE);
-				g.size[1] = LiteGraph.CANVAS_GRID_SIZE * Math.round(g.size[1] / LiteGraph.CANVAS_GRID_SIZE);
-
 			}
 
 			return origDrawGroups.apply(this, arguments);

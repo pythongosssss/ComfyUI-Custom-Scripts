@@ -80,8 +80,6 @@ const ext = {
 			const r = onMouseDown?.apply(this, arguments);
 			const group = this.graph.getGroupOnPos(this.graph_mouse[0], this.graph_mouse[1]);
 			dndState.group = group;
-			dndState.origMouseX = this.graph_mouse[0];
-			dndState.origMouseY = this.graph_mouse[1];
 			return r;
 		};
 

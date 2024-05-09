@@ -20,15 +20,7 @@ class StringFunction:
     CATEGORY = "utils"
     OUTPUT_NODE = True
 
-    def exec(self, action, tidy_tags, text_a="", text_b="", text_c=""):
-        # Converted inputs are sent as the string of 'undefined' if not connected
-        if text_a == "undefined":
-            text_a = ""
-        if text_b == "undefined":
-            text_b = ""
-        if text_c == "undefined":
-            text_c = ""
-            
+    def exec(self, action, tidy_tags, text_a="", text_b="", text_c=""):     
         tidy_tags = tidy_tags == "yes"
         out = ""
         if action == "append":

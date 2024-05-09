@@ -34,7 +34,10 @@ class StringFunction:
            else:
                out = text_a.replace(text_b, text_c)
         if tidy_tags:
-            out = out.replace("  ", " ").replace(" ,", ",").replace(",,", ",").replace(",,", ",")
+            out = re.sub(r"\s{2,}", " ", out)
+            out = out.replace(" ,", ",")
+            out = re.sub(r",{2,}", ",", out)
+            out = out.strip()
         return {"ui": {"text": (out,)}, "result": (out,)}
             
 NODE_CLASS_MAPPINGS = {

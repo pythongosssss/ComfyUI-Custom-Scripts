@@ -7,10 +7,10 @@ class StringFunction:
             "required": {
                 "action": (["append", "replace"], {}),
                 "tidy_tags": (["yes", "no"], {}),
-                "text_a": ("STRING", {"multiline": True, "dynamicPrompts": False}),
-                "text_b": ("STRING", {"multiline": True, "dynamicPrompts": False}),
             },
             "optional": {
+                "text_a": ("STRING", {"multiline": True, "dynamicPrompts": False}),
+                "text_b": ("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "text_c": ("STRING", {"multiline": True, "dynamicPrompts": False})
             }
         }
@@ -20,7 +20,7 @@ class StringFunction:
     CATEGORY = "utils"
     OUTPUT_NODE = True
 
-    def exec(self, action, tidy_tags, text_a, text_b, text_c=""):
+    def exec(self, action, tidy_tags, text_a="", text_b="", text_c=""):
         # Converted inputs are sent as the string of 'undefined' if not connected
         if text_a == "undefined":
             text_a = ""

@@ -12,7 +12,11 @@ operators = {
     ast.Pow: op.pow,
     ast.BitXor: op.xor,
     ast.USub: op.neg,
-    ast.Mod: op.mod
+    ast.Mod: op.mod,
+    ast.BitAnd: op.and_,
+    ast.BitOr: op.or_,
+    ast.Invert: op.invert,
+    ast.And: op.and_,
 }
 
 # TODO: restructure args to provide more info, generate hint based on args to save duplication
@@ -51,6 +55,16 @@ functions = {
         "args": (2, None),
         "call": lambda *args: random.choice(args),
         "hint": "...numbers"
+    },
+    "sqrt": {
+        "args": (1, 1),
+        "call": lambda a: math.sqrt(a),
+        "hint": "number"
+    },
+    "int": {
+        "args": (1, 1),
+        "call": lambda a = None: int(a),
+        "hint": "number"
     },
 }
 
@@ -140,7 +154,11 @@ class MathExpression:
             if isinstance(node, ast.Num):
                 return node.n
             elif isinstance(node, ast.BinOp):
-                return operators[type(node.op)](float(eval_expr(node.left)), float(eval_expr(node.right)))
+                l = eval_expr(node.left)
+                r = eval_expr(node.right)
+                l = l if isinstance(l, int) else float(l)
+                r = r if isinstance(r, int) else float(r)
+                return operators[type(node.op)](l, r)
             elif isinstance(node, ast.UnaryOp):
                 return operators[type(node.op)](eval_expr(node.operand))
             elif isinstance(node, ast.Attribute):

@@ -103,6 +103,12 @@ Adds various menu items to some nodes for quickly setting up common parts of gra
 Plays a sound when the node is executed, either after each prompt or only when the queue is empty for queuing multiple prompts.  
 You can customize the sound by replacing the mp3 file `web/extensions/pysssss/CustomScripts/assets\notify.mp3`
 
+## System Notification
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/30354775/993fd783-5cd6-4779-aa97-173bc06cc405)
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/30354775/e45227fb-5714-4f45-b96b-6601902ef6e2)
+
+Sends a system notification via the browser when the node is executed, either after each prompt or only when the queue is empty for queuing multiple prompts.
+
 ## [WIP] Repeater
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/ec0dac25-14e4-4d44-b975-52193656709d)
 Node allows you to either create a list of N repeats of the input node, or create N outputs from the input node.  

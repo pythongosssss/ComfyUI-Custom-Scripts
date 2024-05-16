@@ -405,6 +405,8 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 					),
 				])
 			);
+			// If lightbox is open, update it with new image
+			lightbox.updateWithNewImage(href, feedDirection.value);
 		}
 
 		imageFeed.append(

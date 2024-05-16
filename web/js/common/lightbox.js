@@ -62,6 +62,13 @@ export class Lightbox {
 			onclick: (e) => {
 				e.stopImmediatePropagation();
 			},
+			onwheel: (e) => {
+				if (!(e instanceof WheelEvent)) {
+					return;
+				}
+				const direction = Math.sign(e.deltaY);
+				this.update(direction);
+			},
 		});
 	}
 

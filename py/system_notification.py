@@ -8,10 +8,11 @@ class AnyType(str):
 any = AnyType("*")
 
 
-class PlaySound:
+class SystemNotification:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {
+            "message": ("STRING", {"default": "Your notification has triggered."}),
             "any": (any, {}),
             "mode": (["always", "on empty queue"], {}),
         }}
@@ -27,12 +28,12 @@ class PlaySound:
     def IS_CHANGED(self, **kwargs):
         return float("NaN")
 
-    def nop(self, any, mode):
+    def nop(self, any, **kwargs):
         return {"ui": {"a": []}, "result": (any,)}
 
 
 NODE_CLASS_MAPPINGS = {
-    "SystemNotification|pysssss": PlaySound,
+    "SystemNotification|pysssss": SystemNotification,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

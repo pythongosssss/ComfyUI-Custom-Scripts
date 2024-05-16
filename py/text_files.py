@@ -132,6 +132,8 @@ class LoadText(TextFileNode):
 
 
 class SaveText(TextFileNode):
+    OUTPUT_NODE = True
+    
     @classmethod
     def IS_CHANGED(self, **kwargs):
         return float("nan")

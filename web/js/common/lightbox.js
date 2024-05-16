@@ -63,7 +63,7 @@ export class Lightbox {
 				e.stopImmediatePropagation();
 			},
 			onwheel: (e) => {
-				if (!(e instanceof WheelEvent)) {
+				if (!(e instanceof WheelEvent) || e.ctrlKey) {
 					return;
 				}
 				const direction = Math.sign(e.deltaY);

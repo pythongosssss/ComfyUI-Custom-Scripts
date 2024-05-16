@@ -85,7 +85,7 @@ def populate_items(names, type):
 
         file_path_no_ext = os.path.splitext(file_path)[0]
 
-        for ext in ["png", "jpg", "jpeg", "preview.png"]:
+        for ext in ["png", "jpg", "jpeg", "preview.png", "preview.jpeg"]:
             has_image = os.path.isfile(file_path_no_ext + "." + ext)
             if has_image:
                 item_image = f"{file_name}.{ext}"

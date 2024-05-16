@@ -7,10 +7,10 @@ class StringFunction:
             "required": {
                 "action": (["append", "replace"], {}),
                 "tidy_tags": (["yes", "no"], {}),
-                "text_a": ("STRING", {"multiline": True, "dynamicPrompts": False}),
-                "text_b": ("STRING", {"multiline": True, "dynamicPrompts": False}),
             },
             "optional": {
+                "text_a": ("STRING", {"multiline": True, "dynamicPrompts": False}),
+                "text_b": ("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "text_c": ("STRING", {"multiline": True, "dynamicPrompts": False})
             }
         }
@@ -20,15 +20,7 @@ class StringFunction:
     CATEGORY = "utils"
     OUTPUT_NODE = True
 
-    def exec(self, action, tidy_tags, text_a, text_b, text_c=""):
-        # Converted inputs are sent as the string of 'undefined' if not connected
-        if text_a == "undefined":
-            text_a = ""
-        if text_b == "undefined":
-            text_b = ""
-        if text_c == "undefined":
-            text_c = ""
-            
+    def exec(self, action, tidy_tags, text_a="", text_b="", text_c=""):     
         tidy_tags = tidy_tags == "yes"
         out = ""
         if action == "append":
@@ -42,7 +34,10 @@ class StringFunction:
            else:
                out = text_a.replace(text_b, text_c)
         if tidy_tags:
-            out = out.replace("  ", " ").replace(" ,", ",").replace(",,", ",").replace(",,", ",")
+            out = re.sub(r"\s{2,}", " ", out)
+            out = out.replace(" ,", ",")
+            out = re.sub(r",{2,}", ",", out)
+            out = out.strip()
         return {"ui": {"text": (out,)}, "result": (out,)}
             
 NODE_CLASS_MAPPINGS = {

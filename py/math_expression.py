@@ -157,7 +157,7 @@ class MathExpression:
 
         lookup = {"a": a, "b": b, "c": c}
 
-        def eval_op(l, r):
+        def eval_op(node, l, r):
             l = eval_expr(l)
             r = eval_expr(r)
             l = l if isinstance(l, int) else float(l)
@@ -168,9 +168,9 @@ class MathExpression:
             if isinstance(node, ast.Constant) or isinstance(node, ast.Num):
                 return node.n
             elif isinstance(node, ast.BinOp):
-                return eval_op(node.left, node.right)
+                return eval_op(node, node.left, node.right)
             elif isinstance(node, ast.BoolOp):
-                return eval_op(node.values[0], node.values[1])
+                return eval_op(node, node.values[0], node.values[1])
             elif isinstance(node, ast.UnaryOp):
                 return operators[type(node.op)](eval_expr(node.operand))
             elif isinstance(node, ast.Attribute):

@@ -1,6 +1,6 @@
 [project]
 name = "comfyui-custom-scripts"
-description = "This extension provides: Auto Arrange Graph, Workflow SVG, Favicon Status, Image Feed, Latent Upscale By, Lock Nodes & Groups, Lora Subfolders, Preset Text, Show Text, Touch Support, Link Render Mode, Locking, Node Finder, Quick Nodes, Show Image On Menu, Show Text, Workflow Managements, Custom Widget Default Values"
+description = "Enhancements & experiments for ComfyUI, mostly focusing on UI features"
 version = "1.0.0"
 license = "LICENSE"
 
@@ -8,6 +8,6 @@ license = "LICENSE"
 Repository = "https://github.com/pythongosssss/ComfyUI-Custom-Scripts"
 
 [tool.comfy]
-PublisherId = ""
+PublisherId = "pythongosssss"
 DisplayName = "ComfyUI-Custom-Scripts"
 Icon = ""

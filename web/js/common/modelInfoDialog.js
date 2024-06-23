@@ -249,8 +249,9 @@ export class ModelInfoDialog extends ComfyDialog {
 					})
 				);
 
-				if (info.images?.length) {
-					this.img.src = info.images[0].url;
+				const preview = info.images.find((i) => i.type === "image");
+				if (preview) {
+					this.img.src = preview.url;
 					this.img.style.display = "";
 
 					this.imgSave = $el("button", {

@@ -37,6 +37,9 @@ $el("style", {
 		min-width: 200px;
 		max-width: calc(var(--max-size, 10) * 1vw);
 	}
+	.comfyui-body-left .pysssss-image-feed--left, .comfyui-body-right .pysssss-image-feed--right {
+		height: 100%;
+	}
 	.pysssss-image-feed--left {
 		left: 0;
 	}

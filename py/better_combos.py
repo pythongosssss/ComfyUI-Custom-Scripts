@@ -106,6 +106,17 @@ class LoraLoaderWithImages(LoraLoader):
         populate_items(names, "loras")
         return types
 
+    @classmethod
+    def VALIDATE_INPUTS(s, lora_name):
+        types = super().INPUT_TYPES()
+        names = types["required"]["lora_name"][0]
+
+        name = lora_name["content"]
+        if name in names:
+            return True
+        else:
+            return f"Lora not found: {name}"
+
     def load_lora(self, **kwargs):
         kwargs["lora_name"] = kwargs["lora_name"]["content"]
         return super().load_lora(**kwargs)
@@ -118,6 +129,17 @@ class CheckpointLoaderSimpleWithImages(CheckpointLoaderSimple):
         names = types["required"]["ckpt_name"][0]
         populate_items(names, "checkpoints")
         return types
+
+    @classmethod
+    def VALIDATE_INPUTS(s, ckpt_name):
+        types = super().INPUT_TYPES()
+        names = types["required"]["ckpt_name"][0]
+
+        name = ckpt_name["content"]
+        if name in names:
+            return True
+        else:
+            return f"Checkpoint not found: {name}"
 
     def load_checkpoint(self, **kwargs):
         kwargs["ckpt_name"] = kwargs["ckpt_name"]["content"]

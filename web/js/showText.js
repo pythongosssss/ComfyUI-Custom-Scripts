@@ -14,10 +14,9 @@ app.registerExtension({
 					this.widgets.length = 1;
 				}
 
-				const v = [...text];
-				if (!v[0]) {
-					v.shift();
-				}
+				const lastText = text.at(-1);
+				const v = lastText !== undefined ? [lastText] : [];
+				
 				for (const list of v) {
 					const w = ComfyWidgets["STRING"](this, "text", ["STRING", { multiline: true }], app).widget;
 					w.inputEl.readOnly = true;

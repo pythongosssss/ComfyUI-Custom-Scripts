@@ -19,6 +19,8 @@ operators = {
     ast.And: lambda a, b: 1 if a and b else 0,
     ast.Or: lambda a, b: 1 if a or b else 0,
     ast.Not: lambda a: 0 if a else 1,
+    ast.RShift: op.rshift,
+    ast.LShift: op.lshift
 }
 
 # TODO: restructure args to provide more info, generate hint based on args to save duplication
@@ -235,3 +237,4 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "MathExpression|pysssss": "Math Expression 🐍",
 }
+

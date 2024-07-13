@@ -1,5 +1,7 @@
 # ComfyUI-Custom-Scripts
 
+### ⚠️ While these extensions work for the most part, i'm very busy at the moment and so unable to keep on top of everything here, thanks for your patience!
+
 # Installation
 
 1. Clone the repository:
@@ -102,6 +104,12 @@ Adds various menu items to some nodes for quickly setting up common parts of gra
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/9bcf9fb3-5898-4432-a974-fb1e17d3b7e8)  
 Plays a sound when the node is executed, either after each prompt or only when the queue is empty for queuing multiple prompts.  
 You can customize the sound by replacing the mp3 file `web/extensions/pysssss/CustomScripts/assets\notify.mp3`
+
+## System Notification
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/30354775/993fd783-5cd6-4779-aa97-173bc06cc405)
+![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/30354775/e45227fb-5714-4f45-b96b-6601902ef6e2)
+
+Sends a system notification via the browser when the node is executed, either after each prompt or only when the queue is empty for queuing multiple prompts.
 
 ## [WIP] Repeater
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/ec0dac25-14e4-4d44-b975-52193656709d)

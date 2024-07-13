@@ -1,5 +1,5 @@
 import { app } from "../../../scripts/app.js";
-import { $el, ComfyDialog } from "../../../scripts/ui.js";
+import { $el } from "../../../scripts/ui.js";
 
 let setting, guide_setting, guide_config;
 const id = "pysssss.SnapToGrid";
@@ -13,6 +13,17 @@ const guide_config_default = {
 		enabled: false,
 		fillStyle: "rgba(0, 0, 255, 0.5)",
 	},
+
+/** Wraps the provided function call to set/reset shiftDown when setting is enabled. */
+function wrapCallInSettingCheck(fn) {
+	if (setting?.value) {
+		const shift = app.shiftDown;
+		app.shiftDown = true;
+		const r = fn();
+		app.shiftDown = shift;
+		return r;
+	}
+	return fn();
 }
 
 const ext = {
@@ -115,14 +126,7 @@ const ext = {
 			// Override drawNode to draw the drop position
 			const drawNode = LGraphCanvas.prototype.drawNode;
 			LGraphCanvas.prototype.drawNode = function () {
-				if (setting?.value) {
-					const shift = app.shiftDown;
-					app.shiftDown = true; 
-					const r = drawNode.apply(this, arguments);
-					app.shiftDown = shift;
-					return r;
-				}
-				return drawNode.apply(this, arguments);
+				wrapCallInSettingCheck(() => drawNode.apply(this, arguments));
 			};
 
 			// Override node added to add a resize handler to force grid alignment
@@ -131,17 +135,26 @@ const ext = {
 				const r = onNodeAdded?.apply(this, arguments);
 				const onResize = node.onResize;
 				node.onResize = function () {
-					if (setting?.value) {
-						const shift = app.shiftDown;
-						app.shiftDown = true;
-						const r = onResize?.apply(this, arguments);
-						app.shiftDown = shift;
-						return r;
-					}
-					return onResize?.apply(this, arguments);
+					wrapCallInSettingCheck(() => onResize?.apply(this, arguments));
 				};
 				return r;
 			};
+
+
+			const groupMove = LGraphGroup.prototype.move;
+			LGraphGroup.prototype.move = function(deltax, deltay, ignore_nodes) {
+				wrapCallInSettingCheck(() => groupMove.apply(this, arguments));
+			}
+
+			const canvasDrawGroups = LGraphCanvas.prototype.drawGroups;
+			LGraphCanvas.prototype.drawGroups = function (canvas, ctx) {
+				wrapCallInSettingCheck(() => canvasDrawGroups.apply(this, arguments));
+			}
+
+			const canvasOnGroupAdd = LGraphCanvas.onGroupAdd;
+			LGraphCanvas.onGroupAdd = function() {
+				wrapCallInSettingCheck(() => canvasOnGroupAdd.apply(this, arguments));
+			}
 
 			return configure.apply(this, arguments);
 		};

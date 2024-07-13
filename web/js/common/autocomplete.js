@@ -471,7 +471,7 @@ export class TextAreaAutoComplete {
 					this.#hide();
 					break;
 			}
-		} else if (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight") {
+		} else if (e.key.length > 1 && e.key != "Delete" && e.key != "Backspace") {
 			return;
 		}
 		if (!e.defaultPrevented) {

@@ -37,6 +37,7 @@ class WorkflowImage {
 			width: app.canvas.canvas.width,
 			height: app.canvas.canvas.height,
 			offset: app.canvas.ds.offset,
+			transform: app.canvas.canvas.getContext('2d').getTransform(), // Save the original transformation matrix
 		};
 	}
 
@@ -45,6 +46,7 @@ class WorkflowImage {
 		app.canvas.canvas.width = this.state.width;
 		app.canvas.canvas.height = this.state.height;
 		app.canvas.ds.offset = this.state.offset;
+		app.canvas.canvas.getContext('2d').setTransform(this.state.transform); // Reapply the original transformation matrix
 	}
 
 	updateView(bounds) {

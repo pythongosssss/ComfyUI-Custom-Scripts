@@ -19,7 +19,7 @@ app.registerExtension({
 					v.shift();
 				}
 				for (const list of v) {
-					const w = ComfyWidgets["STRING"](this, "text", ["STRING", { multiline: true }], app).widget;
+					const w = ComfyWidgets["STRING"](this, "text2", ["STRING", { multiline: true }], app).widget;
 					w.inputEl.readOnly = true;
 					w.inputEl.style.opacity = 0.6;
 					w.value = list;
@@ -49,7 +49,7 @@ app.registerExtension({
 			nodeType.prototype.onConfigure = function () {
 				onConfigure?.apply(this, arguments);
 				if (this.widgets_values?.length) {
-					populate.call(this, this.widgets_values);
+					populate.call(this, this.widgets_values.slice(+this.widgets_values.length > 1));
 				}
 			};
 		}

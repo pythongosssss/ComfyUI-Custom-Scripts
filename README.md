@@ -1,5 +1,7 @@
 # ComfyUI-Custom-Scripts
 
+### ⚠️ While these extensions work for the most part, i'm very busy at the moment and so unable to keep on top of everything here, thanks for your patience!
+
 # Installation
 
 1. Clone the repository:

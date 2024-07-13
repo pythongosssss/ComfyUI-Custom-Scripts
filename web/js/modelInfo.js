@@ -239,7 +239,7 @@ function addInfoOption(node, type, infoClass, widgetNamePattern, opts) {
 		if (value?.content) {
 			value = value.content;
 		}
-		if (!value) {
+		if (!value || value === "None") {
 			return;
 		}
 		let optName;

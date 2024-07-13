@@ -230,27 +230,28 @@ class CheckpointInfoDialog extends ModelInfoDialog {
 
 const lookups = {};
 
-function addInfoOption(node, typeName, type, infoClass, widgetName, opts, useValue) {
-	let value = node.widgets.find((w) => w.name === widgetName)?.value;
-	if (value?.content) {
-		value = value.content;
-	}
-	if (!value) {
-		return;
-	}
-	let optName;
-	if (useValue) {
-		const split = value.split(/\.|\\|\//);
+function addInfoOption(node, type, infoClass, widgetNamePattern, opts) {
+	const widgets = widgetNamePattern
+		? node.widgets.filter((w) => w.name === widgetNamePattern || w.name.match(`^${widgetNamePattern}$`))
+		: [node.widgets[0]];
+	for (const widget of widgets) {
+		let value = widget.value;
+		if (value?.content) {
+			value = value.content;
+		}
+		if (!value) {
+			return;
+		}
+		let optName;
+		const split = value.split(/[.\\/]/);
 		optName = split[split.length - 2];
-	} else {
-		optName = `View ${typeName} info...`;
+		opts.push({
+			content: optName,
+			callback: async () => {
+				new infoClass(value).show(type, value);
+			},
+		});
 	}
-	opts.unshift({
-		content: optName,
-		callback: async () => {
-			new infoClass(value).show(type, value);
-		},
-	});
 }
 
 function addTypeOptions(node, typeName, options) {
@@ -260,22 +261,25 @@ function addTypeOptions(node, typeName, options) {
 
 	const widgets = Object.keys(values);
 	const cls = type === "loras" ? LoraInfoDialog : CheckpointInfoDialog;
-	if (widgets.length === 1) {
-		addInfoOption(node, typeName, type, cls, widgets[0] || node.widgets[0].name, options);
+
+	const opts = [];
+	for (const w of widgets) {
+		addInfoOption(node, type, cls, w, opts);
+	}
+
+	if (!opts.length) return;
+
+	if (opts.length === 1) {
+		opts[0].content = `View ${typeName} info...`;
+		options.unshift(opts[0]);
 	} else {
-		const opts = [];
-		for (const w of widgets) {
-			addInfoOption(node, typeName, type, cls, w, opts, true);
-		}
-		if (opts.length) {
-			options.unshift({
-				title: `View ${typeName} info...`,
-				has_submenu: true,
-				submenu: {
-					options: opts,
-				},
-			});
-		}
+		options.unshift({
+			title: `View ${typeName} info...`,
+			has_submenu: true,
+			submenu: {
+				options: opts,
+			},
+		});
 	}
 }
 
@@ -288,10 +292,12 @@ app.registerExtension({
 				name: `🐍 Model Info - ${type} Nodes/Widgets`,
 				type: "text",
 				defaultValue,
-				tooltip: `Comma separated list of NodeTypeName or NodeTypeName.WidgetName that contain ${type} node names that should have the View Info option available.\nIf no widget name is specifed the first widget will be used.`,
+				tooltip: `Comma separated list of NodeTypeName or NodeTypeName.WidgetName that contain ${type} node names that should have the View Info option available.\nIf no widget name is specifed the first widget will be used. Regex matches (e.g. NodeName..*lora_\\d+) are supported in the widget name.`,
 				onChange(value) {
 					lookups[type] = value.split(",").reduce((p, n) => {
-						const split = n.trim().split(".");
+						n = n.trim();
+						const pos = n.indexOf(".");
+						const split = pos === -1 ? [n] : [n.substring(0, pos), n.substring(pos + 1)];
 						p[split[0]] ??= {};
 						p[split[0]][split[1] ?? ""] = true;
 						return p;
@@ -299,12 +305,14 @@ app.registerExtension({
 				},
 			});
 		};
-		addSetting("Lora", ["LoraLoader.lora_name", "LoraLoader|pysssss", "LoraLoaderModelOnly.lora_name"].join(","));
+		addSetting(
+			"Lora",
+			["LoraLoader.lora_name", "LoraLoader|pysssss", "LoraLoaderModelOnly.lora_name", "LoRA Stacker.lora_name.*"].join(",")
+		);
 		addSetting(
 			"Checkpoint",
 			["CheckpointLoader.ckpt_name", "CheckpointLoaderSimple", "CheckpointLoader|pysssss", "Efficient Loader", "Eff. Loader SDXL"].join(",")
 		);
-		console.log(lookups);
 	},
 	beforeRegisterNodeDef(nodeType) {
 		const getExtraMenuOptions = nodeType.prototype.getExtraMenuOptions;

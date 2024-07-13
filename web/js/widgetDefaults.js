@@ -13,13 +13,35 @@ app.registerExtension({
 	},
 	setup() {
 		let defaults;
+		let regexDefaults;
 		let setting;
+
+		const getNodeDefaults = (node, defaults) => {
+			const nodeDefaults = defaults[node.type] ?? {};
+			const propSetBy = {};
+
+			Object.keys(regexDefaults)
+				.filter((r) => new RegExp(r).test(node.type))
+				.reduce((p, n) => {
+					const props = regexDefaults[n];
+					for (const k in props) {
+						// Use the longest matching key as its probably the most specific
+						if (!(k in nodeDefaults) || (k in propSetBy && n.length > propSetBy[k].length)) {
+							propSetBy[k] = n;
+							nodeDefaults[k] = props[k];
+						}
+					}
+					return p;
+				}, nodeDefaults);
+
+			return nodeDefaults;
+		};
 
 		const applyDefaults = (defaults) => {
 			for (const node of Object.values(LiteGraph.registered_node_types)) {
 				const nodeData = node[nodeDataKey];
 				if (!nodeData) continue;
-				const nodeDefaults = defaults[node.type];
+				const nodeDefaults = getNodeDefaults(node, defaults);
 				if (!nodeDefaults) continue;
 				const inputs = { ...(nodeData.input?.required || {}), ...(nodeData.input?.optional || {}) };
 
@@ -42,9 +64,21 @@ app.registerExtension({
 
 		const getDefaults = () => {
 			let items;
+			regexDefaults = {};
 			try {
 				items = JSON.parse(setting.value);
 				items = items.reduce((p, n) => {
+					if (n.node.startsWith("/") && n.node.endsWith("/")) {
+						const name = n.node.substring(1, n.node.length - 1);
+						try {
+							// Validate regex
+							new RegExp(name);
+
+							if (!regexDefaults[name]) regexDefaults[name] = {};
+							regexDefaults[name][n.widget] = n.value;
+						} catch (error) {}
+					}
+
 					if (!p[n.node]) p[n.node] = {};
 					p[n.node][n.widget] = n.value;
 					return p;
@@ -62,7 +96,7 @@ app.registerExtension({
 			onNodeAdded?.apply?.(this, arguments);
 
 			// See if we have any defaults for this type of node
-			const nodeDefaults = defaults[node.constructor.type];
+			const nodeDefaults = getNodeDefaults(node.constructor, defaults);
 			if (!nodeDefaults) return;
 
 			// Dont run if they are pre-configured nodes from load/pastes

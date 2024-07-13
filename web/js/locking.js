@@ -84,7 +84,7 @@ app.registerExtension({
 			const res = drawNodeShape.apply(this, arguments);
 
 			if (node[LOCKED]) {
-				ctx.fillText("🔒", node.size[0] - 20, -10);
+				ctx.fillText("🔒", node.getBounding()[2] - 20, -10);
 			}
 
 			return res;

@@ -13,6 +13,7 @@ const guide_config_default = {
 		enabled: false,
 		fillStyle: "rgba(0, 0, 255, 0.5)",
 	},
+}
 
 /** Wraps the provided function call to set/reset shiftDown when setting is enabled. */
 function wrapCallInSettingCheck(fn) {

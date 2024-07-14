@@ -66,13 +66,13 @@ async def get_examples(request):
     
     file_path_no_ext = os.path.splitext(file_path)[0]
     examples = []
-        
-    if os.path.isfile(file_path_no_ext + ".txt"):
-        examples += ["notes"]
 
     if os.path.isdir(file_path_no_ext):
         examples += sorted(map(lambda t: os.path.relpath(t, file_path_no_ext),
                         glob.glob(file_path_no_ext + "/*.txt")))
+        
+    if os.path.isfile(file_path_no_ext + ".txt"):
+        examples += ["notes"]
    
     return web.json_response(examples)
 
@@ -95,11 +95,9 @@ async def save_example(request):
         example_name += ".txt"
 
     file_path_no_ext = os.path.splitext(file_path)[0]
-    file_name = os.path.split(file_path_no_ext)[1]
-    example_path = os.path.join(file_path_no_ext, file_name)
-    example_file = os.path.join(example_path, example_name)
-    if not os.path.exists(example_path):
-        os.mkdir(example_path)
+    example_file = os.path.join(file_path_no_ext, example_name)
+    if not os.path.exists(file_path_no_ext):
+        os.mkdir(file_path_no_ext)
     with open(example_file, 'w', encoding='utf8') as f:
         f.write(example)
 
@@ -132,16 +130,14 @@ def populate_items(names, type):
 
 
 class LoraLoaderWithImages(LoraLoader):
-    RETURN_TYPES = ("MODEL", "CLIP", "STRING")
+    RETURN_TYPES = (*LoraLoader.RETURN_TYPES, "STRING",)
 
     @classmethod
     def INPUT_TYPES(s):
         types = super().INPUT_TYPES()
         names = types["required"]["lora_name"][0]
         populate_items(names, "loras")
-
         types["optional"] = { "prompt": ("HIDDEN",) }
-
         return types
 
     @classmethod
@@ -162,11 +158,14 @@ class LoraLoaderWithImages(LoraLoader):
 
 
 class CheckpointLoaderSimpleWithImages(CheckpointLoaderSimple):
+    RETURN_TYPES = (*CheckpointLoaderSimple.RETURN_TYPES, "STRING",)
+    
     @classmethod
     def INPUT_TYPES(s):
         types = super().INPUT_TYPES()
         names = types["required"]["ckpt_name"][0]
         populate_items(names, "checkpoints")
+        types["optional"] = { "prompt": ("HIDDEN",) }
         return types
 
     @classmethod
@@ -182,7 +181,8 @@ class CheckpointLoaderSimpleWithImages(CheckpointLoaderSimple):
 
     def load_checkpoint(self, **kwargs):
         kwargs["ckpt_name"] = kwargs["ckpt_name"]["content"]
-        return super().load_checkpoint(**kwargs)
+        prompt = kwargs.pop("prompt", "")
+        return (*super().load_checkpoint(**kwargs), prompt)
 
 
 NODE_CLASS_MAPPINGS = {

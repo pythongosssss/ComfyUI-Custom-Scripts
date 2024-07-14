@@ -268,6 +268,7 @@ app.registerExtension({
 					return exampleCb?.apply(this, arguments) ?? exampleList.value;
 				};
 
+
 				const listExamples = async () => {
 					exampleList.disabled = true;
 					exampleList.options.values = ["[none]"];
@@ -284,6 +285,9 @@ app.registerExtension({
 					exampleList.disabled = !examples.length;
 					app.graph.setDirtyCanvas(true, true);
 				};
+
+				// Expose function to update examples
+				nodeType.prototype["pysssss.updateExamples"] = listExamples;
 
 				const modelWidget = this.widgets[0];
 				const modelCb = modelWidget.callback;
@@ -305,14 +309,12 @@ app.registerExtension({
 				}, 30);
 			};
 
-			if (isLora) {
-				// Prevent adding HIDDEN inputs
-				const addInput = nodeType.prototype.addInput ?? LGraphNode.prototype.addInput;
-				nodeType.prototype.addInput = function (_, type) {
-					if (type === "HIDDEN") return;
-					return addInput.apply(this, arguments);
-				};
-			}
+			// Prevent adding HIDDEN inputs
+			const addInput = nodeType.prototype.addInput ?? LGraphNode.prototype.addInput;
+			nodeType.prototype.addInput = function (_, type) {
+				if (type === "HIDDEN") return;
+				return addInput.apply(this, arguments);
+			};
 		}
 
 		const getExtraMenuOptions = nodeType.prototype.getExtraMenuOptions;

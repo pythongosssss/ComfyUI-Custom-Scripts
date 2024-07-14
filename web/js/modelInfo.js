@@ -194,6 +194,7 @@ export class LoraInfoDialog extends ModelInfoDialog {
 					"content-type": "application/json",
 				},
 			});
+			this.node?.["pysssss.updateExamples"]?.();
 			alert("Saved!");
 		} catch (error) {
 			console.error(error);
@@ -299,7 +300,7 @@ function addInfoOption(node, type, infoClass, widgetNamePattern, opts) {
 		opts.push({
 			content: optName,
 			callback: async () => {
-				new infoClass(value).show(type, value);
+				new infoClass(value, node).show(type, value);
 			},
 		});
 	}

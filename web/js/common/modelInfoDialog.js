@@ -23,9 +23,10 @@ class MetadataDialog extends ComfyDialog {
 }
 
 export class ModelInfoDialog extends ComfyDialog {
-	constructor(name) {
+	constructor(name, node) {
 		super();
 		this.name = name;
+		this.node = node;
 		this.element.classList.add("pysssss-model-info");
 	}
 
@@ -164,6 +165,7 @@ export class ModelInfoDialog extends ComfyDialog {
 					textarea = null;
 
 					notesContainer.replaceChildren(...parseNote.call(this));
+					this.node?.["pysssss.updateExamples"]?.();
 				} else {
 					e.target.textContent = "💾 Save";
 					textarea = $el("textarea", {

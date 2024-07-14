@@ -15,7 +15,10 @@ class MetadataDialog extends ComfyDialog {
 			$el(
 				"div",
 				Object.keys(metadata).map((k) =>
-					$el("div", [$el("label", { textContent: k }), $el("span", { textContent: metadata[k] })])
+					$el("div", [
+						$el("label", { textContent: k }),
+						$el("span", { textContent: typeof metadata[k] === "object" ? JSON.stringify(metadata[k]) : metadata[k] }),
+					])
 				)
 			)
 		);
@@ -146,13 +149,10 @@ export class ModelInfoDialog extends ComfyDialog {
 				if (textarea) {
 					this.customNotes = textarea.value;
 
-					const resp = await api.fetchApi(
-						"/pysssss/metadata/notes/" + encodeURIComponent(`${this.type}/${this.name}`),
-						{
-							method: "POST",
-							body: this.customNotes,
-						}
-					);
+					const resp = await api.fetchApi("/pysssss/metadata/notes/" + encodeURIComponent(`${this.type}/${this.name}`), {
+						method: "POST",
+						body: this.customNotes,
+					});
 
 					if (resp.status !== 200) {
 						console.error(resp);
@@ -255,10 +255,23 @@ export class ModelInfoDialog extends ComfyDialog {
 					})
 				);
 
-				const preview = info.images.find((i) => i.type === "image");
-				if (preview) {
-					this.img.src = preview.url;
+				const allPreviews = info.images?.filter((i) => i.type === "image");
+				const previews = allPreviews?.filter((i) => i.nsfwLevel <= ModelInfoDialog.nsfwLevel);
+				if (previews?.length) {
+					let previewIndex = 0;
+					let preview;
+					const updatePreview = () => {
+						preview = previews[previewIndex];
+						this.img.src = preview.url;
+					};
+
+					updatePreview();
 					this.img.style.display = "";
+
+					this.img.title = `${previews.length} previews.`;
+					if (allPreviews.length !== previews.length) {
+						this.img.title += ` ${allPreviews.length - previews.length} images hidden due to NSFW level.`;
+					}
 
 					this.imgSave = $el("button", {
 						textContent: "Use as preview",
@@ -299,6 +312,41 @@ export class ModelInfoDialog extends ComfyDialog {
 							app.refreshComboInNodes();
 						},
 					});
+
+					$el("button", {
+						textContent: "Show metadata",
+						parent: this.imgWrapper,
+						onclick: async () => {
+							if (preview.meta && Object.keys(preview.meta).length) {
+								new MetadataDialog().show(preview.meta);
+							} else {
+								alert("No image metadata found");
+							}
+						},
+					});
+
+					const addNavButton = (icon, direction) => {
+						$el("button.pysssss-preview-nav", {
+							textContent: icon,
+							parent: this.imgWrapper,
+							onclick: async () => {
+								previewIndex += direction;
+								if (previewIndex < 0) {
+									previewIndex = previews.length - 1;
+								} else if (previewIndex >= previews.length) {
+									previewIndex = 0;
+								}
+								updatePreview();
+							},
+						});
+					};
+
+					if (previews.length > 1) {
+						addNavButton("‹", -1);
+						addNavButton("›", 1);
+					}
+				} else if (info.images?.length) {
+					$el("span", { style: { opacity: 0.6 }, textContent: "⚠️ All images hidden due to NSFW level setting.", parent: this.imgWrapper });
 				}
 
 				return info;

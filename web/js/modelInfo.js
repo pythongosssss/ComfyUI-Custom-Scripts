@@ -4,6 +4,14 @@ import { $el } from "../../../scripts/ui.js";
 import { ModelInfoDialog } from "./common/modelInfoDialog.js";
 
 const MAX_TAGS = 500;
+const NsfwLevel = {
+	PG: 1,
+	PG13: 2,
+	R: 4,
+	X: 8,
+	XXX: 16,
+	Blocked: 32,
+};
 
 export class LoraInfoDialog extends ModelInfoDialog {
 	getTagFrequency() {
@@ -79,8 +87,8 @@ export class LoraInfoDialog extends ModelInfoDialog {
 
 	addTags() {
 		let tags = this.getTagFrequency();
-		if(!tags?.length) {
-			tags = this.metadata["modelspec.tags"]?.split(",").map(t => [t.trim(), 1]);
+		if (!tags?.length) {
+			tags = this.metadata["modelspec.tags"]?.split(",").map((t) => [t.trim(), 1]);
 		}
 		let hasMore;
 		if (tags?.length) {
@@ -376,6 +384,18 @@ app.registerExtension({
 			"Checkpoint",
 			["CheckpointLoader.ckpt_name", "CheckpointLoaderSimple", "CheckpointLoader|pysssss", "Efficient Loader", "Eff. Loader SDXL"].join(",")
 		);
+
+		app.ui.settings.addSetting({
+			id: `pysssss.ModelInfo.NsfwLevel`,
+			name: `🐍 Model Info - Image Preview Max NSFW Level`,
+			type: "combo",
+			defaultValue: "PG13",
+			options: Object.keys(NsfwLevel),
+			tooltip: `Hides preview images that are tagged as a higher NSFW level`,
+			onChange(value) {
+				ModelInfoDialog.nsfwLevel = NsfwLevel[value] ?? NsfwLevel.PG;
+			},
+		});
 	},
 	beforeRegisterNodeDef(nodeType) {
 		const getExtraMenuOptions = nodeType.prototype.getExtraMenuOptions;

@@ -1,4 +1,5 @@
 import { app } from "../../../scripts/app.js";
+import { api } from "../../../scripts/api.js";
 import { $el } from "../../../scripts/ui.js";
 import { ModelInfoDialog } from "./common/modelInfoDialog.js";
 
@@ -128,6 +129,22 @@ export class LoraInfoDialog extends ModelInfoDialog {
 
 		const info = await p;
 		if (info) {
+			const textArea = $el("textarea", {
+				textContent: info.trainedWords.join(", "),
+				style: {
+					whiteSpace: "pre-wrap",
+					margin: "10px 0",
+					color: "#fff",
+					background: "#222",
+					padding: "5px",
+					borderRadius: "5px",
+					maxHeight: "250px",
+					overflow: "auto",
+					display: "block",
+					border: "none",
+					width: "calc(100% - 10px)",
+				},
+			});
 			$el(
 				"p",
 				{
@@ -135,18 +152,17 @@ export class LoraInfoDialog extends ModelInfoDialog {
 					textContent: "Trained Words: ",
 				},
 				[
-					$el("pre", {
-						textContent: info.trainedWords.join(", "),
+					textArea,
+					$el("button", {
+						onclick: async () => {
+							await this.saveAsExample(textArea.value, "trainedwords.txt");
+						},
+						textContent: "Save as Example",
 						style: {
-							whiteSpace: "pre-wrap",
-							margin: "10px 0",
-							background: "#222",
-							padding: "5px",
-							borderRadius: "5px",
-							maxHeight: "250px",
-							overflow: "auto",
+							fontSize: "14px",
 						},
 					}),
+					$el("hr"),
 				]
 			);
 			$el("div", {
@@ -160,16 +176,43 @@ export class LoraInfoDialog extends ModelInfoDialog {
 		}
 	}
 
+	async saveAsExample(example, name = "example.txt") {
+		if (!example.length) {
+			return;
+		}
+		try {
+			name = prompt("Enter example name", name);
+			if (!name) return;
+
+			await api.fetchApi("/pysssss/examples/" + encodeURIComponent(`${this.type}/${this.name}`), {
+				method: "POST",
+				body: JSON.stringify({
+					name,
+					example,
+				}),
+				headers: {
+					"content-type": "application/json",
+				},
+			});
+			alert("Saved!");
+		} catch (error) {
+			console.error(error);
+			alert("Error saving: " + error);
+		}
+	}
+
 	createButtons() {
 		const btns = super.createButtons();
-
+		function tagsToCsv(tags) {
+			return tags.map((el) => el.dataset.tag).join(", ");
+		}
 		function copyTags(e, tags) {
 			const textarea = $el("textarea", {
 				parent: document.body,
 				style: {
 					position: "fixed",
 				},
-				textContent: tags.map((el) => el.dataset.tag).join(", "),
+				textContent: tagsToCsv(tags),
 			});
 			textarea.select();
 			try {
@@ -189,6 +232,14 @@ export class LoraInfoDialog extends ModelInfoDialog {
 		}
 
 		btns.unshift(
+			$el("button", {
+				type: "button",
+				textContent: "Save Selected as Example",
+				onclick: async (e) => {
+					const tags = tagsToCsv([...this.tags.querySelectorAll(".pysssss-model-tag--selected")]);
+					await this.saveAsExample(tags);
+				},
+			}),
 			$el("button", {
 				type: "button",
 				textContent: "Copy Selected",

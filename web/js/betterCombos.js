@@ -246,8 +246,14 @@ app.registerExtension({
 					const v = this.widgets[0].value.content;
 					const pos = v.lastIndexOf(".");
 					const name = v.substr(0, pos);
-
-					const example = await (await get("view", `/${name}/${exampleList.value}`)).text();
+					let exampleName = exampleList.value;
+					let viewPath = `/${name}`;
+					if (exampleName === "notes") {
+						viewPath += ".txt";
+					} else {
+						viewPath += `/${exampleName}`;
+					}
+					const example = await (await get("view", viewPath)).text();
 					if (!exampleWidget) {
 						exampleWidget = ComfyWidgets["STRING"](this, "prompt", ["STRING", { multiline: true }], app).widget;
 						exampleWidget.inputEl.readOnly = true;
@@ -273,6 +279,7 @@ app.registerExtension({
 						} catch (error) {}
 					}
 					exampleList.options.values = ["[none]", ...examples];
+					exampleList.value = exampleList.options.values[+!!examples.length];
 					exampleList.callback();
 					exampleList.disabled = !examples.length;
 					app.graph.setDirtyCanvas(true, true);
@@ -297,6 +304,15 @@ app.registerExtension({
 					modelWidget.callback();
 				}, 30);
 			};
+
+			if (isLora) {
+				// Prevent adding HIDDEN inputs
+				const addInput = nodeType.prototype.addInput ?? LGraphNode.prototype.addInput;
+				nodeType.prototype.addInput = function (_, type) {
+					if (type === "HIDDEN") return;
+					return addInput.apply(this, arguments);
+				};
+			}
 		}
 
 		const getExtraMenuOptions = nodeType.prototype.getExtraMenuOptions;

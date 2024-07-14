@@ -66,11 +66,44 @@ async def get_examples(request):
     
     file_path_no_ext = os.path.splitext(file_path)[0]
     examples = []
+        
+    if os.path.isfile(file_path_no_ext + ".txt"):
+        examples += ["notes"]
+
     if os.path.isdir(file_path_no_ext):
-        examples += map(lambda t: os.path.relpath(t, file_path_no_ext),
-                        glob.glob(file_path_no_ext + "/*.txt"))
+        examples += sorted(map(lambda t: os.path.relpath(t, file_path_no_ext),
+                        glob.glob(file_path_no_ext + "/*.txt")))
    
     return web.json_response(examples)
+
+@PromptServer.instance.routes.post("/pysssss/examples/{name}")
+async def save_example(request):
+    name = request.match_info["name"]
+    pos = name.index("/")
+    type = name[0:pos]
+    name = name[pos+1:]
+    body = await request.json()
+    example_name = body["name"]
+    example = body["example"]
+
+    file_path = folder_paths.get_full_path(
+        type, name)
+    if not file_path:
+        return web.Response(status=404)
+    
+    if not example_name.endswith(".txt"):
+        example_name += ".txt"
+
+    file_path_no_ext = os.path.splitext(file_path)[0]
+    file_name = os.path.split(file_path_no_ext)[1]
+    example_path = os.path.join(file_path_no_ext, file_name)
+    example_file = os.path.join(example_path, example_name)
+    if not os.path.exists(example_path):
+        os.mkdir(example_path)
+    with open(example_file, 'w', encoding='utf8') as f:
+        f.write(example)
+
+    return web.Response(status=201)
 
 
 def populate_items(names, type):
@@ -99,11 +132,16 @@ def populate_items(names, type):
 
 
 class LoraLoaderWithImages(LoraLoader):
+    RETURN_TYPES = ("MODEL", "CLIP", "STRING")
+
     @classmethod
     def INPUT_TYPES(s):
         types = super().INPUT_TYPES()
         names = types["required"]["lora_name"][0]
         populate_items(names, "loras")
+
+        types["optional"] = { "prompt": ("HIDDEN",) }
+
         return types
 
     @classmethod
@@ -119,7 +157,8 @@ class LoraLoaderWithImages(LoraLoader):
 
     def load_lora(self, **kwargs):
         kwargs["lora_name"] = kwargs["lora_name"]["content"]
-        return super().load_lora(**kwargs)
+        prompt = kwargs.pop("prompt", "")
+        return (*super().load_lora(**kwargs), prompt)
 
 
 class CheckpointLoaderSimpleWithImages(CheckpointLoaderSimple):

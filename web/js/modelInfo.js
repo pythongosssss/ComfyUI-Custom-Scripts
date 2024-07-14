@@ -170,7 +170,7 @@ export class LoraInfoDialog extends ModelInfoDialog {
 		this.addTags();
 
 		const info = await p;
-		this.addExample("Trigger Words", info?.trainedWords?.join(", ") ?? "", "trainedwords");
+		this.addExample("Trained Words", info?.trainedWords?.join(", ") ?? "", "trainedwords");
 
 		const triggerPhrase = this.metadata["modelspec.trigger_phrase"];
 		if (triggerPhrase) {
@@ -179,7 +179,7 @@ export class LoraInfoDialog extends ModelInfoDialog {
 
 		$el("div", {
 			parent: this.content,
-			innerHTML: info.description ?? this.metadata["modelspec.description"],
+			innerHTML: info.description ?? this.metadata["modelspec.description"] ?? "[No description provided]",
 			style: {
 				maxHeight: "250px",
 				overflow: "auto",

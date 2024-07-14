@@ -48,13 +48,27 @@ const style = `
 `;
 
 async function getWorkflows() {
-	const response = await api.fetchApi("/pysssss/workflows", { cache: "no-store" });
-	return await response.json();
+    try {
+        const response = await api.fetchApi("/pysssss/workflows", { cache: "no-store" });
+        if (!response.ok) { // Checks if the response status is not in the range 200-299
+            throw new Error(`API call failed with status: ${response.status}, statusText: ${response.statusText}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Failed to get workflows:", error);
+    }
 }
 
 async function getWorkflow(name) {
-	const response = await api.fetchApi(`/pysssss/workflows/${encodeURIComponent(name)}`, { cache: "no-store" });
-	return await response.json();
+    try {
+        const response = await api.fetchApi(`/pysssss/workflows/${encodeURIComponent(name)}`, { cache: "no-store" });
+        if (!response.ok) { // Checks if the response status is not in the range 200-299
+            throw new Error(`API call failed with status: ${response.status}, statusText: ${response.statusText}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(`Failed to get workflow named ${name}:`, error);
+    }
 }
 
 async function saveWorkflow(name, workflow, overwrite) {

@@ -79,6 +79,9 @@ export class LoraInfoDialog extends ModelInfoDialog {
 
 	addTags() {
 		let tags = this.getTagFrequency();
+		if(!tags?.length) {
+			tags = this.metadata["modelspec.tags"]?.split(" ").map(t => [t, 1]);
+		}
 		let hasMore;
 		if (tags?.length) {
 			const c = tags.length;
@@ -110,6 +113,45 @@ export class LoraInfoDialog extends ModelInfoDialog {
 		}
 	}
 
+	addExample(title, value, name) {
+		const textArea = $el("textarea", {
+			textContent: value,
+			style: {
+				whiteSpace: "pre-wrap",
+				margin: "10px 0",
+				color: "#fff",
+				background: "#222",
+				padding: "5px",
+				borderRadius: "5px",
+				maxHeight: "250px",
+				overflow: "auto",
+				display: "block",
+				border: "none",
+				width: "calc(100% - 10px)",
+			},
+		});
+		$el(
+			"p",
+			{
+				parent: this.content,
+				textContent: `${title}: `,
+			},
+			[
+				textArea,
+				$el("button", {
+					onclick: async () => {
+						await this.saveAsExample(textArea.value, `${name}.txt`);
+					},
+					textContent: "Save as Example",
+					style: {
+						fontSize: "14px",
+					},
+				}),
+				$el("hr"),
+			]
+		);
+	}
+
 	async addInfo() {
 		this.addInfoEntry("Name", this.metadata.ss_output_name || "⚠️ Unknown");
 		this.addInfoEntry("Base Model", this.metadata.ss_sd_model_name || "⚠️ Unknown");
@@ -128,52 +170,21 @@ export class LoraInfoDialog extends ModelInfoDialog {
 		this.addTags();
 
 		const info = await p;
-		if (info) {
-			const textArea = $el("textarea", {
-				textContent: info.trainedWords.join(", "),
-				style: {
-					whiteSpace: "pre-wrap",
-					margin: "10px 0",
-					color: "#fff",
-					background: "#222",
-					padding: "5px",
-					borderRadius: "5px",
-					maxHeight: "250px",
-					overflow: "auto",
-					display: "block",
-					border: "none",
-					width: "calc(100% - 10px)",
-				},
-			});
-			$el(
-				"p",
-				{
-					parent: this.content,
-					textContent: "Trained Words: ",
-				},
-				[
-					textArea,
-					$el("button", {
-						onclick: async () => {
-							await this.saveAsExample(textArea.value, "trainedwords.txt");
-						},
-						textContent: "Save as Example",
-						style: {
-							fontSize: "14px",
-						},
-					}),
-					$el("hr"),
-				]
-			);
-			$el("div", {
-				parent: this.content,
-				innerHTML: info.description,
-				style: {
-					maxHeight: "250px",
-					overflow: "auto",
-				},
-			});
+		this.addExample("Trigger Words", info?.trainedWords?.join(", ") ?? "", "trainedwords");
+
+		const triggerPhrase = this.metadata["modelspec.trigger_phrase"];
+		if (triggerPhrase) {
+			this.addExample("Trigger Phrase", triggerPhrase, "triggerphrase");
 		}
+
+		$el("div", {
+			parent: this.content,
+			innerHTML: info.description ?? this.metadata["modelspec.description"],
+			style: {
+				maxHeight: "250px",
+				overflow: "auto",
+			},
+		});
 	}
 
 	async saveAsExample(example, name = "example.txt") {

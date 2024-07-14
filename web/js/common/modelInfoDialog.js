@@ -194,6 +194,10 @@ export class ModelInfoDialog extends ComfyDialog {
 	}
 
 	addInfo() {
+		const usageHint = this.metadata["modelspec.usage_hint"];
+		if (usageHint) {
+			this.addInfoEntry("Usage Hint", usageHint);
+		}
 		this.addInfoEntry("Notes", this.getNoteInfo());
 	}
 

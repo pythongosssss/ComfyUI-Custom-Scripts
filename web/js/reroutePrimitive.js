@@ -21,6 +21,12 @@ app.registerExtension({
 			return r;
 		};
 
+		// Hide this node as it is no longer supported
+		const getNodeTypesCategories = LiteGraph.getNodeTypesCategories;
+		LiteGraph.getNodeTypesCategories = function() {
+			return getNodeTypesCategories.apply(this, arguments).filter(c => !c.startsWith("__hidden__"));
+		}
+
 		const graphToPrompt = app.graphToPrompt;
 		app.graphToPrompt = async function () {
 			const res = await graphToPrompt.apply(this, arguments);

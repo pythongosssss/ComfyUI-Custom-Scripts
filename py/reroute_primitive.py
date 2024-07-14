@@ -21,7 +21,7 @@ class ReroutePrimitive:
 
     RETURN_TYPES = (any,)
     FUNCTION = "route"
-    CATEGORY = "utils"
+    CATEGORY = "__hidden__"
 
     def route(self, value):
         return (value,)

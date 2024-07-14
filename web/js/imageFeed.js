@@ -252,7 +252,9 @@ app.registerExtension({
 
 		function updateMenuParent(location) {
 			if (showMenuButton) {
-				document.querySelector(".comfyui-body-" + location).append(imageFeed);
+				const el = document.querySelector(".comfyui-body-" + location);
+				if (!el) return;
+				el.append(imageFeed);
 			} else {
 				if (!imageFeed.parent) {
 					document.body.append(imageFeed);
@@ -285,7 +287,7 @@ app.registerExtension({
 									window.dispatchEvent(new Event("resize"));
 								},
 							},
-							["left", "top", "right", "bottom"].map((m) =>
+							["left", "top", "right", "bottom", "hidden"].map((m) =>
 								$el("option", {
 									value: m,
 									textContent: m,
@@ -297,8 +299,14 @@ app.registerExtension({
 				]);
 			},
 			onChange(value) {
-				imageFeed.className = `pysssss-image-feed pysssss-image-feed--${value}`;
-				updateMenuParent(value);
+				if (value === "hidden") {
+					imageFeed.remove();
+					showButton.style.display = "none";
+				} else {
+					showButton.style.display = visible ? "none" : "unset";
+					imageFeed.className = `pysssss-image-feed pysssss-image-feed--${value}`;
+					updateMenuParent(value);
+				}
 			},
 		});
 
@@ -371,7 +379,7 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			textContent: "❌",
 			onclick: () => {
 				imageFeed.style.display = "none";
-				showButton.style.display = "unset";
+				showButton.style.display = feedLocation.value === "hidden" ? "none" : "unset";
 				if (showMenuButton) showMenuButton.enabled = true;
 				saveVal("Visible", 0);
 				visible = false;

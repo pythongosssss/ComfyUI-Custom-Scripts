@@ -80,7 +80,7 @@ export class LoraInfoDialog extends ModelInfoDialog {
 	addTags() {
 		let tags = this.getTagFrequency();
 		if(!tags?.length) {
-			tags = this.metadata["modelspec.tags"]?.split(" ").map(t => [t, 1]);
+			tags = (this.metadata["modelspec.tags"] ?? "").split(",").map(t => [t.trim(), 1]);
 		}
 		let hasMore;
 		if (tags?.length) {

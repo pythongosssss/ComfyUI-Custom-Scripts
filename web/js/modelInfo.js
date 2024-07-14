@@ -179,7 +179,7 @@ export class LoraInfoDialog extends ModelInfoDialog {
 
 		$el("div", {
 			parent: this.content,
-			innerHTML: info.description ?? this.metadata["modelspec.description"] ?? "[No description provided]",
+			innerHTML: info?.description ?? this.metadata["modelspec.description"] ?? "[No description provided]",
 			style: {
 				maxHeight: "250px",
 				overflow: "auto",

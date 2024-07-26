@@ -30,7 +30,7 @@ app.registerExtension({
 			requestAnimationFrame(() => {
 				const menus = document.querySelectorAll(".litecontextmenu");
 				for (let i = menus.length - 1; i >= 0; i--) {
-					if (menus[i].firstElementChild.textContent.includes("No color")) {
+					if (menus[i].firstElementChild.textContent.includes("No color") || menus[i].firstElementChild.value?.content?.includes("No color")) {
 						$el(
 							"div.litemenu-entry.submenu",
 							{

@@ -33,8 +33,8 @@ $el("style", {
 	}
 	.pysssss-image-feed--left, .pysssss-image-feed--right {
 		top: 0;
-		height: 100vh;
-		min-width: 200px;
+		height: 80vh;
+		min-width: 120px;
 		max-width: calc(var(--max-size, 10) * 1vw);
 	}
 	.comfyui-body-left .pysssss-image-feed--left, .comfyui-body-right .pysssss-image-feed--right {

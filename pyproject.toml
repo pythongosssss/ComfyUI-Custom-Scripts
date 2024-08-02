@@ -2,7 +2,7 @@
 name = "comfyui-custom-scripts"
 description = "Enhancements & experiments for ComfyUI, mostly focusing on UI features"
 version = "1.0.0"
-license = "LICENSE"
+license = { file = "LICENSE" }
 
 [project.urls]
 Repository = "https://github.com/pythongosssss/ComfyUI-Custom-Scripts"

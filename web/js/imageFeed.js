@@ -367,6 +367,14 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			},
 		});
 
+		const maxImages = app.ui.settings.addSetting({
+			id: "pysssss.ImageFeed.MaxImages",
+			name: "🐍 Image Feed Max Images",
+			tooltip: `Limits the number of images in the feed to a maximum, removing the oldest images as new ones are added.`,
+			defaultValue: 0,
+			type: "number",
+		});
+
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
 			textContent: "Clear",
 			onclick: () => {
@@ -399,6 +407,11 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 
 		function addImageToFeed(href) {
 			const method = feedDirection.value === "newest first" ? "prepend" : "append";
+
+			if (maxImages.value > 0 && imageList.children.length >= maxImages.value) {
+				imageList.children[method === "prepend" ? imageList.children.length - 1 : 0].remove();
+			}
+
 			imageList[method](
 				$el("div", [
 					$el(

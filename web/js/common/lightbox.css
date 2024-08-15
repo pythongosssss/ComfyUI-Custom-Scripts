@@ -44,7 +44,9 @@
 }
 
 .pysssss-lightbox-main {
+	display: grid;
 	flex: auto;
+	place-content: center;
 	text-align: center;
 }
 

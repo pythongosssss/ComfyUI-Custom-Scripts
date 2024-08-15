@@ -3,6 +3,15 @@ import math
 import random
 import operator as op
 
+# Hack: string type that is always equal in not equal comparisons
+class AnyType(str):
+    def __ne__(self, __value: object) -> bool:
+        return False
+
+
+# Our any instance wants to be a wildcard string
+any = AnyType("*")
+
 operators = {
     ast.Add: op.add,
     ast.Sub: op.sub,
@@ -98,9 +107,9 @@ class MathExpression:
                 }}),
             },
             "optional": {
-                "a": ("INT,FLOAT,IMAGE,LATENT", ),
-                "b": ("INT,FLOAT,IMAGE,LATENT",),
-                "c": ("INT,FLOAT,IMAGE,LATENT", ),
+                "a": (any, ),
+                "b": (any,),
+                "c": (any, ),
             },
             "hidden": {"extra_pnginfo": "EXTRA_PNGINFO",
                        "prompt": "PROMPT"},

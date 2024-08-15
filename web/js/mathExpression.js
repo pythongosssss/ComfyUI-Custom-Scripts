@@ -14,6 +14,15 @@ app.registerExtension({
 	beforeRegisterNodeDef(nodeType) {
 		if (nodeType.comfyClass === "MathExpression|pysssss") {
 			const onDrawForeground = nodeType.prototype.onDrawForeground;
+
+			nodeType.prototype.onNodeCreated = function() {
+				// These are typed as any to bypass backend validation
+				// update frontend to restrict types
+				for(const input of this.inputs) {
+					input.type = "INT,FLOAT,IMAGE,LATENT";
+				}
+			}
+
 			nodeType.prototype.onDrawForeground = function (ctx) {
 				const r = onDrawForeground?.apply?.(this, arguments);
 

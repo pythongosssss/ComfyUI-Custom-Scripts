@@ -146,7 +146,10 @@ class MathExpression:
             values = prompt[str(node_id)]
             if "inputs" in values:
                 if widget_name in values["inputs"]:
-                    return values["inputs"][widget_name]
+                    value = values["inputs"][widget_name]
+                    if isinstance(value, list):
+                        raise ValueError("Converted widgets are not supported via named reference, use the inputs instead.")
+                    return value
             raise NameError(f"Widget not found: {node_name}.{widget_name}")
         raise NameError(f"Node not found: {node_name}.{widget_name}")
 

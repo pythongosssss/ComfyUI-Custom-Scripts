@@ -5,6 +5,7 @@ import { app } from "../../../scripts/app.js";
 const LOCKED = Symbol();
 
 function lockArray(arr, isLocked) {
+	if (!Array.isArray(arr)) return; // Prevent crash on es6
 	const v = [];
 
 	for (let i = 0; i < 2; i++) {

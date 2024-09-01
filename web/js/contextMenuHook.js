@@ -83,7 +83,7 @@ app.registerExtension({
 			}
 
 			triggerCallbacks("ctor", () => [values, options]);
-			ctxMenu.call(this, values, options);
+			return ctxMenu.call(this, values, options);
 		};
 		LiteGraph.ContextMenu.prototype = ctxMenu.prototype;
 	},

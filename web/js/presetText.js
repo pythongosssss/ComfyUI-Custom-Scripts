@@ -63,8 +63,10 @@ app.registerExtension({
 		}
 	},
 	registerCustomNodes() {
-		class PresetTextNode {
+		class PresetTextNode extends LiteGraph.LGraphNode {
 			constructor() {
+				super();
+				this.title = "Preset Text 🐍";
 				this.isVirtualNode = true;
 				this.serialize_widgets = true;
 				this.addOutput("text", "STRING");

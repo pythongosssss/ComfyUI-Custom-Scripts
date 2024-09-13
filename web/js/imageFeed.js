@@ -34,10 +34,12 @@ $el("style", {
 	.pysssss-image-feed--left, .pysssss-image-feed--right {
 		top: 0;
 		height: 100vh;
-		min-width: 200px;
+		min-width: 120px;
 		max-width: calc(var(--max-size, 10) * 1vw);
+  		overflow: hidden;
 	}
 	.comfyui-body-left .pysssss-image-feed--left, .comfyui-body-right .pysssss-image-feed--right {
+ 		max-height: 650px;
 		height: 100%;
 	}
 	.pysssss-image-feed--left {

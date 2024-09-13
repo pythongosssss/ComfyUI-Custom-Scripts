@@ -75,7 +75,8 @@ def get_file(root_dir, file):
 
 
 class TextFileNode:
-    RETURN_TYPES = ("STRING",)
+    RETURN_TYPES = ("STRING","STRING")
+    RETURN_NAMES = ("text", "file")
     CATEGORY = "utils"
 
     @classmethod
@@ -88,7 +89,7 @@ class TextFileNode:
     def load_text(self, **kwargs):
         self.file = get_file(kwargs["root_dir"], kwargs["file"])
         with open(self.file, "r") as f:
-            return (f.read(), )
+            return (f.read(), kwargs["file"].split(".")[0])
 
 
 class LoadText(TextFileNode):

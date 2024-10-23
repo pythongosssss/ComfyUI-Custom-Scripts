@@ -301,6 +301,9 @@ app.registerExtension({
 			onChange(value) {
 				if (value === "hidden") {
 					imageFeed.remove();
+					if (showMenuButton) {
+						showMenuButton.element.style.display = "none";
+					}
 					showButton.style.display = "none";
 				} else {
 					showButton.style.display = visible ? "none" : "unset";

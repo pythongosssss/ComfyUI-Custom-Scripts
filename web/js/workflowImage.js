@@ -50,10 +50,12 @@ class WorkflowImage {
 	}
 
 	updateView(bounds) {
+		const scale = window.devicePixelRatio || 1;
 		app.canvas.ds.scale = 1;
-		app.canvas.canvas.width = bounds[2] - bounds[0];
-		app.canvas.canvas.height = bounds[3] - bounds[1];
-		app.canvas.ds.offset = [-bounds[0], -bounds[1]];
+		app.canvas.canvas.width = (bounds[2] - bounds[0]) * scale;
+		app.canvas.canvas.height = (bounds[3] - bounds[1]) * scale;
+		app.canvas.ds.offset = [-bounds[0] * scale, -bounds[1] * scale];
+		app.canvas.canvas.getContext("2d").setTransform(scale, 0, 0, scale, 0, 0);
 	}
 
 	getDrawTextConfig(_, widget) {

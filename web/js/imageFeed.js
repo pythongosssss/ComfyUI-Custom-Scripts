@@ -232,6 +232,7 @@ app.registerExtension({
 				content: "Show Image Feed 🐍",
 			});
 			showMenuButton.enabled = false;
+			showMenuButton.element.style.display = "none";
 			app.menu.settingsGroup.append(showMenuButton);
 		}
 
@@ -301,6 +302,9 @@ app.registerExtension({
 			onChange(value) {
 				if (value === "hidden") {
 					imageFeed.remove();
+					if (showMenuButton) {
+						showMenuButton.element.style.display = "none";
+					}
 					showButton.style.display = "none";
 				} else {
 					showButton.style.display = visible ? "none" : "unset";
@@ -388,7 +392,10 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			onclick: () => {
 				imageFeed.style.display = "none";
 				showButton.style.display = feedLocation.value === "hidden" ? "none" : "unset";
-				if (showMenuButton) showMenuButton.enabled = true;
+				if (showMenuButton) {
+					showMenuButton.enabled = true;
+					showMenuButton.element.style.display = "";
+				}
 				saveVal("Visible", 0);
 				visible = false;
 				window.dispatchEvent(new Event("resize"));
@@ -499,7 +506,10 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 		showButton.onclick = () => {
 			imageFeed.style.display = "flex";
 			showButton.style.display = "none";
-			if (showMenuButton) showMenuButton.enabled = false;
+			if (showMenuButton) {
+				showMenuButton.enabled = false;
+				showMenuButton.element.style.display = "none";
+			}
 
 			saveVal("Visible", 1);
 			visible = true;

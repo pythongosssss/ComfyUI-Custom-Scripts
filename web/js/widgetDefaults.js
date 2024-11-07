@@ -268,7 +268,19 @@ app.registerExtension({
 						$el("button", {
 							textContent: "Manage",
 							onclick: () => {
-								app.ui.settings.element.close();
+								try {
+									// Try closing old settings window
+									if (typeof app.ui.settings.element?.close === "function") {
+										app.ui.settings.element.close();
+									}
+								} catch (error) {}
+								try {
+									// Try closing new vue dialog
+									document.querySelector(".p-dialog-close-button").click();
+								} catch (error) {
+									// Fallback to just hiding the element
+									app.ui.settings.element.style.display = "none";
+								}
 								const dialog = new WidgetDefaultsDialog();
 								dialog.show();
 							},

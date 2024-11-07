@@ -12,6 +12,8 @@ root_directory = os.path.dirname(inspect.getfile(PromptServer))
 workflows_directory = os.path.join(root_directory, "pysssss-workflows")
 workflows_directory = pysssss.get_config_value(
     "workflows.directory", workflows_directory)
+if not os.path.isabs(workflows_directory):
+    workflows_directory = os.path.abspath(os.path.join(root_directory, workflows_directory))
 
 NODE_CLASS_MAPPINGS = {}
 NODE_DISPLAY_NAME_MAPPINGS = {}

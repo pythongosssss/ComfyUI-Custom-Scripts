@@ -268,12 +268,13 @@ app.registerExtension({
 			parent: document.head,
 		});
 	},
+
+	async refreshComboInNodes() {
+		workflows.load()
+	},
+	
 	async setup() {
 		workflows = new PysssssWorkflows();
-		app.refreshComboInNodes = function () {
-			workflows.load();
-			refreshComboInNodes.apply(this, arguments);
-		};
 
 		const comfyDefault = "[ComfyUI Default]";
 		const defaultWorkflow = app.ui.settings.addSetting({

@@ -494,7 +494,7 @@ export class TextAreaAutoComplete {
 	}
 
 	#getFilteredWords(term) {
-		term = term.toLocaleLowerCase();
+		term = term.toLocaleLowerCase()
 
 		const priorityMatches = [];
 		const prefixMatches = [];
@@ -536,9 +536,11 @@ export class TextAreaAutoComplete {
 	#update() {
 		let before = this.helper.getBeforeCursor();
 		if (before?.length) {
-			const m = before.match(/([^\s|,|;|"]+)$/);
+			const m = before.match(/([^,;"]+)$/);
 			if (m) {
-				before = m[0];
+				before = m[0]
+					.replace(/^\s+/, "")
+					.replace(/\s/g, "_") || null;
 			} else {
 				before = null;
 			}

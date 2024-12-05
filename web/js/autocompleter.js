@@ -6,8 +6,6 @@ import { TextAreaAutoComplete } from "./common/autocomplete.js";
 import { ModelInfoDialog } from "./common/modelInfoDialog.js";
 import { LoraInfoDialog } from "./modelInfo.js";
 
-const MAX_ROW_COUNT = 50;
-
 function parseCSV(csvText) {
 	const rows = [];
 	const delimiter = ",";
@@ -527,7 +525,7 @@ app.registerExtension({
 		TextAreaAutoComplete.insertOnTab = localStorage.getItem(id + ".InsertOnTab") !== "false";
 		TextAreaAutoComplete.insertOnEnter = localStorage.getItem(id + ".InsertOnEnter") !== "false";
 		TextAreaAutoComplete.lorasEnabled = localStorage.getItem(id + ".ShowLoras") === "true";
-		TextAreaAutoComplete.suggestionCount = +localStorage.getItem(id + ".SuggestionCount") || MAX_ROW_COUNT;
+		TextAreaAutoComplete.suggestionCount = +localStorage.getItem(id + ".SuggestionCount") || 20;
 	},
 	setup() {
 		async function addEmbeddings() {

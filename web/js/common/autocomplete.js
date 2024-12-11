@@ -501,11 +501,10 @@ export class TextAreaAutoComplete {
 		const includesMatches = [];
 		for (const word of Object.keys(this.words)) {
 			const lowerWord = word.toLocaleLowerCase();
-			// Show exact matches
-			// if (lowerWord === term) {
-			// 	// Dont include exact matches
-			// 	continue;
-			// }
+			if (lowerWord === term) {
+				// Dont include exact matches
+				continue;
+			}
 
 			const pos = lowerWord.indexOf(term);
 			if (pos === -1) {
@@ -624,7 +623,7 @@ export class TextAreaAutoComplete {
 					value = this.#escapeParentheses(value);
 
 					// Remove underscore
-					value = value.replace("_", " ");
+					value = value.replace(/_/g, " ");
 					
 					const afterCursor = this.helper.getAfterCursor();
 					const shouldAddSeparator = !afterCursor.trim().startsWith(this.separator.trim());

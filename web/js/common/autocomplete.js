@@ -494,17 +494,18 @@ export class TextAreaAutoComplete {
 	}
 
 	#getFilteredWords(term) {
-		term = term.toLocaleLowerCase()
+		term = term.toLocaleLowerCase();
 
 		const priorityMatches = [];
 		const prefixMatches = [];
 		const includesMatches = [];
 		for (const word of Object.keys(this.words)) {
 			const lowerWord = word.toLocaleLowerCase();
-			if (lowerWord === term) {
-				// Dont include exact matches
-				continue;
-			}
+			// Show exact matches
+			// if (lowerWord === term) {
+			// 	// Dont include exact matches
+			// 	continue;
+			// }
 
 			const pos = lowerWord.indexOf(term);
 			if (pos === -1) {
@@ -621,6 +622,10 @@ export class TextAreaAutoComplete {
 					  value = TextAreaAutoComplete.replacer(value);
 					}
 					value = this.#escapeParentheses(value);
+
+					// Remove underscore
+					value = value.replace("_", " ");
+					
 					const afterCursor = this.helper.getAfterCursor();
 					const shouldAddSeparator = !afterCursor.trim().startsWith(this.separator.trim());
 					this.helper.insertAtCursor(

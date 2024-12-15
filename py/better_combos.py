@@ -37,10 +37,11 @@ async def save_preview(request):
     subfolder = body.get("subfolder", "")
     full_output_folder = os.path.join(dir, os.path.normpath(subfolder))
 
-    if os.path.commonpath((dir, os.path.abspath(full_output_folder))) != dir:
+    filepath = os.path.join(full_output_folder, body.get("filename", ""))
+
+    if os.path.commonpath((dir, os.path.abspath(filepath))) != dir:
         return web.Response(status=400)
 
-    filepath = os.path.join(full_output_folder, body.get("filename", ""))
     image_path = folder_paths.get_full_path(type, name)
     image_path = os.path.splitext(
         image_path)[0] + os.path.splitext(filepath)[1]

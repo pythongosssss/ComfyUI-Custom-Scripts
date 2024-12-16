@@ -536,7 +536,7 @@ export class TextAreaAutoComplete {
 	#update() {
 		let before = this.helper.getBeforeCursor();
 		if (before?.length) {
-			const m = before.match(/([^,;"]+)$/);
+			const m = before.match(/([^,;"|{}()]+)$/);
 			if (m) {
 				before = m[0]
 					.replace(/^\s+/, "")

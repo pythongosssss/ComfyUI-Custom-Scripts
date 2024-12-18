@@ -35,8 +35,8 @@ class ConstrainImage:
             current_width, current_height = img.size
             aspect_ratio = current_width / current_height
 
-            constrained_width = max(min(current_width, min_width), max_width)
-            constrained_height = max(min(current_height, min_height), max_height)
+            constrained_width = min(max(current_width, min_width), max_width)
+            constrained_height = min(max(current_height, min_height), max_height)
 
             if constrained_width / constrained_height > aspect_ratio:
                 constrained_width = max(int(constrained_height * aspect_ratio), min_width)

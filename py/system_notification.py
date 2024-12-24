@@ -28,8 +28,8 @@ class SystemNotification:
     def IS_CHANGED(self, **kwargs):
         return float("NaN")
 
-    def nop(self, any, **kwargs):
-        return {"ui": {"a": []}, "result": (any,)}
+    def nop(self, any, message, mode):
+        return {"ui": {"message": message, "mode": mode}, "result": (any,)}
 
 
 NODE_CLASS_MAPPINGS = {

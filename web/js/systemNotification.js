@@ -22,12 +22,10 @@ app.registerExtension({
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
 		if (nodeData.name === "SystemNotification|pysssss") {
 			const onExecuted = nodeType.prototype.onExecuted;
-			nodeType.prototype.onExecuted = async function () {
+			nodeType.prototype.onExecuted = async function ({ message, mode }) {
 				onExecuted?.apply(this, arguments);
-				const mode = this.widgets.find((w) => w.name === "mode");
-				const message = this.widgets.find((w) => w.name === "message");
 
-				if (mode.value === "on empty queue") {
+				if (mode === "on empty queue") {
 					if (app.ui.lastQueueSize !== 0) {
 						await new Promise((r) => setTimeout(r, 500));
 					}
@@ -36,7 +34,7 @@ app.registerExtension({
 					}
 				}
 				if (!notificationSetup()) return;
-				const notification = new Notification("ComfyUI", { body: message.value ?? "Your notification has triggered." });
+				const notification = new Notification("ComfyUI", { body: message ?? "Your notification has triggered." });
 			};
 
 			const onNodeCreated = nodeType.prototype.onNodeCreated;

@@ -285,7 +285,8 @@ app.registerExtension({
 									feedLocation.value = e.target.value;
 									imageFeed.className = `pysssss-image-feed pysssss-image-feed--${feedLocation.value}`;
 									updateMenuParent(feedLocation.value);
-									window.dispatchEvent(new Event("resize"));
+									saveVal("Location", feedLocation.value);
+									window.dispatchEvent(new Event("resize"));									
 								},
 							},
 							["left", "top", "right", "bottom", "hidden"].map((m) =>
@@ -303,10 +304,13 @@ app.registerExtension({
 				if (value === "hidden") {
 					imageFeed.remove();
 					if (showMenuButton) {
-						showMenuButton.element.style.display = "none";
+						requestAnimationFrame(() => {
+							showMenuButton.element.style.display = "none";
+						});
 					}
 					showButton.style.display = "none";
 				} else {
+					showMenuButton.element.style.display = "unset";
 					showButton.style.display = visible ? "none" : "unset";
 					imageFeed.className = `pysssss-image-feed pysssss-image-feed--${value}`;
 					updateMenuParent(value);

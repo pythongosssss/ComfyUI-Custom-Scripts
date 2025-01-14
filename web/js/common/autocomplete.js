@@ -621,9 +621,6 @@ export class TextAreaAutoComplete {
 					  value = TextAreaAutoComplete.replacer(value);
 					}
 					value = this.#escapeParentheses(value);
-
-					// Remove underscore
-					value = value.replace(/_/g, " ");
 					
 					const afterCursor = this.helper.getAfterCursor();
 					const shouldAddSeparator = !afterCursor.trim().startsWith(this.separator.trim());

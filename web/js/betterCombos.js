@@ -141,9 +141,9 @@ app.registerExtension({
 				const showHandler = () => showImage(el, key, getRootRect);
 				const closeHandler = () => closeImage(key);
 
-        el.addEventListener("mouseenter", showHandler, { passive: true });
-        el.addEventListener("mouseleave", closeHandler, { passive: true });
-        el.addEventListener("click", closeHandler, { passive: true });
+				el.addEventListener("mouseenter", showHandler, { passive: true });
+				el.addEventListener("mouseleave", closeHandler, { passive: true });
+				el.addEventListener("click", closeHandler, { passive: true });
 			}
 		});
 

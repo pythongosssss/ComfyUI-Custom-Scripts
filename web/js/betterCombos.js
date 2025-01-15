@@ -128,7 +128,7 @@ app.registerExtension({
 		contextMenuHook["addItem"].push(function (el, menu, [name, value, options]) {
 			if (el && isCustomItem(value) && value?.image && !value.submenu) {
 				const key = `pysssss-image-combo-${name}`;
-        el.textContent += " *";
+				el.textContent += " *";
 				$el(`div.pysssss-combo-image`, {
 					id: key,
 					parent: document.body,
@@ -138,8 +138,8 @@ app.registerExtension({
 				});
 
 				const getRootRect = () => menu.root?.getBoundingClientRect();
-        const showHandler = () => showImage(el, key, getRootRect);
-        const closeHandler = () => closeImage(key);
+				const showHandler = () => showImage(el, key, getRootRect);
+				const closeHandler = () => closeImage(key);
 
         el.addEventListener("mouseenter", showHandler, { passive: true });
         el.addEventListener("mouseleave", closeHandler, { passive: true });

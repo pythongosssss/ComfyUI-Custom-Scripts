@@ -19,12 +19,12 @@ const getImage = (imageId) => document.querySelector(`#${CSS.escape(imageId)}`);
 
 const calculateImagePosition = (el, rootRect, bodyRect) => {
   const { x } = el.getBoundingClientRect();
-  let { top, left } = rootRect
-	const { width: bodyWidth, height: bodyHeight } = bodyRect;
+  let { top, left } = rootRect;
+  const { width: bodyWidth, height: bodyHeight } = bodyRect;
 
-  const isSpaceRight = x + IMAGE_WIDTH <= bodyWidth
+  const isSpaceRight = x + IMAGE_WIDTH <= bodyWidth;
   if (isSpaceRight) {
-    left += rootRect.width + IMAGE_WIDTH
+    left += rootRect.width + IMAGE_WIDTH;
   }
 
   const isSpaceBelow = rootRect.top + IMAGE_HEIGHT <= bodyHeight;
@@ -38,11 +38,11 @@ const calculateImagePosition = (el, rootRect, bodyRect) => {
 function showImage(el, imageId, getRootRect) {
   const img = getImage(imageId);
   if (img) {
-    const rootRect = getRootRect()
+    const rootRect = getRootRect();
     if (!rootRect) return;
 
-		const bodyRect = document.body.getBoundingClientRect();
-		if (!bodyRect) return;
+    const bodyRect = document.body.getBoundingClientRect();
+    if (!bodyRect) return;
 
     const { left, top } = calculateImagePosition(el, rootRect, bodyRect);
 
@@ -127,8 +127,8 @@ app.registerExtension({
 		// After an element is created for an item, add an image if it has one
 		contextMenuHook["addItem"].push(function (el, menu, [name, value, options]) {
 			if (el && isCustomItem(value) && value?.image && !value.submenu) {
-				const key = `pysssss-image-combo-${name}`
-				el.textContent += " *";
+				const key = `pysssss-image-combo-${name}`;
+        el.textContent += " *";
 				$el(`div.pysssss-combo-image`, {
 					id: key,
 					parent: document.body,
@@ -138,12 +138,12 @@ app.registerExtension({
 				});
 
 				const getRootRect = () => menu.root?.getBoundingClientRect();
-				const showHandler = () => showImage(el, key, getRootRect);
-				const closeHandler = () => closeImage(key);
-				
-				el.addEventListener("mouseenter", showHandler, { passive: true });
-				el.addEventListener("mouseleave", closeHandler, { passive: true });
-				el.addEventListener("click", closeHandler, { passive: true });
+        const showHandler = () => showImage(el, key, getRootRect);
+        const closeHandler = () => closeImage(key);
+
+        el.addEventListener("mouseenter", showHandler, { passive: true });
+        el.addEventListener("mouseleave", closeHandler, { passive: true });
+        el.addEventListener("click", closeHandler, { passive: true });
 			}
 		});
 

@@ -355,6 +355,7 @@ export class TextAreaAutoComplete {
 	static insertOnEnter = true;
 	static replacer = undefined;
 	static lorasEnabled = false;
+	static impactPackWildcardsEnabled = false;
 	static suggestionCount = 20;
 
 	/** @type {Record<string, Record<string, AutoCompleteEntry>>} */
@@ -613,32 +614,29 @@ export class TextAreaAutoComplete {
 			const item = $el(
 				"div.pysssss-autocomplete-item",
 				{
-				  onclick: () => {
-					this.el.focus();
-					let value = wordInfo.value ?? wordInfo.text;
-					const use_replacer = wordInfo.use_replacer ?? true;
-					if (TextAreaAutoComplete.replacer && use_replacer) {
-					  value = TextAreaAutoComplete.replacer(value);
-					}
-					value = this.#escapeParentheses(value);
+					onclick: () => {
+						this.el.focus();
+						let value = wordInfo.value ?? wordInfo.text;
+						const use_replacer = wordInfo.use_replacer ?? true;
+						if (TextAreaAutoComplete.replacer && use_replacer) {
+							value = TextAreaAutoComplete.replacer(value);
+						}
+						value = this.#escapeParentheses(value);
 
-					// Remove underscore
-					value = value.replace(/_/g, " ");
-					
-					const afterCursor = this.helper.getAfterCursor();
-					const shouldAddSeparator = !afterCursor.trim().startsWith(this.separator.trim());
-					this.helper.insertAtCursor(
-					  value + (shouldAddSeparator ? this.separator : ''),
-					  -before.length,
-					  wordInfo.caretOffset
-					);			
-					setTimeout(() => {
-					  this.#update();
-					}, 150);
-				  },
+						const afterCursor = this.helper.getAfterCursor();
+						const shouldAddSeparator = !afterCursor.trim().startsWith(this.separator.trim());
+						this.helper.insertAtCursor(
+							value + (shouldAddSeparator ? this.separator : ''),
+							-before.length,
+							wordInfo.caretOffset
+						);
+						setTimeout(() => {
+							this.#update();
+						}, 150);
+					},
 				},
 				parts
-			  );
+			);
 
 			if (wordInfo === this.selected) {
 				hasSelected = true;

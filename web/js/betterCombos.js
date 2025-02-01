@@ -17,46 +17,53 @@ function getType(node) {
 
 const getImage = (imageId) => document.querySelector(`#${CSS.escape(imageId)}`);
 
-const calculateImagePosition = (el, rootRect, bodyRect) => {
-  const { x } = el.getBoundingClientRect();
-  let { top, left } = rootRect;
-  const { width: bodyWidth, height: bodyHeight } = bodyRect;
+const calculateImagePosition = (el, bodyRect) => {
+	let { top, left, right } = el.getBoundingClientRect();
+	const { width: bodyWidth, height: bodyHeight } = bodyRect;
 
-  const isSpaceRight = x + IMAGE_WIDTH <= bodyWidth;
-  if (isSpaceRight) {
-    left += rootRect.width + IMAGE_WIDTH;
-  }
+	const isSpaceRight = right + IMAGE_WIDTH <= bodyWidth;
+	if (isSpaceRight) {
+		left = right;
+	} else {
+		left -= IMAGE_WIDTH;
+	}
 
-  const isSpaceBelow = rootRect.top + IMAGE_HEIGHT <= bodyHeight;
-  if (!isSpaceBelow) {
-    top = bodyHeight - IMAGE_HEIGHT;
-  }
+	top = top - IMAGE_HEIGHT / 2;
+	if (top + IMAGE_HEIGHT > bodyHeight) {
+		top = bodyHeight - IMAGE_HEIGHT;
+	}
+	if (top < 0) {
+		top = 0;
+	}
 
-  return { left: Math.round(left), top: Math.round(top) };
+	return { left: Math.round(left), top: Math.round(top), isLeft: !isSpaceRight };
 };
 
-function showImage(el, imageId, getRootRect) {
-  const img = getImage(imageId);
-  if (img) {
-    const rootRect = getRootRect();
-    if (!rootRect) return;
+function showImage(el, imageId) {
+	const img = getImage(imageId);
+	if (img) {
+		const bodyRect = document.body.getBoundingClientRect();
+		if (!bodyRect) return;
 
-    const bodyRect = document.body.getBoundingClientRect();
-    if (!bodyRect) return;
+		const { left, top, isLeft } = calculateImagePosition(el, bodyRect);
 
-    const { left, top } = calculateImagePosition(el, rootRect, bodyRect);
+		img.style.display = "block";
+		img.style.left = `${left}px`;
+		img.style.top = `${top}px`;
 
-    img.style.display = "block";
-    img.style.left = `${left}px`;
-    img.style.top = `${top}px`;
-  }
+		if (isLeft) {
+			img.classList.add("left");
+		} else {
+			img.classList.remove("left");
+		}
+	}
 }
 
 function closeImage(imageId) {
-  const img = getImage(imageId);
-  if (img) {
-    img.style.display = "none";
-  }
+	const img = getImage(imageId);
+	if (img) {
+		img.style.display = "none";
+	}
 }
 
 app.registerExtension({
@@ -72,13 +79,14 @@ app.registerExtension({
 					position: absolute;
 					left: 0;
 					top: 0;
-					transform: translate(-100%, 0);
 					width: ${IMAGE_WIDTH}px;
 					height: ${IMAGE_HEIGHT}px;
 					background-size: contain;
-					background-position: top right;
 					background-repeat: no-repeat;
-					filter: brightness(65%);
+					z-index: 9999;
+				}
+				.pysssss-combo-image.left {
+					background-position: top right;
 				}
 			`,
 			parent: document.body,
@@ -118,10 +126,7 @@ app.registerExtension({
 		});
 
 		function encodeRFC3986URIComponent(str) {
-			return encodeURIComponent(str).replace(
-				/[!'()*]/g,
-				(c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
-			);
+			return encodeURIComponent(str).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
 		}
 
 		// After an element is created for an item, add an image if it has one
@@ -129,16 +134,14 @@ app.registerExtension({
 			if (el && isCustomItem(value) && value?.image && !value.submenu) {
 				const key = `pysssss-image-combo-${name}`;
 				el.textContent += " *";
-				$el(`div.pysssss-combo-image`, {
+				$el("div.pysssss-combo-image", {
 					id: key,
 					parent: document.body,
 					style: {
 						backgroundImage: `url(/pysssss/view/${encodeRFC3986URIComponent(value.image)})`,
 					},
 				});
-
-				const getRootRect = () => menu.root?.getBoundingClientRect();
-				const showHandler = () => showImage(el, key, getRootRect);
+				const showHandler = () => showImage(el, key);
 				const closeHandler = () => closeImage(key);
 
 				el.addEventListener("mouseenter", showHandler, { passive: true });
@@ -225,18 +228,18 @@ app.registerExtension({
 									}
 								}
 								return false;
-							}
+							};
 							const includesFromMenuItem = function (item) {
 								if (item.submenu) {
-									return includesFromMenuItems(item.submenu.options)
+									return includesFromMenuItems(item.submenu.options);
 								} else {
 									return item.content === searchElement.content;
 								}
-							}
+							};
 
 							const includes = valuesIncludes.apply(this, arguments) || includesFromMenuItems(this);
 							return includes;
-						}
+						};
 
 						return v;
 					},
@@ -324,7 +327,6 @@ app.registerExtension({
 					return exampleCb?.apply(this, arguments) ?? exampleList.value;
 				};
 
-
 				const listExamples = async () => {
 					exampleList.disabled = true;
 					exampleList.options.values = ["[none]"];
@@ -386,9 +388,7 @@ app.registerExtension({
 					img = this.imgs[this.overIndex];
 				}
 				if (img) {
-					const nodes = app.graph._nodes.filter(
-						(n) => n.comfyClass === LORA_LOADER || n.comfyClass === CHECKPOINT_LOADER
-					);
+					const nodes = app.graph._nodes.filter((n) => n.comfyClass === LORA_LOADER || n.comfyClass === CHECKPOINT_LOADER);
 					if (nodes.length) {
 						options.unshift({
 							content: "Save as Preview",

@@ -2,6 +2,8 @@
 
 ### ⚠️ While these extensions work for the most part, i'm very busy at the moment and so unable to keep on top of everything here, thanks for your patience!
 
+### @samhodge-aiml make changes to be pip installable for hiddenswitch branch
+
 # Installation
 
 1. Clone the repository:

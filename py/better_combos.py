@@ -133,6 +133,8 @@ def populate_items(names, type):
         return
     all_ok_count: int = 0
     for i in names:
+        if not isinstance(i, dict):
+            continue
         if isinstance( i.get("contents",None),str):
             all_ok_count += 1
     if all_ok_count < count:

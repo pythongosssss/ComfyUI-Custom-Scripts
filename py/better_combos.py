@@ -1,7 +1,7 @@
 import glob
 import os
-from comfy.nodes import LoraLoader as LoraLoader
-from comfy.nodes import CheckpointLoaderSimple as CheckpointLoaderSimple
+from comfy.nodes.base_nodes import LoraLoader as LoraLoader
+from comfy.nodes.base_nodes import CheckpointLoaderSimple as CheckpointLoaderSimple
 from comfy.cmd import folder_paths as folder_paths
 from comfy.cmd.server import PromptServer as PromptServer
 from comfy.cmd.folder_paths import get_directory_by_type as get_directory_by_type

@@ -128,6 +128,15 @@ def populate_items(names, type):
             "content": item_name,
             "image": f"{type}/{item_image}" if has_image else None,
         }
+    count: int = len(names)
+    if not count:
+        return
+    all_ok_count: int = 0
+    for i in names:
+        if isinstance( i.get("contents",None),str):
+            all_ok_count += 1
+    if all_ok_count < count:
+        return
     names.sort(key=lambda i: i["content"].lower())
 
 

@@ -1,8 +1,8 @@
 import hashlib
 import json
 from aiohttp import web
-from server import PromptServer
-import folder_paths
+from comfy.cmd.server import PromptServer as PromptServer
+from comfy.cmd import folder_paths as folder_paths
 import os
 
 

@@ -1,7 +1,7 @@
 import os
-import folder_paths
+from comfy.cmd import folder_paths as folder_paths
 import json
-from server import PromptServer
+from comfy.cmd.server import PromptServer as PromptServer
 import glob
 from aiohttp import web
 

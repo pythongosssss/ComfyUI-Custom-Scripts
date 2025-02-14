@@ -1,7 +1,7 @@
-from server import PromptServer
+from comfy.cmd.server import PromptServer as PromptServer
 from aiohttp import web
 import os
-import folder_paths
+from comfy.cmd import folder_paths as folder_paths
 
 dir = os.path.abspath(os.path.join(__file__, "../../user"))
 if not os.path.exists(dir):

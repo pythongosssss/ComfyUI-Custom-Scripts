@@ -2,7 +2,7 @@ import glob
 import os
 from nodes import LoraLoader, CheckpointLoaderSimple
 from comfy.cmd import folder_paths as folder_paths
-from server import PromptServer
+from comfy.cmd.server import PromptServer as PromptServer
 from comfy.cmd.folder_paths import get_directory_by_type as get_directory_by_type
 from aiohttp import web
 import shutil

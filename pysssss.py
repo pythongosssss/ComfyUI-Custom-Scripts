@@ -4,7 +4,7 @@ import json
 import shutil
 import inspect
 import aiohttp
-from server import PromptServer
+from comfy.cmd.server import PromptServer as PromptServer
 from tqdm import tqdm
 
 config = None

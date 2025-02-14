@@ -1,4 +1,4 @@
-from server import PromptServer
+from comfy.cmd.server import PromptServer as PromptServer
 from aiohttp import web
 import os
 import inspect

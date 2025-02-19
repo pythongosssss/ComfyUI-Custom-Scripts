@@ -11,3 +11,25 @@ Repository = "https://github.com/pythongosssss/ComfyUI-Custom-Scripts"
 PublisherId = "pythongosssss"
 DisplayName = "ComfyUI-Custom-Scripts"
 Icon = ""
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = [ 
+    "ComfyUI_pythongosssss_nodes", 
+    "ComfyUI_pythongosssss_nodes.py",
+    "ComfyUI_pythongosssss_nodes.web",
+]
+
+[tool.setuptools.package-dir]
+"ComfyUI_pythongosssss_nodes" = "."
+"ComfyUI_pythongosssss_nodes.py" = "py"
+"ComfyUI_pythongosssss_nodes.web" = "web"
+
+[tool.setuptools.package-data]
+"*" = ["**/*.js", "**/*.json", "**/*.css","**/*.ico", "**/*.mp3"]
+
+[project.entry-points."comfyui.custom_nodes"]
+ComfyUI_pythongosssss_nodes = "ComfyUI_pythongosssss_nodes"

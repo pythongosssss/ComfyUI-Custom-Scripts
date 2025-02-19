@@ -283,7 +283,7 @@ app.registerExtension({
 			const onAdded = nodeType.prototype.onAdded;
 			nodeType.prototype.onAdded = function () {
 				onAdded?.apply(this, arguments);
-				const { widget: exampleList } = ComfyWidgets["COMBO"](this, "example", [[""]], app);
+				const { widget: exampleList } = ComfyWidgets["COMBO"](this, "example", [[""], {}], app);
 
 				let exampleWidget;
 

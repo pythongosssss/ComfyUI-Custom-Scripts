@@ -23,8 +23,8 @@ to your ComfyUI `custom_nodes` directory
 
 ## Autocomplete
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/b5971135-414f-4f4e-a6cf-2650dc01085f)  
-Provides embedding and custom word autocomplete. You can view embedding details by clicking on the info icon on the list.  
-Define your list of custom words via the settings.  
+Provides embedding, [Impact-Pack](https://github.com/ltdrdata/ComfyUI-Impact-Pack) wildcards and custom word autocomplete. You can view embedding details by clicking on the info icon on the list.  
+Define your list of custom words via the settings.
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/160ef61c-7d7e-49d0-b60f-5a1501b74c9d)  
 You can quickly default to danbooru tags using the Load button, or load/manage other custom word lists.  
 ![image](https://github.com/pythongosssss/ComfyUI-Custom-Scripts/assets/125205205/cc180b35-5f45-442f-9285-3ddf3fa320d0)

@@ -355,6 +355,7 @@ export class TextAreaAutoComplete {
 	static insertOnEnter = true;
 	static replacer = undefined;
 	static lorasEnabled = false;
+	static impactPackWildcardsEnabled = false;
 	static suggestionCount = 20;
 
 	/** @type {Record<string, Record<string, AutoCompleteEntry>>} */

@@ -106,6 +106,7 @@ async def save_example(request):
 
 
 def populate_items(names, type):
+    new_names = []
     for idx, item_name in enumerate(names):
 
         file_name = os.path.splitext(item_name)[0]
@@ -123,11 +124,14 @@ def populate_items(names, type):
                 item_image = f"{file_name}.{ext}"
                 break
 
-        names[idx] = {
+        new_names.append({
             "content": item_name,
             "image": f"{type}/{item_image}" if has_image else None,
-        }
-    names.sort(key=lambda i: i["content"].lower())
+        })
+    
+    new_names.sort(key=lambda i: i["content"].lower())
+    names.clear()
+    names.extend(new_names)
 
 
 class LoraLoaderWithImages(LoraLoader):

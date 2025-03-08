@@ -64,18 +64,19 @@ async def get_examples(request):
         type, name)
     if not file_path:
         return web.Response(status=404)
-    
+
     file_path_no_ext = os.path.splitext(file_path)[0]
     examples = []
 
     if os.path.isdir(file_path_no_ext):
         examples += sorted(map(lambda t: os.path.relpath(t, file_path_no_ext),
-                        glob.glob(file_path_no_ext + "/*.txt")))
-        
+                               glob.glob(file_path_no_ext + "/*.txt")))
+
     if os.path.isfile(file_path_no_ext + ".txt"):
         examples += ["notes"]
-   
+
     return web.json_response(examples)
+
 
 @PromptServer.instance.routes.post("/pysssss/examples/{name}")
 async def save_example(request):
@@ -91,7 +92,7 @@ async def save_example(request):
         type, name)
     if not file_path:
         return web.Response(status=404)
-    
+
     if not example_name.endswith(".txt"):
         example_name += ".txt"
 
@@ -105,83 +106,57 @@ async def save_example(request):
     return web.Response(status=201)
 
 
-def populate_items(names, type):
-    for idx, item_name in enumerate(names):
+@PromptServer.instance.routes.get("/pysssss/images/{type}")
+async def get_images(request):
+    type = request.match_info["type"]
+    names = folder_paths.get_filename_list(type)
 
+    images = {}
+    for item_name in names:
         file_name = os.path.splitext(item_name)[0]
         file_path = folder_paths.get_full_path(type, item_name)
 
         if file_path is None:
-            print(f"(pysssss:better_combos) Unable to get path for {type} {item_name}")
             continue
 
         file_path_no_ext = os.path.splitext(file_path)[0]
 
         for ext in ["png", "jpg", "jpeg", "preview.png", "preview.jpeg"]:
-            has_image = os.path.isfile(file_path_no_ext + "." + ext)
-            if has_image:
-                item_image = f"{file_name}.{ext}"
+            if os.path.isfile(file_path_no_ext + "." + ext):
+                images[item_name] = f"{type}/{file_name}.{ext}"
                 break
 
-        names[idx] = {
-            "content": item_name,
-            "image": f"{type}/{item_image}" if has_image else None,
-        }
-    names.sort(key=lambda i: i["content"].lower())
+    return web.json_response(images)
 
 
 class LoraLoaderWithImages(LoraLoader):
     RETURN_TYPES = (*LoraLoader.RETURN_TYPES, "STRING",)
+    RETURN_NAMES = (*getattr(LoraLoader, "RETURN_NAMES",
+                    LoraLoader.RETURN_TYPES), "example")
 
     @classmethod
     def INPUT_TYPES(s):
         types = super().INPUT_TYPES()
-        names = types["required"]["lora_name"][0]
-        populate_items(names, "loras")
-        types["optional"] = { "prompt": ("HIDDEN",) }
+        types["optional"] = {"prompt": ("STRING", {"hidden": True})}
         return types
 
-    @classmethod
-    def VALIDATE_INPUTS(s, lora_name):
-        types = super().INPUT_TYPES()
-        names = types["required"]["lora_name"][0]
-
-        name = lora_name["content"]
-        if name in names:
-            return True
-        else:
-            return f"Lora not found: {name}"
-
     def load_lora(self, **kwargs):
-        kwargs["lora_name"] = kwargs["lora_name"]["content"]
         prompt = kwargs.pop("prompt", "")
         return (*super().load_lora(**kwargs), prompt)
 
 
 class CheckpointLoaderSimpleWithImages(CheckpointLoaderSimple):
     RETURN_TYPES = (*CheckpointLoaderSimple.RETURN_TYPES, "STRING",)
-    
+    RETURN_NAMES = (*getattr(CheckpointLoaderSimple, "RETURN_NAMES",
+                    CheckpointLoaderSimple.RETURN_TYPES), "example")
+
     @classmethod
     def INPUT_TYPES(s):
         types = super().INPUT_TYPES()
-        names = types["required"]["ckpt_name"][0]
-        populate_items(names, "checkpoints")
-        types["optional"] = { "prompt": ("HIDDEN",) }
+        types["optional"] = {"prompt": ("STRING", {"hidden": True})}
         return types
 
-    @classmethod
-    def VALIDATE_INPUTS(s, ckpt_name):
-        types = super().INPUT_TYPES()
-        names = types["required"]["ckpt_name"][0]
-
-        name = ckpt_name["content"]
-        if name in names:
-            return True
-        else:
-            return f"Checkpoint not found: {name}"
-
     def load_checkpoint(self, **kwargs):
-        kwargs["ckpt_name"] = kwargs["ckpt_name"]["content"]
         prompt = kwargs.pop("prompt", "")
         return (*super().load_checkpoint(**kwargs), prompt)
 

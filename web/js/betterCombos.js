@@ -15,7 +15,13 @@ function getType(node) {
 	return "loras";
 }
 
-const getImage = (imageId) => document.querySelector(`#${CSS.escape(imageId)}`);
+function getWidgetName(type) {
+	return type === "checkpoints" ? "ckpt_name" : "lora_name";
+}
+
+function encodeRFC3986URIComponent(str) {
+	return encodeURIComponent(str).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
+}
 
 const calculateImagePosition = (el, bodyRect) => {
 	let { top, left, right } = el.getBoundingClientRect();
@@ -39,256 +45,368 @@ const calculateImagePosition = (el, bodyRect) => {
 	return { left: Math.round(left), top: Math.round(top), isLeft: !isSpaceRight };
 };
 
-function showImage(el, imageId) {
-	const img = getImage(imageId);
-	if (img) {
-		const bodyRect = document.body.getBoundingClientRect();
-		if (!bodyRect) return;
+function showImage(relativeToEl, imageEl) {
+	const bodyRect = document.body.getBoundingClientRect();
+	if (!bodyRect) return;
 
-		const { left, top, isLeft } = calculateImagePosition(el, bodyRect);
+	const { left, top, isLeft } = calculateImagePosition(relativeToEl, bodyRect);
 
-		img.style.display = "block";
-		img.style.left = `${left}px`;
-		img.style.top = `${top}px`;
+	imageEl.style.left = `${left}px`;
+	imageEl.style.top = `${top}px`;
 
-		if (isLeft) {
-			img.classList.add("left");
-		} else {
-			img.classList.remove("left");
-		}
+	if (isLeft) {
+		imageEl.classList.add("left");
+	} else {
+		imageEl.classList.remove("left");
 	}
+
+	document.body.appendChild(imageEl);
 }
 
-function closeImage(imageId) {
-	const img = getImage(imageId);
-	if (img) {
-		img.style.display = "none";
-	}
-}
+let imagesByType = {};
+const loadImageList = async (type) => {
+	imagesByType[type] = await (await api.fetchApi(`/pysssss/images/${type}`)).json();
+};
 
 app.registerExtension({
 	name: "pysssss.Combo++",
 	init() {
+		const displayOptions = { "List (normal)": 0, "Tree (subfolders)": 1, "Thumbnails (grid)": 2 };
+		const displaySetting = app.ui.settings.addSetting({
+			id: "pysssss.Combo++.Submenu",
+			name: "🐍 Lora/Checkpoint loader display mode",
+			defaultValue: 1,
+			type: "combo",
+			options: (value) => {
+				value = +value;
+
+				return Object.entries(displayOptions).map(([k, v]) => ({
+					value: v,
+					text: k,
+					selected: k === value,
+				}));
+			},
+		});
+
 		$el("style", {
 			textContent: `
-				.litemenu-entry:hover .pysssss-combo-image {
-					display: block;
-				}
 				.pysssss-combo-image {
-					display: none;
 					position: absolute;
 					left: 0;
 					top: 0;
 					width: ${IMAGE_WIDTH}px;
 					height: ${IMAGE_HEIGHT}px;
-					background-size: contain;
-					background-repeat: no-repeat;
+					object-fit: contain;
+					object-position: top left;
 					z-index: 9999;
 				}
 				.pysssss-combo-image.left {
-					background-position: top right;
+					object-position: top right;
 				}
+				.pysssss-combo-folder { opacity: 0.7 }
+				.pysssss-combo-folder-arrow { display: inline-block; width: 15px; }
+				.pysssss-combo-folder:hover { background-color: rgba(255, 255, 255, 0.1); }
+				.pysssss-combo-prefix { display: none }
+
+				/* Special handling for when the filter input is populated to revert to normal */
+				.litecontextmenu:has(input:not(:placeholder-shown)) .pysssss-combo-folder-contents {
+					display: block !important;
+				}
+				.litecontextmenu:has(input:not(:placeholder-shown)) .pysssss-combo-folder { 
+					display: none;
+				}
+				.litecontextmenu:has(input:not(:placeholder-shown)) .pysssss-combo-prefix { 
+					display: inline;
+				}
+				.litecontextmenu:has(input:not(:placeholder-shown)) .litemenu-entry { 
+					padding-left: 2px !important;
+				}
+
+				/* Grid mode */
+				.pysssss-combo-grid {
+					display: grid;
+					grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+					gap: 10px;
+					overflow-x: hidden;
+					max-width: 60vw;
+				}
+				.pysssss-combo-grid .comfy-context-menu-filter {
+					grid-column: 1 / -1;
+					position: sticky;
+					top: 0;
+				}
+				.pysssss-combo-grid .litemenu-entry {
+					word-break: break-word;
+					display: flex;
+					flex-direction: column;
+					justify-content: space-between;
+					align-items: center;
+				}
+				.pysssss-combo-grid .litemenu-entry:before {
+					content: "";
+					display: block;
+					width: 100%;
+					height: 250px;
+					background-size: contain;
+					background-position: center;
+					background-repeat: no-repeat;
+					/* No-image image attribution: Picture icons created by Pixel perfect - Flaticon */
+					background-image: var(--background-image, url(extensions/ComfyUI-Custom-Scripts/js/assets/no-image.png));
+				}
+
 			`,
 			parent: document.body,
 		});
+		const p1 = loadImageList("checkpoints");
+		const p2 = loadImageList("loras");
 
-		const submenuSetting = app.ui.settings.addSetting({
-			id: "pysssss.Combo++.Submenu",
-			name: "🐍 Enable submenu in custom nodes",
-			defaultValue: true,
-			type: "boolean",
-		});
-
-		// Ensure hook callbacks are available
-		const getOrSet = (target, name, create) => {
-			if (name in target) return target[name];
-			return (target[name] = create());
+		const refreshComboInNodes = app.refreshComboInNodes;
+		app.refreshComboInNodes = async function () {
+			const r = await Promise.all([
+				refreshComboInNodes.apply(this, arguments),
+				loadImageList("checkpoints").catch(() => {}),
+				loadImageList("loras").catch(() => {}),
+			]);
+			return r[0];
 		};
-		const symbol = getOrSet(window, "__pysssss__", () => Symbol("__pysssss__"));
-		const store = getOrSet(window, symbol, () => ({}));
-		const contextMenuHook = getOrSet(store, "contextMenuHook", () => ({}));
-		for (const e of ["ctor", "preAddItem", "addItem"]) {
-			if (!contextMenuHook[e]) {
-				contextMenuHook[e] = [];
+
+		const imageHost = $el("img.pysssss-combo-image");
+
+		const positionMenu = (menu, fillWidth) => {
+			// compute best position
+			let left = app.canvas.last_mouse[0] - 10;
+			let top = app.canvas.last_mouse[1] - 10;
+
+			const body_rect = document.body.getBoundingClientRect();
+			const root_rect = menu.getBoundingClientRect();
+
+			if (body_rect.width && left > body_rect.width - root_rect.width - 10) left = body_rect.width - root_rect.width - 10;
+			if (body_rect.height && top > body_rect.height - root_rect.height - 10) top = body_rect.height - root_rect.height - 10;
+
+			menu.style.left = `${left}px`;
+			menu.style.top = `${top}px`;
+			if (fillWidth) {
+				menu.style.right = "10px";
 			}
-		}
-		// // Checks if this is a custom combo item
-		const isCustomItem = (value) => value && typeof value === "object" && "image" in value && value.content;
-		// Simple check for what separator to split by
-		const splitBy = (navigator.platform || navigator.userAgent).includes("Win") ? /\/|\\/ : /\//;
+		};
 
-		contextMenuHook["ctor"].push(function (values, options) {
-			// Copy the class from the parent so if we are dark we are also dark
-			// this enables the filter box
-			if (options.parentMenu?.options?.className === "dark") {
-				options.className = "dark";
+		const updateMenu = async (menu, type) => {
+			try {
+				await p1;
+				await p2;
+			} catch (error) {
+				console.error(error);
+				console.error("Error loading pysssss.betterCombos data")
 			}
-		});
 
-		function encodeRFC3986URIComponent(str) {
-			return encodeURIComponent(str).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
-		}
+			// Clamp max height so it doesn't overflow the screen
+			const position = menu.getBoundingClientRect();
+			const maxHeight = window.innerHeight - position.top - 20;
+			menu.style.maxHeight = `${maxHeight}px`;
 
-		// After an element is created for an item, add an image if it has one
-		contextMenuHook["addItem"].push(function (el, menu, [name, value, options]) {
-			if (el && isCustomItem(value) && value?.image && !value.submenu) {
-				const key = `pysssss-image-combo-${name}`;
-				el.textContent += " *";
-				$el("div.pysssss-combo-image", {
-					id: key,
-					parent: document.body,
-					style: {
-						backgroundImage: `url(/pysssss/view/${encodeRFC3986URIComponent(value.image)})`,
-					},
-				});
-				const showHandler = () => showImage(el, key);
-				const closeHandler = () => closeImage(key);
+			const images = imagesByType[type];
+			const items = menu.querySelectorAll(".litemenu-entry");
 
-				el.addEventListener("mouseenter", showHandler, { passive: true });
-				el.addEventListener("mouseleave", closeHandler, { passive: true });
-				el.addEventListener("click", closeHandler, { passive: true });
-			}
-		});
+			// Add image handler to items
+			const addImageHandler = (item) => {
+				const text = item.getAttribute("data-value").trim();
+				if (images[text]) {
+					const textNode = document.createTextNode("*");
+					item.appendChild(textNode);
 
-		function buildMenu(widget, values) {
-			const lookup = {
-				"": { options: [] },
+					item.addEventListener(
+						"mouseover",
+						() => {
+							imageHost.src = `/pysssss/view/${encodeRFC3986URIComponent(images[text])}?${+new Date()}`;
+							document.body.appendChild(imageHost);
+							showImage(item, imageHost);
+						},
+						{ passive: true }
+					);
+					item.addEventListener(
+						"mouseout",
+						() => {
+							imageHost.remove();
+						},
+						{ passive: true }
+					);
+					item.addEventListener(
+						"click",
+						() => {
+							imageHost.remove();
+						},
+						{ passive: true }
+					);
+				}
 			};
 
-			// Split paths into menu structure
-			for (const value of values) {
-				const split = value.content.split(splitBy);
-				let path = "";
-				for (let i = 0; i < split.length; i++) {
-					const s = split[i];
-					const last = i === split.length - 1;
-					if (last) {
-						// Leaf node, manually add handler that sets the lora
-						lookup[path].options.push({
-							...value,
-							title: s,
-							callback: () => {
-								widget.value = value;
-								widget.callback(value);
-								app.graph.setDirtyCanvas(true);
-							},
-						});
-					} else {
-						const prevPath = path;
-						path += s + splitBy;
-						if (!lookup[path]) {
-							const sub = {
-								title: s,
-								submenu: {
-									options: [],
-									title: s,
-								},
-							};
+			const createTree = () => {
+				// Create a map to store folder structures
+				const folderMap = new Map();
+				const rootItems = [];
+				const splitBy = (navigator.platform || navigator.userAgent).includes("Win") ? /\/|\\/ : /\//;
+				const itemsSymbol = Symbol("items");
 
-							// Add to tree
-							lookup[path] = sub.submenu;
-							lookup[prevPath].options.push(sub);
+				// First pass - organize items into folder structure
+				for (const item of items) {
+					const path = item.getAttribute("data-value").split(splitBy);
+
+					// Remove path from visible text
+					item.textContent = path[path.length - 1];
+					if (path.length > 1) {
+						// Add the prefix path back in so it can be filtered on
+						const prefix = $el("span.pysssss-combo-prefix", {
+							textContent: path.slice(0, -1).join("/") + "/",
+						});
+						item.prepend(prefix);
+					}
+
+					addImageHandler(item);
+
+					if (path.length === 1) {
+						rootItems.push(item);
+						continue;
+					}
+
+					// Temporarily remove the item from current position
+					item.remove();
+
+					// Create folder hierarchy
+					let currentLevel = folderMap;
+					for (let i = 0; i < path.length - 1; i++) {
+						const folder = path[i];
+						if (!currentLevel.has(folder)) {
+							currentLevel.set(folder, new Map());
 						}
+						currentLevel = currentLevel.get(folder);
+					}
+
+					// Store the actual item in the deepest folder
+					if (!currentLevel.has(itemsSymbol)) {
+						currentLevel.set(itemsSymbol, []);
+					}
+					currentLevel.get(itemsSymbol).push(item);
+				}
+
+				const createFolderElement = (name) => {
+					const folder = $el("div.litemenu-entry.pysssss-combo-folder", {
+						innerHTML: `<span class="pysssss-combo-folder-arrow">▶</span> ${name}`,
+						style: { paddingLeft: "5px" },
+					});
+					return folder;
+				};
+
+				const insertFolderStructure = (parentElement, map, level = 0) => {
+					for (const [folderName, content] of map.entries()) {
+						if (folderName === itemsSymbol) continue;
+
+						const folderElement = createFolderElement(folderName);
+						folderElement.style.paddingLeft = `${level * 10 + 5}px`;
+						parentElement.appendChild(folderElement);
+
+						const childContainer = $el("div.pysssss-combo-folder-contents", {
+							style: { display: "none" },
+						});
+
+						// Add items in this folder
+						const items = content.get(itemsSymbol) || [];
+						for (const item of items) {
+							item.style.paddingLeft = `${(level + 1) * 10 + 14}px`;
+							childContainer.appendChild(item);
+						}
+
+						// Recursively add subfolders
+						insertFolderStructure(childContainer, content, level + 1);
+						parentElement.appendChild(childContainer);
+
+						// Add click handler for folder
+						folderElement.addEventListener("click", (e) => {
+							e.stopPropagation();
+							const arrow = folderElement.querySelector(".pysssss-combo-folder-arrow");
+							const contents = folderElement.nextElementSibling;
+							if (contents.style.display === "none") {
+								contents.style.display = "block";
+								arrow.textContent = "▼";
+							} else {
+								contents.style.display = "none";
+								arrow.textContent = "▶";
+							}
+						});
+					}
+				};
+
+				insertFolderStructure(items[0].parentElement, folderMap);
+				positionMenu(menu);
+			};
+
+			const addImageData = (item) => {
+				const text = item.getAttribute("data-value").trim();
+				if (images[text]) {
+					item.style.setProperty("--background-image", `url(/pysssss/view/${encodeRFC3986URIComponent(images[text])})`);
+				}
+			};
+
+			if (displaySetting.value === 1 || displaySetting.value === true) {
+				createTree();
+			} else if (displaySetting.value === 2) {
+				menu.classList.add("pysssss-combo-grid");
+
+				for (const item of items) {
+					addImageData(item);
+				}
+				positionMenu(menu, true);
+			} else {
+				for (const item of items) {
+					addImageHandler(item);
+				}
+			}
+		};
+
+		const mutationObserver = new MutationObserver((mutations) => {
+			const node = app.canvas.current_node;
+
+			if (!node || (node.comfyClass !== LORA_LOADER && node.comfyClass !== CHECKPOINT_LOADER)) {
+				return;
+			}
+
+			for (const mutation of mutations) {
+				for (const removed of mutation.removedNodes) {
+					if (removed.classList?.contains("litecontextmenu")) {
+						imageHost.remove();
+					}
+				}
+
+				for (const added of mutation.addedNodes) {
+					if (added.classList?.contains("litecontextmenu")) {
+						const overWidget = app.canvas.getWidgetAtCursor();
+						const type = getType(node);
+						if (overWidget?.name === getWidgetName(type)) {
+							requestAnimationFrame(() => {
+								// Bad hack to prevent showing on right click menu by checking for the filter input
+								if (!added.querySelector(".comfy-context-menu-filter")) return;
+								updateMenu(added, type);
+							});
+						}
+						return;
 					}
 				}
 			}
-
-			return lookup[""].options;
-		}
-
-		// Override COMBO widgets to patch their values
-		const combo = ComfyWidgets["COMBO"];
-		ComfyWidgets["COMBO"] = function (node, inputName, inputData) {
-			const type = inputData[0];
-			const res = combo.apply(this, arguments);
-			if (isCustomItem(type[0])) {
-				let value = res.widget.value;
-				let values = res.widget.options.values;
-				let menu = null;
-
-				// Override the option values to check if we should render a menu structure
-				Object.defineProperty(res.widget.options, "values", {
-					get() {
-						let v = values;
-
-						if (submenuSetting.value) {
-							if (!menu) {
-								// Only build the menu once
-								menu = buildMenu(res.widget, values);
-							}
-							v = menu;
-						}
-
-						const valuesIncludes = v.includes;
-						v.includes = function (searchElement) {
-							const includesFromMenuItems = function (items) {
-								for (const item of items) {
-									if (includesFromMenuItem(item)) {
-										return true;
-									}
-								}
-								return false;
-							};
-							const includesFromMenuItem = function (item) {
-								if (item.submenu) {
-									return includesFromMenuItems(item.submenu.options);
-								} else {
-									return item.content === searchElement.content;
-								}
-							};
-
-							const includes = valuesIncludes.apply(this, arguments) || includesFromMenuItems(this);
-							return includes;
-						};
-
-						return v;
-					},
-					set(v) {
-						// Options are changing (refresh) so reset the menu so it can be rebuilt if required
-						values = v;
-						menu = null;
-					},
-				});
-
-				Object.defineProperty(res.widget, "value", {
-					get() {
-						// HACK: litegraph supports rendering items with "content" in the menu, but not on the widget
-						// This detects when its being called by the widget drawing and just returns the text
-						// Also uses the content for the same image replacement value
-						if (res.widget) {
-							const stack = new Error().stack;
-							if (stack.includes("drawNodeWidgets") || stack.includes("saveImageExtraOutput")) {
-								return (value || type[0]).content;
-							}
-						}
-						return value;
-					},
-					set(v) {
-						if (v?.submenu) {
-							// Dont allow selection of submenus
-							return;
-						}
-						value = v;
-					},
-				});
-			}
-
-			return res;
-		};
+		});
+		mutationObserver.observe(document.body, { childList: true, subtree: false });
 	},
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
-		const isCkpt = nodeType.comfyClass === CHECKPOINT_LOADER;
-		const isLora = nodeType.comfyClass === LORA_LOADER;
+		const isCkpt = nodeData.name === CHECKPOINT_LOADER;
+		const isLora = nodeData.name === LORA_LOADER;
 		if (isCkpt || isLora) {
 			const onAdded = nodeType.prototype.onAdded;
 			nodeType.prototype.onAdded = function () {
 				onAdded?.apply(this, arguments);
 				const { widget: exampleList } = ComfyWidgets["COMBO"](this, "example", [[""], {}], app);
-
+				this.widgets.find((w) => w.name === "prompt").computeSize = () => [0, -4];
 				let exampleWidget;
 
 				const get = async (route, suffix) => {
-					const url = encodeURIComponent(`${getType(nodeType)}${suffix || ""}`);
+					const url = encodeRFC3986URIComponent(`${getType(nodeType)}${suffix || ""}`);
 					return await api.fetchApi(`/pysssss/${route}/${url}`);
 				};
 
@@ -302,7 +420,7 @@ app.registerExtension({
 						return;
 					}
 
-					const v = this.widgets[0].value.content;
+					const v = this.widgets[0].value;
 					const pos = v.lastIndexOf(".");
 					const name = v.substr(0, pos);
 					let exampleName = exampleList.value;
@@ -332,9 +450,9 @@ app.registerExtension({
 					exampleList.options.values = ["[none]"];
 					exampleList.value = "[none]";
 					let examples = [];
-					if (this.widgets[0].value?.content) {
+					if (this.widgets[0].value) {
 						try {
-							examples = await (await get("examples", `/${this.widgets[0].value.content}`)).json();
+							examples = await (await get("examples", `/${this.widgets[0].value}`)).json();
 						} catch (error) {}
 					}
 					exampleList.options.values = ["[none]", ...examples];
@@ -353,9 +471,6 @@ app.registerExtension({
 				modelWidget.callback = function () {
 					const ret = modelCb?.apply(this, arguments) ?? modelWidget.value;
 					let v = ret;
-					if (ret?.content) {
-						v = ret.content;
-					}
 					if (prev !== v) {
 						listExamples();
 						prev = v;
@@ -365,13 +480,6 @@ app.registerExtension({
 				setTimeout(() => {
 					modelWidget.callback();
 				}, 30);
-			};
-
-			// Prevent adding HIDDEN inputs
-			const addInput = nodeType.prototype.addInput ?? LGraphNode.prototype.addInput;
-			nodeType.prototype.addInput = function (_, type) {
-				if (type === "HIDDEN") return;
-				return addInput.apply(this, arguments);
 			};
 		}
 
@@ -394,25 +502,21 @@ app.registerExtension({
 							content: "Save as Preview",
 							submenu: {
 								options: nodes.map((n) => ({
-									content: n.widgets[0].value.content,
+									content: n.widgets[0].value,
 									callback: async () => {
 										const url = new URL(img.src);
-										const { image } = await api.fetchApi(
-											"/pysssss/save/" + encodeURIComponent(`${getType(n)}/${n.widgets[0].value.content}`),
-											{
-												method: "POST",
-												body: JSON.stringify({
-													filename: url.searchParams.get("filename"),
-													subfolder: url.searchParams.get("subfolder"),
-													type: url.searchParams.get("type"),
-												}),
-												headers: {
-													"content-type": "application/json",
-												},
-											}
-										);
-										n.widgets[0].value.image = image;
-										app.refreshComboInNodes();
+										await api.fetchApi("/pysssss/save/" + encodeRFC3986URIComponent(`${getType(n)}/${n.widgets[0].value}`), {
+											method: "POST",
+											body: JSON.stringify({
+												filename: url.searchParams.get("filename"),
+												subfolder: url.searchParams.get("subfolder"),
+												type: url.searchParams.get("type"),
+											}),
+											headers: {
+												"content-type": "application/json",
+											},
+										});
+										loadImageList(getType(n));
 									},
 								})),
 							},

@@ -142,6 +142,26 @@ async function addCustomWords(text) {
 	}
 }
 
+async function getImpactWildcards() {
+	const resp = await api.fetchApi("/impact/wildcards/list", { cache: "no-store" });
+	if (resp.status === 200) {
+		return await resp.json();
+	}
+	return undefined;
+}
+
+async function addImpactWildcards() {
+	const jObj = await getImpactWildcards();
+	if (jObj == null)
+		return;
+	const dict = jObj.data.reduce((p, wildcard) =>{
+		p[wildcard] = { text: wildcard, use_replacer: false, value: wildcard };
+		return p;
+	}, {});
+	console.log(dict);
+	TextAreaAutoComplete.updateWords("impact.wildcards", dict);
+}
+
 function toggleLoras() {
 	[TextAreaAutoComplete.globalWords, TextAreaAutoComplete.globalWordsExclLoras] = [
 		TextAreaAutoComplete.globalWordsExclLoras,
@@ -374,6 +394,27 @@ app.registerExtension({
 							]
 						),
 						$el(
+							"label.comfy-tooltip-indicator",
+							{
+								title: "Show or not wildcards provided by impact pack extension. Require page reload!",
+								textContent: "Impact-pack wildcards enabled ",
+								style: {
+									display: "block",
+								},
+							},
+							[
+								$el("input", {
+									type: "checkbox",
+									checked: !!TextAreaAutoComplete.impactPackWildcardsEnabled,
+									onchange: (event) => {
+										const checked = !!event.target.checked;
+										TextAreaAutoComplete.impactPackWildcardsEnabled = checked;
+										localStorage.setItem(id + ".ShowImpactPackWildcards", TextAreaAutoComplete.impactPackWildcardsEnabled);
+									},
+								}),
+							]
+						),
+						$el(
 							"label",
 							{
 								textContent: "Auto-insert comma ",
@@ -525,6 +566,7 @@ app.registerExtension({
 		TextAreaAutoComplete.insertOnTab = localStorage.getItem(id + ".InsertOnTab") !== "false";
 		TextAreaAutoComplete.insertOnEnter = localStorage.getItem(id + ".InsertOnEnter") !== "false";
 		TextAreaAutoComplete.lorasEnabled = localStorage.getItem(id + ".ShowLoras") === "true";
+		TextAreaAutoComplete.impactPackWildcardsEnabled = localStorage.getItem(id + ".ShowImpactPackWildcards") === "true";
 		TextAreaAutoComplete.suggestionCount = +localStorage.getItem(id + ".SuggestionCount") || 20;
 	},
 	setup() {
@@ -571,7 +613,11 @@ app.registerExtension({
 		}
 
 		// store global words with/without loras
-		Promise.all([addEmbeddings(), addCustomWords()])
+		const autocompleteLoaders = [addEmbeddings(), addCustomWords()];
+		if (TextAreaAutoComplete.impactPackWildcardsEnabled) {
+			autocompleteLoaders.push(addImpactWildcards())
+		}
+		Promise.all(autocompleteLoaders)
 			.then(() => {
 				TextAreaAutoComplete.globalWordsExclLoras = Object.assign({}, TextAreaAutoComplete.globalWords);
 			})

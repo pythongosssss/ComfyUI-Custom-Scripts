@@ -470,7 +470,7 @@ app.registerExtension({
 				let prev = undefined;
 				modelWidget.callback = function () {
 					let ret = modelCb?.apply(this, arguments) ?? modelWidget.value;
-					if ("content" in ret) {
+					if (typeof ret === "object" && "content" in ret) {
 						ret = ret.content;
 						modelWidget.value = ret;
 					}

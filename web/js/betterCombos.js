@@ -74,7 +74,7 @@ app.registerExtension({
 		const displayOptions = { "List (normal)": 0, "Tree (subfolders)": 1, "Thumbnails (grid)": 2 };
 		const displaySetting = app.ui.settings.addSetting({
 			id: "pysssss.Combo++.Submenu",
-			name: "🐍 Lora/Checkpoint loader display mode",
+			name: "🐍 Lora & Checkpoint loader display mode",
 			defaultValue: 1,
 			type: "combo",
 			options: (value) => {

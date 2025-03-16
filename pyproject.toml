@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-custom-scripts"
 description = "Enhancements & experiments for ComfyUI, mostly focusing on UI features"
-version = "1.2.0"
+version = "1.2.1"
 license = { file = "LICENSE" }
 
 [project.urls]

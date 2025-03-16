@@ -196,7 +196,7 @@ app.registerExtension({
 				await p2;
 			} catch (error) {
 				console.error(error);
-				console.error("Error loading pysssss.betterCombos data")
+				console.error("Error loading pysssss.betterCombos data");
 			}
 
 			// Clamp max height so it doesn't overflow the screen
@@ -335,7 +335,7 @@ app.registerExtension({
 					}
 				};
 
-				insertFolderStructure(items[0].parentElement, folderMap);
+				insertFolderStructure(items[0]?.parentElement || menu, folderMap);
 				positionMenu(menu);
 			};
 

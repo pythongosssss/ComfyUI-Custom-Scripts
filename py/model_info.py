@@ -6,6 +6,13 @@ import folder_paths
 import os
 
 
+def calculate_hash(filepath, chunksize=1024*1024):
+    sha256_hash = hashlib.sha256()
+    with open(filepath, "rb") as f:
+        while chunk := f.read(chunksize):
+            sha256_hash.update(chunk)
+    return sha256_hash.hexdigest()
+
 def get_metadata(filepath):
     with open(filepath, "rb") as file:
         # https://github.com/huggingface/safetensors#format
@@ -107,8 +114,7 @@ async def load_metadata(request):
         with open(hash_file, "rt") as f:
             meta["pysssss.sha256"] = f.read()
     else:
-        with open(file_path, "rb") as f:
-            meta["pysssss.sha256"] = hashlib.sha256(f.read()).hexdigest()
+        meta["pysssss.sha256"] = calculate_hash(file_path)
         with open(hash_file, "wt") as f:
             f.write(meta["pysssss.sha256"])
 

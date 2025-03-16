@@ -469,7 +469,11 @@ app.registerExtension({
 				const modelCb = modelWidget.callback;
 				let prev = undefined;
 				modelWidget.callback = function () {
-					const ret = modelCb?.apply(this, arguments) ?? modelWidget.value;
+					let ret = modelCb?.apply(this, arguments) ?? modelWidget.value;
+					if ("content" in ret) {
+						ret = ret.content;
+						modelWidget.value = ret;
+					}
 					let v = ret;
 					if (prev !== v) {
 						listExamples();

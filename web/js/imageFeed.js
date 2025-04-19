@@ -383,6 +383,14 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			type: "number",
 		});
 
+		const saveNodeOnly = app.ui.settings.addSetting({
+		id: "pysssss.ImageFeed.SaveNodeOnly",
+		name: "🐍 Image Feed Display Nodes",
+		tooltip: `Only show images from Save Image nodes. This prevents temporary previews from appearing in the feed.`,
+		defaultValue: false,
+		type: "boolean",
+		});
+
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
 			textContent: "Clear",
 			onclick: () => {
@@ -533,6 +541,12 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 					const n = app.graph.getNodeById(detail.node.split(":")[0]);
 					if (n?.getInnerNodes) return;
 				}
+				
+				// Apply "Display Save Image Node Only" filter if setting is enabled
+					const nodeName = detail.node?.split(":")?.[0];
+					const node = app.graph.getNodeById(nodeName);
+				
+				if (saveNodeOnly.value && node?.type !== "SaveImage") return;
 
 				for (const src of detail.output.images) {
 					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type}&

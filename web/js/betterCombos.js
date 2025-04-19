@@ -63,9 +63,23 @@ function showImage(relativeToEl, imageEl) {
 	document.body.appendChild(imageEl);
 }
 
+let imagePromises = {};
 let imagesByType = {};
 const loadImageList = async (type) => {
-	imagesByType[type] = await (await api.fetchApi(`/pysssss/images/${type}`)).json();
+    if (!imagePromises[type]) {
+        imagePromises[type] = api.fetchApi(`/pysssss/images/${type}`)
+            .then(resp => resp.json())
+            .then(data => {
+                imagesByType[type] = data;
+                return data;
+            })
+            .catch(err => {
+                console.error(`Error loading images for ${type}:`, err);
+                imagesByType[type] = {};
+                return {};
+            });
+    }
+    return imagePromises[type];
 };
 
 app.registerExtension({
@@ -157,8 +171,6 @@ app.registerExtension({
 			`,
 			parent: document.body,
 		});
-		const p1 = loadImageList("checkpoints");
-		const p2 = loadImageList("loras");
 
 		const refreshComboInNodes = app.refreshComboInNodes;
 		app.refreshComboInNodes = async function () {
@@ -192,8 +204,7 @@ app.registerExtension({
 
 		const updateMenu = async (menu, type) => {
 			try {
-				await p1;
-				await p2;
+				await loadImageList(type);
 			} catch (error) {
 				console.error(error);
 				console.error("Error loading pysssss.betterCombos data");

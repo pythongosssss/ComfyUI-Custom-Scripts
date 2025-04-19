@@ -385,8 +385,8 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 
 		const saveNodeOnly = app.ui.settings.addSetting({
 		id: "pysssss.ImageFeed.SaveNodeOnly",
-		name: "🐍 Image Feed Display Nodes",
-		tooltip: `Only show images from Save Image nodes. This prevents temporary previews from appearing in the feed.`,
+		name: "🐍 Image Feed Display 'SaveImage' Nodes Only",
+		tooltip: `Only show images from SaveImage nodes. This prevents 'PreviewImage' node outputs from appearing in the feed.`,
 		defaultValue: false,
 		type: "boolean",
 		});

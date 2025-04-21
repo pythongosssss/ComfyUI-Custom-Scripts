@@ -286,7 +286,7 @@ app.registerExtension({
 									imageFeed.className = `pysssss-image-feed pysssss-image-feed--${feedLocation.value}`;
 									updateMenuParent(feedLocation.value);
 									saveVal("Location", feedLocation.value);
-									window.dispatchEvent(new Event("resize"));									
+									window.dispatchEvent(new Event("resize"));
 								},
 							},
 							["left", "top", "right", "bottom", "hidden"].map((m) =>
@@ -365,13 +365,12 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			defaultValue: 0,
 			type: "combo",
 			options: (value) => {
-				let dedupeOptions = {"disabled": 0, "enabled (slow)": 1, "enabled (performance)": 0.5, "enabled (max performance)": 0.25};
+				let dedupeOptions = { disabled: 0, "enabled (slow)": 1, "enabled (performance)": 0.5, "enabled (max performance)": 0.25 };
 				return Object.entries(dedupeOptions).map(([k, v]) => ({
-						value: v,
-						text: k,
-						selected: k === value,
-					})
-				)
+					value: v,
+					text: k,
+					selected: k === value,
+				}));
 			},
 		});
 
@@ -384,11 +383,11 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 		});
 
 		const saveNodeOnly = app.ui.settings.addSetting({
-		id: "pysssss.ImageFeed.SaveNodeOnly",
-		name: "🐍 Image Feed Display 'SaveImage' Only",
-		tooltip: `Only show images from 'SaveImage' nodes. This prevents 'PreviewImage' node outputs from appearing in the feed.`,
-		defaultValue: false,
-		type: "boolean",
+			id: "pysssss.ImageFeed.SaveNodeOnly",
+			name: "🐍 Image Feed Display 'SaveImage' Only",
+			tooltip: `Only show images from 'SaveImage' nodes. This prevents 'PreviewImage' node outputs from appearing in the feed.`,
+			defaultValue: false,
+			type: "boolean",
 		});
 
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
@@ -541,12 +540,14 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 					const n = app.graph.getNodeById(detail.node.split(":")[0]);
 					if (n?.getInnerNodes) return;
 				}
-				
+
 				// Apply "Display Save Image Node Only" filter if setting is enabled
-					const nodeName = detail.node?.split(":")?.[0];
+				const nodeName = detail.node?.split(":")?.[0];
+				if (nodeName) {
 					const node = app.graph.getNodeById(nodeName);
-				
-				if (saveNodeOnly.value && node?.type !== "SaveImage") return;
+
+					if (saveNodeOnly.value && node?.type !== "SaveImage") return;
+				}
 
 				for (const src of detail.output.images) {
 					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type}&
@@ -561,11 +562,11 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 							// NOOP: image is a duplicate
 						} else {
 							seenImages.set(fingerprint, true);
-							let img = $el("img", { src: href })
+							let img = $el("img", { src: href });
 							img.onerror = () => {
 								// fall back to default behavior
 								addImageToFeed(href);
-							}
+							};
 							img.onload = () => {
 								// redraw the image onto a canvas to strip metadata (resize if performance mode)
 								let imgCanvas = document.createElement("canvas");
@@ -580,7 +581,7 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 								// calculate fast hash of the image data
 								let hash = 0;
 								for (const b of data.data) {
-									hash = ((hash << 5) - hash) + b;
+									hash = (hash << 5) - hash + b;
 								}
 
 								// add image to feed if we've never seen the hash before
@@ -591,7 +592,7 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 									seenImages.set(hash, true);
 									addImageToFeed(href);
 								}
-							}
+							};
 						}
 					} else {
 						addImageToFeed(href);

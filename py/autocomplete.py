@@ -31,7 +31,7 @@ async def save_custom_word_list_url(request):
     return web.Response(status=200)
 
 
-@PromptServer.instance.routes.get("/pysssss/customWordListUrl")
+@PromptServer.instance.routes.get("/pysssss/getCustomWordListUrl")
 async def get_custom_word_list_url(request):
     if os.path.isfile(custom_word_list_file):
         with open(custom_word_list_file, "r", encoding="utf-8") as f:

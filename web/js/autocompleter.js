@@ -179,11 +179,11 @@ class CustomWordsDialog extends ComfyDialog {
 		// Store the url of the custom words list, so we can reload it if needed
 		this.customWordsUrl = "";
 		try {
-			const res0 = await api.fetchApi("/pysssss/customWordListUrl", { cache: "no-store" });
-			if (res0.status !== 200) {
-				throw new Error("Error saving custom word list url: " + res.status + " " + res.statusText);
+			const resGetUrl = await api.fetchApi("/pysssss/getCustomWordListUrl", { cache: "no-store" });
+			if (resGetUrl.status !== 200) {
+				throw new Error("Error fetching custom word list url: " + res.status + " " + res.statusText);
 			} else {
-				this.customWordsUrl = await res0.text();
+				this.customWordsUrl = await resGetUrl.text();
 			}
 		} catch (error) {
 			alert("Error loading custom list url!");
@@ -238,8 +238,8 @@ class CustomWordsDialog extends ComfyDialog {
 									try {
 										// Save custom word list url to file
 										this.customWordsUrl = input.value;
-										const res0 = await api.fetchApi("/pysssss/autocomplete", { method: "POST", body: this.customWordsUrl });
-										if (res0.status !== 200) {
+										const resSaveUrl = await api.fetchApi("/pysssss/saveCustomWordListUrl", { method: "POST", body: this.customWordsUrl });
+										if (resSaveUrl.status !== 200) {
 											throw new Error("Error saving custom word list url: " + res.status + " " + res.statusText);
 										}
 										const res = await fetch(input.value);

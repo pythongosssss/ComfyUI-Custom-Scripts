@@ -176,13 +176,25 @@ class CustomWordsDialog extends ComfyDialog {
 				height: "70vh",
 			},
 		});
+		// Store the url of the custom words list, so we can reload it if needed
+		this.customWordsUrl = "https://gist.githubusercontent.com/pythongosssss/1d3efa6050356a08cea975183088159a/raw/a18fb2f94f9156cf4476b0c24a09544d6c0baec6/danbooru-tags.txt";
+		try {
+			const res0 = await api.fetchApi("/pysssss/autocomplete", { cache: "no-store" });
+			if (res0.status !== 200) {
+				throw new Error("Error saving custom word list url: " + res.status + " " + res.statusText);
+			} else {
+				this.customWordsUrl = await res0.text();
+			}
+		} catch (error) {
+			alert("Error loading custom list url!");
+		}
 
 		const input = $el("input", {
 			style: {
 				flex: "auto",
 			},
 			value:
-				"https://gist.githubusercontent.com/pythongosssss/1d3efa6050356a08cea975183088159a/raw/a18fb2f94f9156cf4476b0c24a09544d6c0baec6/danbooru-tags.txt",
+				this.customWordsUrl,
 		});
 
 		super.show(
@@ -224,6 +236,12 @@ class CustomWordsDialog extends ComfyDialog {
 								textContent: "Load",
 								onclick: async () => {
 									try {
+										// Save custom word list url to file
+										this.customWordsUrl = input.value;
+										const res0 = await api.fetchApi("/pysssss/autocomplete", { method: "POST", body: this.customWordsUrl });
+										if (res0.status !== 200) {
+											throw new Error("Error saving custom word list url: " + res.status + " " + res.statusText);
+										}
 										const res = await fetch(input.value);
 										if (res.status !== 200) {
 											throw new Error("Error loading: " + res.status + " " + res.statusText);
@@ -494,9 +512,9 @@ app.registerExtension({
 							onclick: () => {
 								try {
 									// Try closing old settings window
-									if (typeof app.ui.settings.element?.close === "function") { 
+									if (typeof app.ui.settings.element?.close === "function") {
 										app.ui.settings.element.close();
-									}	
+									}
 								} catch (error) {
 								}
 								try {
@@ -506,7 +524,7 @@ app.registerExtension({
 									// Fallback to just hiding the element
 									app.ui.settings.element.style.display = "none";
 								}
-								
+
 								new CustomWordsDialog().show();
 							},
 							style: {
@@ -549,7 +567,7 @@ app.registerExtension({
 			let loras;
 			try {
 				loras = LiteGraph.registered_node_types["LoraLoader"]?.nodeData.input.required.lora_name[0];
-			} catch (error) {}
+			} catch (error) { }
 
 			if (!loras?.length) {
 				loras = await api.fetchApi("/pysssss/loras", { cache: "no-store" }).then((res) => res.json());

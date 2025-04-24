@@ -177,9 +177,9 @@ class CustomWordsDialog extends ComfyDialog {
 			},
 		});
 		// Store the url of the custom words list, so we can reload it if needed
-		this.customWordsUrl = "https://gist.githubusercontent.com/pythongosssss/1d3efa6050356a08cea975183088159a/raw/a18fb2f94f9156cf4476b0c24a09544d6c0baec6/danbooru-tags.txt";
+		this.customWordsUrl = "";
 		try {
-			const res0 = await api.fetchApi("/pysssss/autocomplete", { cache: "no-store" });
+			const res0 = await api.fetchApi("/pysssss/customWordListUrl", { cache: "no-store" });
 			if (res0.status !== 200) {
 				throw new Error("Error saving custom word list url: " + res.status + " " + res.statusText);
 			} else {

@@ -91,15 +91,11 @@ async function getCWLUrl() {
 		/** @type {string} */
 		let url = await resp.text();
 		return url;
-
 	}
+	
 	return "https://gist.githubusercontent.com/pythongosssss/" +
 		"1d3efa6050356a08cea975183088159a/raw/" +
 		"a18fb2f94f9156cf4476b0c24a09544d6c0baec6/danbooru-tags.txt";
-}
-
-async function insertCWLUrlTo(self) {
-	this.cwlUrl = await getCWLUrl();
 }
 
 /**

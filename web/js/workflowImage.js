@@ -558,7 +558,10 @@ app.registerExtension({
 						const x = config.x;
 						const y = config.y;
 						const domWrapper = this.inputEl.closest(".dom-widget") ?? widget.inputEl;
-						const w = parseInt(domWrapper.style.width);
+						let w = parseInt(domWrapper.style.width);
+						if (w === 0) {
+							w = this.node.size[0] - 20;
+						}
 						const h = parseInt(domWrapper.style.height);
 						ctx.fillStyle = style.getPropertyValue("background-color");
 						ctx.fillRect(x, y, w, h);

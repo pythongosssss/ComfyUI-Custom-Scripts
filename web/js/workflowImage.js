@@ -37,7 +37,7 @@ class WorkflowImage {
 			width: app.canvas.canvas.width,
 			height: app.canvas.canvas.height,
 			offset: app.canvas.ds.offset,
-			transform: app.canvas.canvas.getContext('2d').getTransform(), // Save the original transformation matrix
+			transform: app.canvas.canvas.getContext("2d").getTransform(), // Save the original transformation matrix
 		};
 	}
 
@@ -46,7 +46,7 @@ class WorkflowImage {
 		app.canvas.canvas.width = this.state.width;
 		app.canvas.canvas.height = this.state.height;
 		app.canvas.ds.offset = this.state.offset;
-		app.canvas.canvas.getContext('2d').setTransform(this.state.transform); // Reapply the original transformation matrix
+		app.canvas.canvas.getContext("2d").setTransform(this.state.transform); // Reapply the original transformation matrix
 	}
 
 	updateView(bounds) {
@@ -427,9 +427,10 @@ class SvgWorkflowImage extends WorkflowImage {
 	}
 
 	getDrawTextConfig(_, widget) {
+		const domWrapper = widget.inputEl.closest(".dom-widget") ?? widget.inputEl;
 		return {
-			x: parseInt(widget.inputEl.style.left),
-			y: parseInt(widget.inputEl.style.top),
+			x: parseInt(domWrapper.style.left),
+			y: parseInt(domWrapper.style.top),
 			resetTransform: true,
 		};
 	}
@@ -486,9 +487,7 @@ class SvgWorkflowImage extends WorkflowImage {
 	}
 
 	getBlob(workflow) {
-		let svg = this.svgCtx
-			.getSerializedSvg(true)
-			.replace("<svg ", `<svg style="background: ${app.canvas.clear_background_color}" `);
+		let svg = this.svgCtx.getSerializedSvg(true).replace("<svg ", `<svg style="background: ${app.canvas.clear_background_color}" `);
 
 		if (workflow) {
 			svg = svg.replace("</svg>", `<desc>${SvgWorkflowImage.escapeXml(workflow)}</desc></svg>`);
@@ -558,8 +557,12 @@ app.registerExtension({
 						const style = document.defaultView.getComputedStyle(this.inputEl, null);
 						const x = config.x;
 						const y = config.y;
-						const w = parseInt(this.inputEl.style.width);
-						const h = parseInt(this.inputEl.style.height);
+						const domWrapper = this.inputEl.closest(".dom-widget") ?? widget.inputEl;
+						let w = parseInt(domWrapper.style.width);
+						if (w === 0) {
+							w = this.node.size[0] - 20;
+						}
+						const h = parseInt(domWrapper.style.height);
 						ctx.fillStyle = style.getPropertyValue("background-color");
 						ctx.fillRect(x, y, w, h);
 

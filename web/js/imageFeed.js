@@ -390,6 +390,14 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			type: "boolean",
 		});
 
+		const enableGifs = app.ui.settings.addSetting({
+			id: "pysssss.ImageFeed.EnableGifs",
+			name: "🐍 Image Feed Enable VHS-VideoCombine",
+			tooltip: `Show VHS-VideoCombine node outputs in the image feed.`,
+			defaultValue: false,
+			type: "boolean",
+		});
+
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
 			textContent: "Clear",
 			onclick: () => {
@@ -628,7 +636,7 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 						addImageToFeed(href);
 					}
 				}
-			} else if (detail?.output?.gifs) {
+			} else if (detail?.output?.gifs && enableGifs.value) {
 				if (detail.node?.includes?.(":")) {
 					// Ignore group nodes
 					const n = app.graph.getNodeById(detail.node.split(":")[0]);

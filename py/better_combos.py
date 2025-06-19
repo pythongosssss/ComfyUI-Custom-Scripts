@@ -130,15 +130,28 @@ async def get_images(request):
 
 
 class LoraLoaderWithImages(LoraLoader):
-    RETURN_TYPES = (*LoraLoader.RETURN_TYPES, "STRING")
-    RETURN_NAMES = (
-        *getattr(LoraLoader, "RETURN_NAMES", LoraLoader.RETURN_TYPES), "lora_name")
+    RETURN_TYPES = (*LoraLoader.RETURN_TYPES, "STRING",)
+    RETURN_NAMES = (*getattr(LoraLoader, "RETURN_NAMES",
+                    LoraLoader.RETURN_TYPES), "lora_name")  # Changed "example" to "lora_name"
+
+    @classmethod
+    def INPUT_TYPES(s):
+        types = super().INPUT_TYPES()
+        # Keep the optional prompt input if needed elsewhere, but we won't use it
+        types["optional"] = {"prompt": ("STRING", {"hidden": True})}
+        return types
 
     def load_lora(self, **kwargs):
+        # Get the lora name from the input parameters
         lora_name = kwargs["lora_name"]
+        
+        # Get the base results (model, clip)
         result = super().load_lora(**kwargs)
+        
+        # Return model, clip, and lora_name (replacing the example prompt)
         return (*result, lora_name)
-    
+
+
 class CheckpointLoaderSimpleWithImages(CheckpointLoaderSimple):
     RETURN_TYPES = (*CheckpointLoaderSimple.RETURN_TYPES, "STRING",)
     RETURN_NAMES = (*getattr(CheckpointLoaderSimple, "RETURN_NAMES",

@@ -68,6 +68,10 @@ def get_file(root_dir, file):
         os.mkdir(root_dir)
     full_path = os.path.join(root_dir, file)
 
+    file_dir = os.path.dirname(full_path)
+    if file_dir and not os.path.exists(file_dir):
+        os.makedirs(file_dir, exist_ok=True)
+
     if not is_child_dir(root_dir, full_path):
         raise ReferenceError()
 

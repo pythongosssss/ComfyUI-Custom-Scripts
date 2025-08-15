@@ -1,9 +1,19 @@
 import hashlib
 import json
+import mmap
 from aiohttp import web
 from server import PromptServer
 import folder_paths
 import os
+
+
+async def generate_sha256(path):
+    hasher = hashlib.sha256()
+    with open(path, "rb") as f:
+        with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
+            hasher.update(mm)
+
+    return hasher.hexdigest()
 
 
 def get_metadata(filepath):
@@ -28,7 +38,7 @@ async def save_notes(request):
     name = request.match_info["name"]
     pos = name.index("/")
     type = name[0:pos]
-    name = name[pos+1:]
+    name = name[pos + 1:]
 
     file_path = None
     if type == "embeddings" or type == "loras":
@@ -64,7 +74,7 @@ async def load_metadata(request):
     name = request.match_info["name"]
     pos = name.index("/")
     type = name[0:pos]
-    name = name[pos+1:]
+    name = name[pos + 1:]
 
     file_path = None
     if type == "embeddings" or type == "loras":
@@ -107,8 +117,7 @@ async def load_metadata(request):
         with open(hash_file, "rt") as f:
             meta["pysssss.sha256"] = f.read()
     else:
-        with open(file_path, "rb") as f:
-            meta["pysssss.sha256"] = hashlib.sha256(f.read()).hexdigest()
+        meta["pysssss.sha256"] = await generate_sha256(file_path)
         with open(hash_file, "wt") as f:
             f.write(meta["pysssss.sha256"])
 

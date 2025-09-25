@@ -500,7 +500,7 @@ app.registerExtension({
 							[
 								$el("input", {
 									type: "number",
-									value: +TextAreaAutoComplete.debounceMs || 150,
+									value: +TextAreaAutoComplete.debounceMs || 75,
 									min: 0,
 									step: 10,
 									style: {

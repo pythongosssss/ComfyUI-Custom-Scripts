@@ -390,7 +390,7 @@ export class TextAreaAutoComplete {
 		this.dropdown = $el("div.pysssss-autocomplete");
 		this.overrideWords = words;
 		this.overrideSeparator = separator;
-		this.debouncedUpdate = this.#debounce(this.#update.bind(this), 150);
+		this.debouncedUpdate = this.#debounce(this.#update.bind(this), 75);
 
 		this.#setup();
 	}

@@ -489,6 +489,31 @@ app.registerExtension({
 								}),
 							]
 						),
+						$el(
+							"label",
+							{
+								textContent: "Debounce in ms: ",
+								style: {
+									display: "block",
+								},
+							},
+							[
+								$el("input", {
+									type: "number",
+									value: +TextAreaAutoComplete.debounceMs || 150,
+									min: 0,
+									step: 10,
+									style: {
+										width: "80px"
+									},
+									onchange: (event) => {
+										const value = Math.max(0, +event.target.value || 0);
+										TextAreaAutoComplete.debounceMs = value;
+										localStorage.setItem(id + ".DebounceMs", value);
+									},
+								}),
+							]
+						),
 						$el("button", {
 							textContent: "Manage Custom Words",
 							onclick: () => {
@@ -520,12 +545,13 @@ app.registerExtension({
 			},
 		});
 
-		TextAreaAutoComplete.enabled = enabledSetting.value;
-		TextAreaAutoComplete.replacer = localStorage.getItem(id + ".ReplaceUnderscore") === "true" ? (v) => v.replaceAll("_", " ") : undefined;
-		TextAreaAutoComplete.insertOnTab = localStorage.getItem(id + ".InsertOnTab") !== "false";
-		TextAreaAutoComplete.insertOnEnter = localStorage.getItem(id + ".InsertOnEnter") !== "false";
-		TextAreaAutoComplete.lorasEnabled = localStorage.getItem(id + ".ShowLoras") === "true";
-		TextAreaAutoComplete.suggestionCount = +localStorage.getItem(id + ".SuggestionCount") || 20;
+	TextAreaAutoComplete.enabled = enabledSetting.value;
+	TextAreaAutoComplete.replacer = localStorage.getItem(id + ".ReplaceUnderscore") === "true" ? (v) => v.replaceAll("_", " ") : undefined;
+	TextAreaAutoComplete.insertOnTab = localStorage.getItem(id + ".InsertOnTab") !== "false";
+	TextAreaAutoComplete.insertOnEnter = localStorage.getItem(id + ".InsertOnEnter") !== "false";
+	TextAreaAutoComplete.lorasEnabled = localStorage.getItem(id + ".ShowLoras") === "true";
+	TextAreaAutoComplete.suggestionCount = +localStorage.getItem(id + ".SuggestionCount") || 20;
+	TextAreaAutoComplete.debounceMs = +localStorage.getItem(id + ".DebounceMs") || 75;
 	},
 	setup() {
 		async function addEmbeddings() {

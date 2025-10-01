@@ -270,10 +270,13 @@ class CustomWordsDialog extends ComfyDialog {
 	}
 }
 
-const id = "pysssss.AutoCompleter";
+// Base key used for all localStorage persisted options for backward compatibility
+const baseKey = "pysssss.AutoCompleter";
+// Distinct setting id for the enabled toggle to avoid clashes with other dynamic settings systems
+const settingId = baseKey + ".Enabled";
 
 app.registerExtension({
-	name: id,
+	name: baseKey,
 	init() {
 		const STRING = ComfyWidgets.STRING;
 		const SKIP_WIDGETS = new Set(["ttN xyPlot.x_values", "ttN xyPlot.y_values"]);
@@ -316,16 +319,16 @@ app.registerExtension({
 			return r;
 		};
 
-		TextAreaAutoComplete.globalSeparator = localStorage.getItem(id + ".AutoSeparate") ?? ", ";
+		TextAreaAutoComplete.globalSeparator = localStorage.getItem(baseKey + ".AutoSeparate") ?? ", ";
 		const enabledSetting = app.ui.settings.addSetting({
-			id,
+			id: settingId,
 			name: "🐍 Text Autocomplete",
 			defaultValue: true,
 			type: (name, setter, value) => {
 				return $el("tr", [
 					$el("td", [
 						$el("label", {
-							for: id.replaceAll(".", "-"),
+							for: settingId.replaceAll(".", "-"),
 							textContent: name,
 						}),
 					]),
@@ -340,7 +343,7 @@ app.registerExtension({
 							},
 							[
 								$el("input", {
-									id: id.replaceAll(".", "-"),
+									id: settingId.replaceAll(".", "-"),
 									type: "checkbox",
 									checked: value,
 									onchange: (event) => {
@@ -368,7 +371,7 @@ app.registerExtension({
 										const checked = !!event.target.checked;
 										TextAreaAutoComplete.lorasEnabled = checked;
 										toggleLoras();
-										localStorage.setItem(id + ".ShowLoras", TextAreaAutoComplete.lorasEnabled);
+										localStorage.setItem(baseKey + ".ShowLoras", TextAreaAutoComplete.lorasEnabled);
 									},
 								}),
 							]
@@ -388,7 +391,7 @@ app.registerExtension({
 									onchange: (event) => {
 										const checked = !!event.target.checked;
 										TextAreaAutoComplete.globalSeparator = checked ? ", " : "";
-										localStorage.setItem(id + ".AutoSeparate", TextAreaAutoComplete.globalSeparator);
+										localStorage.setItem(baseKey + ".AutoSeparate", TextAreaAutoComplete.globalSeparator);
 									},
 								}),
 							]
@@ -408,7 +411,7 @@ app.registerExtension({
 									onchange: (event) => {
 										const checked = !!event.target.checked;
 										TextAreaAutoComplete.replacer = checked ? (v) => v.replaceAll("_", " ") : undefined;
-										localStorage.setItem(id + ".ReplaceUnderscore", checked);
+										localStorage.setItem(baseKey + ".ReplaceUnderscore", checked);
 									},
 								}),
 							]
@@ -438,7 +441,7 @@ app.registerExtension({
 											onchange: (event) => {
 												const checked = !!event.target.checked;
 												TextAreaAutoComplete.insertOnTab = checked;
-												localStorage.setItem(id + ".InsertOnTab", checked);
+												localStorage.setItem(baseKey + ".InsertOnTab", checked);
 											},
 										}),
 									]
@@ -459,7 +462,7 @@ app.registerExtension({
 											onchange: (event) => {
 												const checked = !!event.target.checked;
 												TextAreaAutoComplete.insertOnEnter = checked;
-												localStorage.setItem(id + ".InsertOnEnter", checked);
+												localStorage.setItem(baseKey + ".InsertOnEnter", checked);
 											},
 										}),
 									]
@@ -484,7 +487,7 @@ app.registerExtension({
 									onchange: (event) => {
 										const value = +event.target.value;
 										TextAreaAutoComplete.suggestionCount = value;;
-										localStorage.setItem(id + ".SuggestionCount", TextAreaAutoComplete.suggestionCount);
+										localStorage.setItem(baseKey + ".SuggestionCount", TextAreaAutoComplete.suggestionCount);
 									},
 								}),
 							]
@@ -509,7 +512,7 @@ app.registerExtension({
 									onchange: (event) => {
 										const value = Math.max(0, +event.target.value || 0);
 										TextAreaAutoComplete.debounceMs = value;
-										localStorage.setItem(id + ".DebounceMs", value);
+										localStorage.setItem(baseKey + ".DebounceMs", value);
 									},
 								}),
 							]
@@ -545,13 +548,13 @@ app.registerExtension({
 			},
 		});
 
-	TextAreaAutoComplete.enabled = enabledSetting.value;
-	TextAreaAutoComplete.replacer = localStorage.getItem(id + ".ReplaceUnderscore") === "true" ? (v) => v.replaceAll("_", " ") : undefined;
-	TextAreaAutoComplete.insertOnTab = localStorage.getItem(id + ".InsertOnTab") !== "false";
-	TextAreaAutoComplete.insertOnEnter = localStorage.getItem(id + ".InsertOnEnter") !== "false";
-	TextAreaAutoComplete.lorasEnabled = localStorage.getItem(id + ".ShowLoras") === "true";
-	TextAreaAutoComplete.suggestionCount = +localStorage.getItem(id + ".SuggestionCount") || 20;
-	TextAreaAutoComplete.debounceMs = +localStorage.getItem(id + ".DebounceMs") || 75;
+	TextAreaAutoComplete.enabled = enabledSetting?.value ?? true;
+	TextAreaAutoComplete.replacer = localStorage.getItem(baseKey + ".ReplaceUnderscore") === "true" ? (v) => v.replaceAll("_", " ") : undefined;
+	TextAreaAutoComplete.insertOnTab = localStorage.getItem(baseKey + ".InsertOnTab") !== "false";
+	TextAreaAutoComplete.insertOnEnter = localStorage.getItem(baseKey + ".InsertOnEnter") !== "false";
+	TextAreaAutoComplete.lorasEnabled = localStorage.getItem(baseKey + ".ShowLoras") === "true";
+	TextAreaAutoComplete.suggestionCount = +localStorage.getItem(baseKey + ".SuggestionCount") || 20;
+	TextAreaAutoComplete.debounceMs = +localStorage.getItem(baseKey + ".DebounceMs") || 75;
 	},
 	setup() {
 		async function addEmbeddings() {

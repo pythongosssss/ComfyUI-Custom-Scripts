@@ -106,7 +106,7 @@ const ext = {
 		const origDrawNode = LGraphCanvas.prototype.drawNode;
 		LGraphCanvas.prototype.drawNode = function (node, ctx) {
 			const enabled = guide_config.lines.enabled || guide_config.block.enabled;
-			if (enabled && this.node_dragged && node.id in this.selected_nodes && snapToGridEnabled()) {
+			if (enabled && this.isDragging && node.id in this.selected_nodes && snapToGridEnabled()) {
 				// discretize the canvas into grid
 				let x = LiteGraph.CANVAS_GRID_SIZE * Math.round(node.pos[0] / LiteGraph.CANVAS_GRID_SIZE);
 				let y = LiteGraph.CANVAS_GRID_SIZE * Math.round(node.pos[1] / LiteGraph.CANVAS_GRID_SIZE);

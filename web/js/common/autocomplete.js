@@ -356,6 +356,9 @@ export class TextAreaAutoComplete {
 	static replacer = undefined;
 	static lorasEnabled = false;
 	static suggestionCount = 20;
+	static promptDelimiters = ',;"|{}()\n';
+	static #cachedRegex = null;
+	static #lastDelimiters = "";
 
 	/** @type {Record<string, Record<string, AutoCompleteEntry>>} */
 	static groups = {};
@@ -536,15 +539,33 @@ export class TextAreaAutoComplete {
 	#update() {
 		let before = this.helper.getBeforeCursor();
 		if (before?.length) {
-			const m = before.match(/([^,;"|{}()\n]+)$/);
-			if (m) {
-				before = m[0]
-					.replace(/^\s+/, "")
-					.replace(/\s/g, "_") || null;
-			} else {
-				before = null;
-			}
-		}
+      // Get delimiters from config or fallback to default
+      const delims = TextAreaAutoComplete.promptDelimiters || ',;"|{}()\\n';
+      
+			// Re-new regex if delimiters have changed
+      if (delims !== TextAreaAutoComplete.#lastDelimiters) {
+        try {
+          const safeDelims = delims.replace(/]/g, '\\]');
+          TextAreaAutoComplete.#cachedRegex = new RegExp(`([^${safeDelims}]+)$`);
+          TextAreaAutoComplete.#lastDelimiters = delims;
+        } catch (e) {
+          console.error("Regex compilation failed:", e);
+          TextAreaAutoComplete.#cachedRegex = null;
+        }
+      }
+
+      if (TextAreaAutoComplete.#cachedRegex) {
+        const match = before.match(TextAreaAutoComplete.#cachedRegex);
+        if (match) {
+          // Normalize: remove leading space and convert interior spaces to underscores
+          before = match[0].replace(/^\s+/, "").replace(/\s/g, "_") || null;
+        } else {
+          before = null;
+        }
+      } else {
+        before = null;
+      }
+    }
 
 		if (!before) {
 			this.#hide();

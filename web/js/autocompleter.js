@@ -310,7 +310,7 @@ app.registerExtension({
 					}
 				}
 
-				new TextAreaAutoComplete(r.widget.inputEl, words, separator);
+				new TextAreaAutoComplete(r.widget.inputEl ?? r.widget.element, words, separator);
 			}
 
 			return r;

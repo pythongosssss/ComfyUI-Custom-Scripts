@@ -544,7 +544,8 @@ app.registerExtension({
 				const draw = w.widget.draw;
 				w.widget.draw = function (ctx) {
 					draw.apply(this, arguments);
-					if (this.inputEl.hidden) return;
+					const inputEl = this.inputEl ?? this.element;
+					if (!inputEl || inputEl.hidden) return;
 
 					if (getDrawTextConfig) {
 						const config = getDrawTextConfig(ctx, this);
@@ -554,10 +555,10 @@ app.registerExtension({
 							ctx.resetTransform();
 						}
 
-						const style = document.defaultView.getComputedStyle(this.inputEl, null);
+						const style = document.defaultView.getComputedStyle(inputEl, null);
 						const x = config.x;
 						const y = config.y;
-						const domWrapper = this.inputEl.closest(".dom-widget") ?? widget.inputEl;
+						const domWrapper = inputEl.closest(".dom-widget") ?? inputEl;
 						let w = parseInt(domWrapper.style.width);
 						if (w === 0) {
 							w = this.node.size[0] - 20;
@@ -570,7 +571,7 @@ app.registerExtension({
 						ctx.font = style.getPropertyValue("font");
 
 						const line = t.d * 12;
-						const split = this.inputEl.value.split("\n");
+						const split = inputEl.value.split("\n");
 						let start = y;
 						for (const l of split) {
 							start += line;

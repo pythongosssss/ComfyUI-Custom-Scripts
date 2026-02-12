@@ -482,8 +482,32 @@ app.registerExtension({
 									},
 									onchange: (event) => {
 										const value = +event.target.value;
-										TextAreaAutoComplete.suggestionCount = value;;
+										TextAreaAutoComplete.suggestionCount = value;
 										localStorage.setItem(id + ".SuggestionCount", TextAreaAutoComplete.suggestionCount);
+									},
+								}),
+							]
+						),
+						$el(
+							"label",
+							{
+								textContent: "Prompt delimiters: ",
+								style: {
+									display: "block",
+								},
+							},
+							[
+								$el("input", {
+									type: "text",
+									value: TextAreaAutoComplete.promptDelimiters,
+									style: {
+										width: "80px",
+										fontFamily: "monospace"
+									},
+									onchange: (event) => {
+										const delimiters = event.target.value;
+										TextAreaAutoComplete.promptDelimiters = delimiters;
+										localStorage.setItem(id + ".PromptDelimiters", TextAreaAutoComplete.promptDelimiters);
 									},
 								}),
 							]
@@ -525,6 +549,7 @@ app.registerExtension({
 		TextAreaAutoComplete.insertOnEnter = localStorage.getItem(id + ".InsertOnEnter") !== "false";
 		TextAreaAutoComplete.lorasEnabled = localStorage.getItem(id + ".ShowLoras") === "true";
 		TextAreaAutoComplete.suggestionCount = +localStorage.getItem(id + ".SuggestionCount") || 20;
+		TextAreaAutoComplete.promptDelimiters = localStorage.getItem(id + ".PromptDelimiters") || ',;\"|{}()\n';
 	},
 	setup() {
 		async function addEmbeddings() {

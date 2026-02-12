@@ -326,7 +326,6 @@ app.registerExtension({
 					$el("td", [
 						$el("label", {
 							for: id.replaceAll(".", "-"),
-							textContent: name,
 						}),
 					]),
 					$el("td", [

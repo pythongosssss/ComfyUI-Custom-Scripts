@@ -38,7 +38,7 @@ def get_ext_dir(subpath=None, mkdir=False):
     dir = os.path.abspath(dir)
 
     if mkdir and not os.path.exists(dir):
-        os.makedirs(dir)
+        os.makedirs(dir, exist_ok=True)
     return dir
 
 
@@ -50,7 +50,7 @@ def get_comfy_dir(subpath=None, mkdir=False):
     dir = os.path.abspath(dir)
 
     if mkdir and not os.path.exists(dir):
-        os.makedirs(dir)
+        os.makedirs(dir, exist_ok=True)
     return dir
 
 
@@ -59,7 +59,7 @@ def get_web_ext_dir():
     name = config["name"]
     dir = get_comfy_dir("web/extensions/pysssss")
     if not os.path.exists(dir):
-        os.makedirs(dir)
+        os.makedirs(dir, exist_ok=True)
     dir = os.path.join(dir, name)
     return dir
 

@@ -121,7 +121,7 @@ async def get_images(request):
 
         file_path_no_ext = os.path.splitext(file_path)[0]
 
-        for ext in ["png", "jpg", "jpeg", "preview.png", "preview.jpeg"]:
+        for ext in ["png", "jpg", "jpeg", "webp", "preview.png", "preview.jpeg", "preview.webp"]:
             if os.path.isfile(file_path_no_ext + "." + ext):
                 images[item_name] = f"{type}/{file_name}.{ext}"
                 break

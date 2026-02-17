@@ -390,6 +390,14 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			type: "boolean",
 		});
 
+		const enableGifs = app.ui.settings.addSetting({
+			id: "pysssss.ImageFeed.EnableGifs",
+			name: "🐍 Image Feed Enable VHS-VideoCombine",
+			tooltip: `Show VHS-VideoCombine node outputs in the image feed.`,
+			defaultValue: false,
+			type: "boolean",
+		});
+
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
 			textContent: "Clear",
 			onclick: () => {
@@ -423,12 +431,26 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			window.dispatchEvent(new Event("resize"));
 		}
 
-		function addImageToFeed(href) {
+		function addImageToFeed(href, isVideo = false) {
 			const method = feedDirection.value === "newest first" ? "prepend" : "append";
 
 			if (maxImages.value > 0 && imageList.children.length >= maxImages.value) {
 				imageList.children[method === "prepend" ? imageList.children.length - 1 : 0].remove();
 			}
+
+			const mediaElement = isVideo ? 
+				$el("video", { 
+					src: href, 
+					controls: true,
+					loop: true,
+					muted: true,
+					style: {
+						maxWidth: "100%",
+						maxHeight: "calc(var(--max-size) * 1vh)",
+						borderRadius: "4px"
+					}
+				}) :
+				$el("img", { src: href });
 
 			imageList[method](
 				$el("div", [
@@ -438,17 +460,23 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 							target: "_blank",
 							href,
 							onclick: (e) => {
+								if (isVideo) {
+									// For videos, just open in new tab
+									return true;
+								}
 								const imgs = [...imageList.querySelectorAll("img")].map((img) => img.getAttribute("src"));
 								lightbox.show(imgs, imgs.indexOf(href));
 								e.preventDefault();
 							},
 						},
-						[$el("img", { src: href })]
+						[mediaElement]
 					),
 				])
 			);
-			// If lightbox is open, update it with new image
-			lightbox.updateWithNewImage(href, feedDirection.value);
+			// If lightbox is open, update it with new image (skip for videos)
+			if (!isVideo) {
+				lightbox.updateWithNewImage(href, feedDirection.value);
+			}
 		}
 
 		imageFeed.append(
@@ -533,20 +561,30 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			hideButton.onclick();
 		}
 
+		function isVideoFormat(filename) {
+			return filename && filename.match(/\.(mp4|webm|mov|avi|mkv)$/i);
+		}
+
+		function isAnimatedImageFormat(filename) {
+			return filename && filename.match(/\.(gif|webp|apng)$/i);
+		}
+
 		api.addEventListener("executed", ({ detail }) => {
-			if (visible && detail?.output?.images) {
+			if (!visible) return;
+
+			// Apply "Display Save Image Node Only" filter if setting is enabled
+			const nodeName = detail.node?.split(":")?.[0];
+			if (nodeName) {
+				const node = app.graph.getNodeById(nodeName);
+
+				if (saveNodeOnly.value && node?.type !== "SaveImage") return;
+			}
+
+			if (detail?.output?.images) {
 				if (detail.node?.includes?.(":")) {
 					// Ignore group nodes
 					const n = app.graph.getNodeById(detail.node.split(":")[0]);
 					if (n?.getInnerNodes) return;
-				}
-
-				// Apply "Display Save Image Node Only" filter if setting is enabled
-				const nodeName = detail.node?.split(":")?.[0];
-				if (nodeName) {
-					const node = app.graph.getNodeById(nodeName);
-
-					if (saveNodeOnly.value && node?.type !== "SaveImage") return;
 				}
 
 				for (const src of detail.output.images) {
@@ -596,6 +634,39 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 						}
 					} else {
 						addImageToFeed(href);
+					}
+				}
+			} else if (detail?.output?.gifs && enableGifs.value) {
+				if (detail.node?.includes?.(":")) {
+					// Ignore group nodes
+					const n = app.graph.getNodeById(detail.node.split(":")[0]);
+					if (n?.getInnerNodes) return;
+				}
+
+				// Filter displayable formats and determine display method
+				const displayableGifs = detail.output.gifs.filter(gif => {
+					const filename = gif.filename;
+					// Show GIFs, WebP, and APNG as images; videos as video elements
+					return isAnimatedImageFormat(filename) || isVideoFormat(filename);
+				});
+
+				for (const src of displayableGifs) {
+					const href = `./view?filename=${encodeURIComponent(src.filename)}&type=${src.type}&subfolder=${encodeURIComponent(src.subfolder)}&t=${+new Date()}`;
+					
+					// Use video element for actual video formats, image for animated images
+					const useVideoElement = isVideoFormat(src.filename);
+					
+					if (deduplicateFeed.value > 0) {
+						// Deduplicate by filename/type/subfolder for gifs
+						const fingerprint = JSON.stringify({ filename: src.filename, type: src.type, subfolder: src.subfolder });
+						if (seenImages.has(fingerprint)) {
+							// NOOP: duplicate
+						} else {
+							seenImages.set(fingerprint, true);
+							addImageToFeed(href, useVideoElement);
+						}
+					} else {
+						addImageToFeed(href, useVideoElement);
 					}
 				}
 			}

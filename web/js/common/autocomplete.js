@@ -390,8 +390,17 @@ export class TextAreaAutoComplete {
 		this.dropdown = $el("div.pysssss-autocomplete");
 		this.overrideWords = words;
 		this.overrideSeparator = separator;
+		this.debouncedUpdate = this.#debounce(this.#update.bind(this), 75);
 
 		this.#setup();
+	}
+
+	#debounce(func, delay) {
+		let timeout;
+		return (...args) => {
+			clearTimeout(timeout);
+			timeout = setTimeout(() => func.apply(this, args), delay);
+		};
 	}
 
 	#setup() {
@@ -457,7 +466,7 @@ export class TextAreaAutoComplete {
 		}
 
 		if (!e.defaultPrevented) {
-			this.#update();
+			this.debouncedUpdate();
 		}
 	}
 
@@ -475,7 +484,7 @@ export class TextAreaAutoComplete {
 			return;
 		}
 		if (!e.defaultPrevented) {
-			this.#update();
+			this.debouncedUpdate();
 		}
 	}
 

@@ -1,79 +1,194 @@
 import { app } from "../../../scripts/app.js";
 import { api } from "../../../scripts/api.js";
 
-// Adds a menu option to toggle follow the executing node
-// Adds a menu option to go to the currently executing node
-// Adds a menu option to go to a node by type
-
 app.registerExtension({
 	name: "pysssss.NodeFinder",
 	setup() {
 		let followExecution = false;
+		let focusTimeoutId = null;
 
-		const centerNode = (id) => {
-			if (!followExecution || !id) return;
-			const node = app.graph.getNodeById(id);
-			if (!node) return;
-			app.canvas.centerOnNode(node);
+		const findNodePath = (targetNode, graph = app.graph, path =[]) => {
+			for (const node of graph.nodes) {
+				if (node === targetNode) {
+					return [...path, node.graph];
+				}
+				if (node.subgraph) {
+					const found = findNodePath(targetNode, node.subgraph, [...path, node.graph]);
+					if (found) {
+						return found;
+					}
+				}
+			}
+			return null;
 		};
 
-		api.addEventListener("executing", ({ detail }) => centerNode(detail));
+		const focusNode = (node) => {
+			if (!node) return;
 
-		// Add canvas menu options
-		const orig = LGraphCanvas.prototype.getCanvasMenuOptions;
+			const centerOnNodeAction = () => {
+				app.canvas.centerOnNode(node);
+			};
+
+			if (app.canvas.graph !== node.graph) {
+				const path = findNodePath(node);
+				if (path) {
+					app.canvas.setGraph(app.graph);
+					for (let i = 1; i < path.length; i++) {
+						app.canvas.openSubgraph(path[i]);
+					}
+				}
+				setTimeout(centerOnNodeAction, 0);
+			} else {
+				centerOnNodeAction();
+			}
+		};
+
+		const findNodeByExecutionId = (id) => {
+			if (!id) return null;
+			const path = String(id).split(":");
+			let currentGraph = app.graph;
+			let node = null;
+
+			for (let i = 0; i < path.length; i++) {
+				node = currentGraph.getNodeById(Number(path[i]));
+				if (!node) return null;
+				if (i < path.length - 1) {
+					if (!node.subgraph) return null;
+					currentGraph = node.subgraph;
+				}
+			}
+			return node;
+		};
+
+		const centerExecutionNode = (id) => {
+			if (!followExecution || !id) return;
+
+			if (focusTimeoutId) {
+				clearTimeout(focusTimeoutId);
+			}
+
+			focusTimeoutId = setTimeout(() => {
+				focusNode(findNodeByExecutionId(id));
+				focusTimeoutId = null;
+			}, 50); 
+		};
+
+		api.addEventListener("executing", ({ detail }) => centerExecutionNode(detail));
+
+		const origDrawNode = LGraphCanvas.prototype.drawNode;
+		LGraphCanvas.prototype.drawNode = function (node, ctx) {
+			origDrawNode.apply(this, arguments);
+
+			let isRunning = false;
+			if (app.runningNodeId) {
+				const runningIdPath = String(app.runningNodeId).split(":");
+				if (Number(runningIdPath[runningIdPath.length - 1]) === node.id) {
+					if (findNodeByExecutionId(app.runningNodeId) === node) {
+						isRunning = true;
+					}
+				}
+			}
+
+			const isError = (node.color === "#FF0000" || node.bgcolor === "#FF0000" || node.has_errors);
+
+			if (isRunning || isError) {
+				ctx.save();
+				ctx.lineWidth = 6;
+				ctx.strokeStyle = isError ? "#FF0000" : "#00FF00";
+				
+				const titleHeight = LiteGraph.NODE_TITLE_HEIGHT || 30;
+				const isCollapsed = node.flags && node.flags.collapsed;
+				
+				// If collapsed, only frame the title bar. Otherwise, frame the whole node.
+				const boxWidth = node._collapsed_width || node.size[0];
+				const boxHeight = isCollapsed ? titleHeight : node.size[1] + titleHeight;
+
+				if (ctx.roundRect) {
+					ctx.beginPath();
+					ctx.roundRect(0, -titleHeight, boxWidth, boxHeight, 8);
+					ctx.stroke();
+				} else {
+					ctx.strokeRect(0, -titleHeight, boxWidth, boxHeight);
+				}
+				ctx.restore();
+			}
+		};
+
+		const buildGraphMenu = (graph, activeGraph) => {
+			const nodes = graph._nodes || graph.nodes ||[];
+			const types = {};
+			const subgraphs =[];
+
+			for (const n of nodes) {
+				if (n.subgraph) {
+					subgraphs.push(n);
+				} else {
+					if (!types[n.type]) types[n.type] = [];
+					types[n.type].push(n);
+				}
+			}
+
+			const options =[];
+
+			subgraphs.sort((a, b) => a.pos[0] - b.pos[0]).forEach((n) => {
+				const isCurrentGraph = n.subgraph === activeGraph;
+				const prefix = isCurrentGraph ? "* " : "";
+				const subOptions =[
+					{ content: `↳ Go to this Subgraph node`, callback: () => focusNode(n) },
+					null,
+					...buildGraphMenu(n.subgraph, activeGraph)
+				];
+
+				options.push({
+					content: `${prefix}[SUBGRAPH] (#${n.id}) ${n.getTitle()}`,
+					has_submenu: true,
+					submenu: { options: subOptions }
+				});
+			});
+
+			Object.keys(types).sort().forEach((t) => {
+				options.push({
+					content: t,
+					has_submenu: true,
+					submenu: {
+						options: types[t]
+							.sort((a, b) => a.pos[0] - b.pos[0])
+							.map((n) => ({
+								content: `${n.getTitle()} - #${n.id} (${Math.round(n.pos[0])}, ${Math.round(n.pos[1])})`,
+								callback: () => focusNode(n),
+							})),
+					},
+				});
+			});
+
+			return options;
+		};
+
+		const origGetCanvasMenuOptions = LGraphCanvas.prototype.getCanvasMenuOptions;
 		LGraphCanvas.prototype.getCanvasMenuOptions = function () {
-			const options = orig.apply(this, arguments);
+			const options = origGetCanvasMenuOptions.apply(this, arguments);
+
 			options.push(null, {
 				content: followExecution ? "Stop following execution" : "Follow execution",
 				callback: () => {
 					if ((followExecution = !followExecution)) {
-						centerNode(app.runningNodeId);
+						centerExecutionNode(app.runningNodeId);
 					}
 				},
 			});
+
 			if (app.runningNodeId) {
 				options.push({
 					content: "Show executing node",
-					callback: () => {
-						const node = app.graph.getNodeById(app.runningNodeId);
-						if (!node) return;
-						app.canvas.centerOnNode(node);
-					},
+					callback: () => focusNode(findNodeByExecutionId(app.runningNodeId)),
 				});
 			}
 
-			const nodes = app.graph._nodes;
-			const types = nodes.reduce((p, n) => {
-				if (n.type in p) {
-					p[n.type].push(n);
-				} else {
-					p[n.type] = [n];
-				}
-				return p;
-			}, {});
+			const isRootActive = app.canvas.graph === app.graph;
 			options.push({
-				content: "Go to node",
+				content: `${isRootActive ? "* " : ""}Go to node`,
 				has_submenu: true,
-				submenu: {
-					options: Object.keys(types)
-						.sort()
-						.map((t) => ({
-							content: t,
-							has_submenu: true,
-							submenu: {
-								options: types[t]
-									.sort((a, b) => {
-										return a.pos[0] - b.pos[0];
-									})
-									.map((n) => ({
-										content: `${n.getTitle()} - #${n.id} (${n.pos[0]}, ${n.pos[1]})`,
-										callback: () => {
-											app.canvas.centerOnNode(n);
-										},
-									})),
-							},
-						})),
-				},
+				submenu: { options: buildGraphMenu(app.graph, app.canvas.graph) },
 			});
 
 			return options;

@@ -179,8 +179,8 @@ class MathExpression:
             return operators[type(node.op)](l, r)
 
         def eval_expr(node):
-            if isinstance(node, ast.Constant) or isinstance(node, ast.Num):
-                return node.n
+            if isinstance(node, ast.Constant) or isinstance(node, ast.Constant):
+                return node.value
             elif isinstance(node, ast.BinOp):
                 return eval_op(node, node.left, node.right)
             elif isinstance(node, ast.BoolOp):

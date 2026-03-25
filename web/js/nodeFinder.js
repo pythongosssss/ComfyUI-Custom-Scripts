@@ -12,7 +12,16 @@ app.registerExtension({
 
 		const centerNode = (id) => {
 			if (!followExecution || !id) return;
-			const node = app.graph.getNodeById(id);
+			// Subgraph node IDs are formatted as "parentId:nodeId"
+			// Try the canvas's current graph first (may be a subgraph), then root graph
+			const parts = String(id).split(":");
+			const graphs = [app.canvas.graph, app.graph].filter(Boolean);
+			const candidates = [id, parts[0], parts[parts.length - 1]];
+			let node = null;
+			for (const graph of graphs) {
+				node = candidates.reduce((found, cid) => found || graph.getNodeById(cid), null);
+				if (node) break;
+			}
 			if (!node) return;
 			app.canvas.centerOnNode(node);
 		};
@@ -35,7 +44,15 @@ app.registerExtension({
 				options.push({
 					content: "Show executing node",
 					callback: () => {
-						const node = app.graph.getNodeById(app.runningNodeId);
+						const id = app.runningNodeId;
+						const parts = String(id).split(":");
+						const graphs = [app.canvas.graph, app.graph].filter(Boolean);
+						const candidates = [id, parts[0], parts[parts.length - 1]];
+						let node = null;
+						for (const graph of graphs) {
+							node = candidates.reduce((found, cid) => found || graph.getNodeById(cid), null);
+							if (node) break;
+						}
 						if (!node) return;
 						app.canvas.centerOnNode(node);
 					},

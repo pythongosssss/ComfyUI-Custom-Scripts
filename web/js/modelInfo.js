@@ -300,6 +300,11 @@ class CheckpointInfoDialog extends ModelInfoDialog {
 }
 
 const lookups = {};
+const modelInfoTypes = {
+	Lora: { folderType: "loras", infoClass: LoraInfoDialog },
+	Checkpoint: { folderType: "checkpoints", infoClass: CheckpointInfoDialog },
+	"Diffusion Model": { folderType: "diffusion_models", infoClass: CheckpointInfoDialog },
+};
 
 function addInfoOption(node, type, infoClass, widgetNamePattern, opts) {
 	const widgets = widgetNamePattern
@@ -326,12 +331,14 @@ function addInfoOption(node, type, infoClass, widgetNamePattern, opts) {
 }
 
 function addTypeOptions(node, typeName, options) {
-	const type = typeName.toLowerCase() + "s";
+	const typeInfo = modelInfoTypes[typeName];
+	if (!typeInfo) return;
+
+	const { folderType: type, infoClass: cls } = typeInfo;
 	const values = lookups[typeName][node.type];
 	if (!values) return;
 
 	const widgets = Object.keys(values);
-	const cls = type === "loras" ? LoraInfoDialog : CheckpointInfoDialog;
 
 	const opts = [];
 	for (const w of widgets) {
@@ -357,9 +364,9 @@ function addTypeOptions(node, typeName, options) {
 app.registerExtension({
 	name: "pysssss.ModelInfo",
 	setup() {
-		const addSetting = (type, defaultValue) => {
+		const addSetting = (type, defaultValue, idType = type) => {
 			app.ui.settings.addSetting({
-				id: `pysssss.ModelInfo.${type}Nodes`,
+				id: `pysssss.ModelInfo.${idType}Nodes`,
 				name: `🐍 Model Info - ${type} Nodes/Widgets`,
 				type: "text",
 				defaultValue,
@@ -384,6 +391,7 @@ app.registerExtension({
 			"Checkpoint",
 			["CheckpointLoader.ckpt_name", "CheckpointLoaderSimple", "CheckpointLoader|pysssss", "Efficient Loader", "Eff. Loader SDXL"].join(",")
 		);
+		addSetting("Diffusion Model", ["UNETLoader.unet_name", "UNETLoader|pysssss"].join(","), "DiffusionModel");
 
 		app.ui.settings.addSetting({
 			id: `pysssss.ModelInfo.NsfwLevel`,

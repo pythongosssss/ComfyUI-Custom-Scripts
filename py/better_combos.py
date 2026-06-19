@@ -1,6 +1,6 @@
 import glob
 import os
-from nodes import LoraLoader, CheckpointLoaderSimple
+from nodes import LoraLoader, CheckpointLoaderSimple, UNETLoader
 import folder_paths
 from server import PromptServer
 from folder_paths import get_directory_by_type
@@ -161,12 +161,18 @@ class CheckpointLoaderSimpleWithImages(CheckpointLoaderSimple):
         return (*super().load_checkpoint(**kwargs), prompt)
 
 
+class UNETLoaderWithImages(UNETLoader):
+    pass
+
+
 NODE_CLASS_MAPPINGS = {
     "LoraLoader|pysssss": LoraLoaderWithImages,
     "CheckpointLoader|pysssss": CheckpointLoaderSimpleWithImages,
+    "UNETLoader|pysssss": UNETLoaderWithImages,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "LoraLoader|pysssss": "Lora Loader 🐍",
     "CheckpointLoader|pysssss": "Checkpoint Loader 🐍",
+    "UNETLoader|pysssss": "Load Diffusion Model 🐍",
 }

@@ -5,6 +5,7 @@ import { api } from "../../../scripts/api.js";
 
 const CHECKPOINT_LOADER = "CheckpointLoader|pysssss";
 const LORA_LOADER = "LoraLoader|pysssss";
+const DIFFUSION_MODEL_LOADER = "UNETLoader|pysssss";
 const IMAGE_WIDTH = 384;
 const IMAGE_HEIGHT = 384;
 
@@ -12,11 +13,28 @@ function getType(node) {
 	if (node.comfyClass === CHECKPOINT_LOADER) {
 		return "checkpoints";
 	}
+	if (node.comfyClass === DIFFUSION_MODEL_LOADER) {
+		return "diffusion_models";
+	}
 	return "loras";
 }
 
 function getWidgetName(type) {
-	return type === "checkpoints" ? "ckpt_name" : "lora_name";
+	if (type === "checkpoints") {
+		return "ckpt_name";
+	}
+	if (type === "diffusion_models") {
+		return "unet_name";
+	}
+	return "lora_name";
+}
+
+function isImageLoader(node) {
+	return node?.comfyClass === LORA_LOADER || node?.comfyClass === CHECKPOINT_LOADER || node?.comfyClass === DIFFUSION_MODEL_LOADER;
+}
+
+function hasExamples(nodeData) {
+	return nodeData.name === LORA_LOADER || nodeData.name === CHECKPOINT_LOADER;
 }
 
 function encodeRFC3986URIComponent(str) {
@@ -74,7 +92,7 @@ app.registerExtension({
 		const displayOptions = { "List (normal)": 0, "Tree (subfolders)": 1, "Thumbnails (grid)": 2 };
 		const displaySetting = app.ui.settings.addSetting({
 			id: "pysssss.Combo++.Submenu",
-			name: "🐍 Lora & Checkpoint loader display mode",
+			name: "🐍 Model loader display mode",
 			defaultValue: 1,
 			type: "combo",
 			options: (value) => {
@@ -157,15 +175,14 @@ app.registerExtension({
 			`,
 			parent: document.body,
 		});
-		const p1 = loadImageList("checkpoints");
-		const p2 = loadImageList("loras");
+		const modelTypes = ["checkpoints", "loras", "diffusion_models"];
+		const modelLists = Promise.all(modelTypes.map((type) => loadImageList(type)));
 
 		const refreshComboInNodes = app.refreshComboInNodes;
 		app.refreshComboInNodes = async function () {
 			const r = await Promise.all([
 				refreshComboInNodes.apply(this, arguments),
-				loadImageList("checkpoints").catch(() => {}),
-				loadImageList("loras").catch(() => {}),
+				...modelTypes.map((type) => loadImageList(type).catch(() => {})),
 			]);
 			return r[0];
 		};
@@ -192,8 +209,7 @@ app.registerExtension({
 
 		const updateMenu = async (menu, type) => {
 			try {
-				await p1;
-				await p2;
+				await modelLists;
 			} catch (error) {
 				console.error(error);
 				console.error("Error loading pysssss.betterCombos data");
@@ -365,7 +381,7 @@ app.registerExtension({
 		const mutationObserver = new MutationObserver((mutations) => {
 			const node = app.canvas.current_node;
 
-			if (!node || (node.comfyClass !== LORA_LOADER && node.comfyClass !== CHECKPOINT_LOADER)) {
+			if (!isImageLoader(node)) {
 				return;
 			}
 
@@ -395,14 +411,15 @@ app.registerExtension({
 		mutationObserver.observe(document.body, { childList: true, subtree: false });
 	},
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
-		const isCkpt = nodeData.name === CHECKPOINT_LOADER;
-		const isLora = nodeData.name === LORA_LOADER;
-		if (isCkpt || isLora) {
+		if (hasExamples(nodeData)) {
 			const onAdded = nodeType.prototype.onAdded;
 			nodeType.prototype.onAdded = function () {
 				onAdded?.apply(this, arguments);
 				const { widget: exampleList } = ComfyWidgets["COMBO"](this, "example", [[""], {}], app);
-				this.widgets.find((w) => w.name === "prompt").computeSize = () => [0, -4];
+				const promptWidget = this.widgets.find((w) => w.name === "prompt");
+				if (promptWidget) {
+					promptWidget.computeSize = () => [0, -4];
+				}
 				let exampleWidget;
 
 				const get = async (route, suffix) => {
@@ -500,7 +517,7 @@ app.registerExtension({
 					img = this.imgs[this.overIndex];
 				}
 				if (img) {
-					const nodes = app.graph._nodes.filter((n) => n.comfyClass === LORA_LOADER || n.comfyClass === CHECKPOINT_LOADER);
+					const nodes = app.graph._nodes.filter((n) => isImageLoader(n));
 					if (nodes.length) {
 						options.unshift({
 							content: "Save as Preview",

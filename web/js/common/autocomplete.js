@@ -4,16 +4,16 @@ import { addStylesheet } from "./utils.js";
 addStylesheet(import.meta.url);
 
 /*
-    https://github.com/component/textarea-caret-position
-    The MIT License (MIT)
+	https://github.com/component/textarea-caret-position
+	The MIT License (MIT)
 
-    Copyright (c) 2015 Jonathan Ong me@jongleberry.com
+	Copyright (c) 2015 Jonathan Ong me@jongleberry.com
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+	The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 const getCaretCoordinates = (function () {
 	// We'll copy the properties below into the mirror div.
@@ -140,10 +140,12 @@ const getCaretCoordinates = (function () {
 		span.textContent = element.value.substring(position) || "."; // || because a completely empty faux span doesn't render at all
 		div.appendChild(span);
 
+		const lineHeight = Math.ceil(parseFloat(computed["lineHeight"]));
+
 		var coordinates = {
 			top: span.offsetTop + parseInt(computed["borderTopWidth"]),
 			left: span.offsetLeft + parseInt(computed["borderLeftWidth"]),
-			height: parseInt(computed["lineHeight"]),
+			height: lineHeight,
 		};
 
 		if (debug) {
@@ -157,19 +159,19 @@ const getCaretCoordinates = (function () {
 })();
 
 /*
-    Key functions from:
-    https://github.com/yuku/textcomplete
-    © Yuku Takahashi - This software is licensed under the MIT license.
+	Key functions from:
+	https://github.com/yuku/textcomplete
+	© Yuku Takahashi - This software is licensed under the MIT license.
 
-    The MIT License (MIT)
+	The MIT License (MIT)
 
-    Copyright (c) 2015 Jonathan Ong me@jongleberry.com
+	Copyright (c) 2015 Jonathan Ong me@jongleberry.com
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+	The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 const CHAR_CODE_ZERO = "0".charCodeAt(0);
 const CHAR_CODE_NINE = "9".charCodeAt(0);
@@ -613,29 +615,29 @@ export class TextAreaAutoComplete {
 			const item = $el(
 				"div.pysssss-autocomplete-item",
 				{
-				  onclick: () => {
-					this.el.focus();
-					let value = wordInfo.value ?? wordInfo.text;
-					const use_replacer = wordInfo.use_replacer ?? true;
-					if (TextAreaAutoComplete.replacer && use_replacer) {
-					  value = TextAreaAutoComplete.replacer(value);
-					}
-					value = this.#escapeParentheses(value);
-					
-					const afterCursor = this.helper.getAfterCursor();
-					const shouldAddSeparator = !afterCursor.trim().startsWith(this.separator.trim());
-					this.helper.insertAtCursor(
-					  value + (shouldAddSeparator ? this.separator : ''),
-					  -before.length,
-					  wordInfo.caretOffset
-					);			
-					setTimeout(() => {
-					  this.#update();
-					}, 150);
-				  },
+					onclick: () => {
+						this.el.focus();
+						let value = wordInfo.value ?? wordInfo.text;
+						const use_replacer = wordInfo.use_replacer ?? true;
+						if (TextAreaAutoComplete.replacer && use_replacer) {
+							value = TextAreaAutoComplete.replacer(value);
+						}
+						value = this.#escapeParentheses(value);
+
+						const afterCursor = this.helper.getAfterCursor();
+						const shouldAddSeparator = !afterCursor.trim().startsWith(this.separator.trim());
+						this.helper.insertAtCursor(
+							value + (shouldAddSeparator ? this.separator : ''),
+							-before.length,
+							wordInfo.caretOffset
+						);
+						setTimeout(() => {
+							this.#update();
+						}, 150);
+					},
 				},
 				parts
-			  );
+			);
 
 			if (wordInfo === this.selected) {
 				hasSelected = true;
@@ -662,7 +664,7 @@ export class TextAreaAutoComplete {
 
 	#escapeParentheses(text) {
 		return text.replace(/\(/g, '\\(').replace(/\)/g, '\\)');
-	  }
+	}
 
 	#hide() {
 		this.selected = null;

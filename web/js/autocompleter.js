@@ -6,6 +6,10 @@ import { TextAreaAutoComplete } from "./common/autocomplete.js";
 import { ModelInfoDialog } from "./common/modelInfoDialog.js";
 import { LoraInfoDialog } from "./modelInfo.js";
 
+const DEFAULT_CWL_URL = "https://gist.githubusercontent.com/pythongosssss/" +
+	"1d3efa6050356a08cea975183088159a/raw/" +
+	"a18fb2f94f9156cf4476b0c24a09544d6c0baec6/danbooru-tags.txt";
+
 function parseCSV(csvText) {
 	const rows = [];
 	const delimiter = ",";
@@ -83,6 +87,30 @@ async function getCustomWords() {
 		return await resp.text();
 	}
 	return undefined;
+}
+
+/**
+ * 获取自定义词的URL
+ * @returns {string} 
+ */
+async function getCWLUrl() {
+	const resp = await api.fetchApi("/pysssss/cwlUrl", { cache: "no-store" });
+	if (resp.status === 200) {
+		/** @type {string} */
+		let url = await resp.text();
+		return url;
+	}
+
+	return DEFAULT_CWL_URL;
+}
+
+/**
+ * 将自定义词的URL保存到服务器
+ * @param {string} url 
+ */
+async function saveCWLUrl(url) {
+	const resp = await api.fetchApi("/pysssss/cwlUrl", { method: "POST", body: url });
+	return resp.status === 200;
 }
 
 async function addCustomWords(text) {
@@ -177,12 +205,13 @@ class CustomWordsDialog extends ComfyDialog {
 			},
 		});
 
-		const input = $el("input", {
+		this.cwlUrl = await getCWLUrl();
+
+		this.input = $el("input", {
 			style: {
 				flex: "auto",
 			},
-			value:
-				"https://gist.githubusercontent.com/pythongosssss/1d3efa6050356a08cea975183088159a/raw/a18fb2f94f9156cf4476b0c24a09544d6c0baec6/danbooru-tags.txt",
+			value: this.cwlUrl,
 		});
 
 		super.show(
@@ -219,17 +248,21 @@ class CustomWordsDialog extends ComfyDialog {
 						},
 						[
 							$el("label", { textContent: "Load Custom List: " }),
-							input,
+							this.input,
 							$el("button", {
 								textContent: "Load",
 								onclick: async () => {
 									try {
-										const res = await fetch(input.value);
-										if (res.status !== 200) {
-											throw new Error("Error loading: " + res.status + " " + res.statusText);
+										this.cwlUrl = this.input.value || DEFAULT_CWL_URL;
+										if (!await saveCWLUrl(this.cwlUrl)) {
+											throw new Error("Error saving URL!");
 										}
+										const res = await api.fetchApi("/pysssss/getWordList", {
+											method: "POST", cache: "no-store", body: app.extensionManager.setting.get(`${id}.Proxies`)
+										});
 										this.words.value = await res.text();
 									} catch (error) {
+										console.error(error);
 										alert("Error loading custom list, try manually copy + pasting the list");
 									}
 								},
@@ -249,6 +282,10 @@ class CustomWordsDialog extends ComfyDialog {
 			textContent: "Save",
 			onclick: async (e) => {
 				try {
+					this.cwlUrl = this.input.value;
+					if (!await saveCWLUrl(this.cwlUrl)) {
+						throw new Error("Error saving URL!");
+					}
 					const res = await api.fetchApi("/pysssss/autocomplete", { method: "POST", body: this.words.value });
 					if (res.status !== 200) {
 						throw new Error("Error saving: " + res.status + " " + res.statusText);
@@ -259,7 +296,6 @@ class CustomWordsDialog extends ComfyDialog {
 						save.textContent = "Save";
 					}, 500);
 				} catch (error) {
-					alert("Error saving word list!");
 					console.error(error);
 				}
 			},
@@ -274,6 +310,15 @@ const id = "pysssss.AutoCompleter";
 
 app.registerExtension({
 	name: id,
+	settings: [
+		{
+			id: `${id}.Proxies`,
+			name: "Proxies",
+			type: "text",
+			defaultValue: "",
+			tooltip: "http://<addr>:<port>"
+		}
+	],
 	init() {
 		const STRING = ComfyWidgets.STRING;
 		const SKIP_WIDGETS = new Set(["ttN xyPlot.x_values", "ttN xyPlot.y_values"]);
@@ -494,9 +539,9 @@ app.registerExtension({
 							onclick: () => {
 								try {
 									// Try closing old settings window
-									if (typeof app.ui.settings.element?.close === "function") { 
+									if (typeof app.ui.settings.element?.close === "function") {
 										app.ui.settings.element.close();
-									}	
+									}
 								} catch (error) {
 								}
 								try {
@@ -506,7 +551,7 @@ app.registerExtension({
 									// Fallback to just hiding the element
 									app.ui.settings.element.style.display = "none";
 								}
-								
+
 								new CustomWordsDialog().show();
 							},
 							style: {
@@ -549,7 +594,7 @@ app.registerExtension({
 			let loras;
 			try {
 				loras = LiteGraph.registered_node_types["LoraLoader"]?.nodeData.input.required.lora_name[0];
-			} catch (error) {}
+			} catch (error) { }
 
 			if (!loras?.length) {
 				loras = await api.fetchApi("/pysssss/loras", { cache: "no-store" }).then((res) => res.json());

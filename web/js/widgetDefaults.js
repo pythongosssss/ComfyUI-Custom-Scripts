@@ -6,10 +6,18 @@ import { $el, ComfyDialog } from "../../../scripts/ui.js";
 const id = "pysssss.WidgetDefaults";
 const nodeDataKey = Symbol();
 
+// Newer frontends create a separate graph per workflow tab, so the onNodeAdded
+// hook has to be installed on each graph rather than once on app.graph.
+const hookedGraphs = new WeakSet();
+let hookGraph;
+
 app.registerExtension({
 	name: id,
 	beforeRegisterNodeDef(nodeType, nodeData) {
 		nodeType[nodeDataKey] = nodeData;
+	},
+	beforeConfigureGraph() {
+		hookGraph?.(app.graph);
 	},
 	setup() {
 		let defaults;
@@ -91,39 +99,45 @@ app.registerExtension({
 			return items;
 		};
 
-		const onNodeAdded = app.graph.onNodeAdded;
-		app.graph.onNodeAdded = function (node) {
-			onNodeAdded?.apply?.(this, arguments);
+		hookGraph = (graph) => {
+			if (hookedGraphs.has(graph)) return;
+			hookedGraphs.add(graph);
 
-			// See if we have any defaults for this type of node
-			const nodeDefaults = getNodeDefaults(node.constructor, defaults);
-			if (!nodeDefaults) return;
+			const onNodeAdded = graph.onNodeAdded;
+			graph.onNodeAdded = function (node) {
+				onNodeAdded?.apply?.(this, arguments);
 
-			// Dont run if they are pre-configured nodes from load/pastes
-			const stack = new Error().stack;
-			if (stack.includes("pasteFromClipboard") || stack.includes("loadGraphData")) {
-				return;
-			}
+				// See if we have any defaults for this type of node
+				const nodeDefaults = getNodeDefaults(node.constructor, defaults);
+				if (!nodeDefaults) return;
 
-			for (const k in nodeDefaults) {
-				if (k.startsWith("property.")) {
-					const name = k.substring(9);
-					let v = nodeDefaults[k];
-					// Special handling for some built in values
-					if (name in node || ["color", "bgcolor", "title"].includes(name)) {
-						node[name] = v;
-					} else {
-						// Try using the correct type
-						if (!node.properties) node.properties = {};
-						if (typeof node.properties[name] === "number") v = +v;
-						else if (typeof node.properties[name] === "boolean") v = v === "true";
-						else if (v === "true") v = true;
+				// Dont run if they are pre-configured nodes from load/pastes
+				const stack = new Error().stack;
+				if (stack.includes("pasteFromClipboard") || stack.includes("loadGraphData")) {
+					return;
+				}
 
-						node.properties[name] = v;
+				for (const k in nodeDefaults) {
+					if (k.startsWith("property.")) {
+						const name = k.substring(9);
+						let v = nodeDefaults[k];
+						// Special handling for some built in values
+						if (name in node || ["color", "bgcolor", "title"].includes(name)) {
+							node[name] = v;
+						} else {
+							// Try using the correct type
+							if (!node.properties) node.properties = {};
+							if (typeof node.properties[name] === "number") v = +v;
+							else if (typeof node.properties[name] === "boolean") v = v === "true";
+							else if (v === "true") v = true;
+
+							node.properties[name] = v;
+						}
 					}
 				}
-			}
+			};
 		};
+		hookGraph(app.graph);
 
 		class WidgetDefaultsDialog extends ComfyDialog {
 			constructor() {

@@ -1,5 +1,6 @@
 import { app } from "../../../scripts/app.js";
 import { $el, ComfyDialog } from "../../../scripts/ui.js";
+import { closeGlobalSettings, placeSettingRow } from "./settingsHost.js";
 
 // Allows you to specify custom default values for any widget on any node
 
@@ -257,7 +258,7 @@ app.registerExtension({
 			id,
 			name: "🐍 Widget Defaults",
 			type: () => {
-				return $el("tr", [
+				return placeSettingRow($el("tr", [
 					$el("td", [
 						$el("label", {
 							for: id.replaceAll(".", "-"),
@@ -268,19 +269,7 @@ app.registerExtension({
 						$el("button", {
 							textContent: "Manage",
 							onclick: () => {
-								try {
-									// Try closing old settings window
-									if (typeof app.ui.settings.element?.close === "function") {
-										app.ui.settings.element.close();
-									}
-								} catch (error) {}
-								try {
-									// Try closing new vue dialog
-									document.querySelector(".p-dialog-close-button").click();
-								} catch (error) {
-									// Fallback to just hiding the element
-									app.ui.settings.element.style.display = "none";
-								}
+								closeGlobalSettings();
 								const dialog = new WidgetDefaultsDialog();
 								dialog.show();
 							},
@@ -289,7 +278,7 @@ app.registerExtension({
 							},
 						}),
 					]),
-				]);
+				]));
 			},
 		});
 		defaults = getDefaults();

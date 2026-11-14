@@ -1,5 +1,6 @@
 import { app } from "../../../scripts/app.js";
 import { $el } from "../../../scripts/ui.js";
+import { placeSettingRow } from "./settingsHost.js";
 
 const id = "pysssss.LinkRenderMode";
 const ext = {
@@ -14,7 +15,7 @@ const ext = {
 			name: "🐍 Link Render Mode",
 			defaultValue: 2,
 			type: () => {
-				return $el("tr", [
+				return placeSettingRow($el("tr", [
 					$el("td", [
 						$el("label", {
 							for: id.replaceAll(".", "-"),
@@ -44,7 +45,7 @@ const ext = {
 							)
 						),
 					]),
-				]);
+				]));
 			},
 			onChange(value) {
 				app.canvas.links_render_mode = +value;

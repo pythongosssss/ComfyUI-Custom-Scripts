@@ -1,6 +1,7 @@
 import { api } from "../../../scripts/api.js";
 import { app } from "../../../scripts/app.js";
 import { $el } from "../../../scripts/ui.js";
+import { placeSettingRow } from "./settingsHost.js";
 import { lightbox } from "./common/lightbox.js";
 
 $el("style", {
@@ -268,7 +269,7 @@ app.registerExtension({
 			name: "🐍 Image Feed Location",
 			defaultValue: "bottom",
 			type: () => {
-				return $el("tr", [
+				return placeSettingRow($el("tr", [
 					$el("td", [
 						$el("label", {
 							textContent: "🐍 Image Feed Location:",
@@ -298,7 +299,7 @@ app.registerExtension({
 							)
 						),
 					]),
-				]);
+				]));
 			},
 			onChange(value) {
 				if (value === "hidden") {
@@ -323,7 +324,7 @@ app.registerExtension({
 			name: "🐍 Image Feed Direction",
 			defaultValue: "newest first",
 			type: () => {
-				return $el("tr", [
+				return placeSettingRow($el("tr", [
 					$el("td", [
 						$el("label", {
 							textContent: "🐍 Image Feed Direction:",
@@ -350,7 +351,7 @@ app.registerExtension({
 							)
 						),
 					]),
-				]);
+				]));
 			},
 		});
 

@@ -1,5 +1,6 @@
 import { app } from "../../../scripts/app.js";
 import { $el } from "../../../scripts/ui.js";
+import { placeSettingRow } from "./settingsHost.js";
 
 let guide_config;
 const id = "pysssss.SnapToGrid.Guide";
@@ -26,7 +27,7 @@ const ext = {
 			id,
 			name: "🐍 Display drag-and-drop guides",
 			type: (name, setter, value) => {
-				return $el("tr", [
+				return placeSettingRow($el("tr", [
 					$el("td", [
 						$el("label", {
 							for: id.replaceAll(".", "-"),
@@ -93,7 +94,7 @@ const ext = {
 							]
 						),
 					]),
-				]);
+				]));
 			}
 		});
 
